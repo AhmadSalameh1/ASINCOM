@@ -40,6 +40,8 @@ Modes
                 "replay" : the players' recorded decisions are replayed: production orders (all products) on their
                            conversion days with recorded quantities and recipes, POs on their creation days with
                            recorded quantities. Validates the physics (DR-3); lead times remain sampled.
+                "controller" : an external controller object makes the three real decisions each day
+                           (model/twin/controllers.py): production-order conversions, POs, transfers to DCs
   push_rule     "lag1"     : output is held one day at the plant and then shipped in full (recorded: transfers
                              correlate 0.72 with the previous day's output, 0.12 with the same day's)
                 "fraction" : a fixed daily fraction of plant stock is shipped (fitted; superseded)
@@ -62,13 +64,16 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
         self.mrp_timing, self.dc_split, self.policy = mrp_timing, dc_split, policy
         self._changeover_days = changeover_days
         self.scenario = scenario or {}
+        self.controller = controller
+        if policy == "controller" and controller is None:
+            raise ValueError("policy='controller' needs a controller object")
         self.rec_orders = defaultdict(list)
         for o in inp["recorded_production_orders"] + inp["other_production_orders"]:
             self.rec_orders[o["day"]].append(o)
@@ -200,7 +205,7 @@ class Twin:
             if e:
                 blocked = p["qty"] * e["block_share"]
                 self.blocked[p["material"]] += blocked
-                if self.policy == "replay" and blocked > 0:
+                if self.policy in ("replay", "controller") and blocked > 0:
                     # minimal reaction of the accepted MRP replica (rule R5): blocked stock is not available, so
                     # the net requirement rises by the blocked quantity and a replacement PO is placed today
                     self._new_po(p["material"], blocked, day, quality_exempt=True)
@@ -301,6 +306,16 @@ class Twin:
             self.dc[t["dc"]] += t["qty"]
 
     def _push(self, carried):
+        if self.policy == "controller":
+            plan = self.controller.transfers(self, self.today, carried) or {}
+            sent = 0.0
+            for d in DCS:
+                q = max(0.0, min(plan.get(d, 0.0), self.plant - sent))
+                if q > 0:
+                    self._to_dc(d, q)
+                    sent += q
+            self.plant -= sent
+            return sent
         if self.push_rule == "replay":
             sent = 0.0
             for t in self.rec_transfers.get(self.today, []):
@@ -392,6 +407,14 @@ class Twin:
     def _decide(self, day):
         if self.policy == "replay":
             return self._decide_replay(day)
+        if self.policy == "controller":
+            created = [{"product": p, "qty": q, "remaining": q, "recipe": r, "day": day}
+                       for p, q, r in self.controller.production_orders(self, day)]
+            self.queue.extend(created)
+            pos = self.controller.purchase_orders(self, day)
+            for m, q in pos:
+                self._new_po(m, q, day)
+            return bool(created or pos), len(created)
         run_for = []
         for u in self.updates.get(day, []):
             if u["material"] in self.planning_products:
@@ -439,7 +462,9 @@ class Twin:
             self._arrivals()
             received = self._receipts(day)
             carried = self.plant
+            before = dict(self.comp)
             out_f12, out_other = self._produce()
+            self.last_consumption = {c: before[c] - self.comp[c] for c in self.components}
             sent = self._push(carried)
             sold, lost = self._sales(day)
             for d in DCS:
