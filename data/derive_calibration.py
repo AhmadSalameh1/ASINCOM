@@ -274,7 +274,11 @@ def derive(tb, ev):
                 f"{int(promo.sum())} F12 items removed"))
     log.append(("C2 applied to demand", "F12 order items outside the steady window",
                 f"{int((~window).sum())} of {len(prod)} items excluded from demand statistics"))
-    out["order_qty"] = summary(base.KWMENG)
+    # a customer order can hold several F12 lines (1-5); demand is the order total
+    per_order = base.groupby("VBELN").KWMENG.sum()
+    out["order_qty"] = summary(per_order)
+    out["order_qty_per_line"] = summary(base.KWMENG)
+    out["lines_per_order"] = {int(k): int(v) for k, v in base.groupby("VBELN").size().value_counts().sort_index().items()}
     orders = base.drop_duplicates("VBELN").sort_values("gday")
     gaps = orders.groupby("KUNNR").gday.diff().dropna()
     out["inter_order_days"] = summary(gaps) | {"shifted_gamma_fit": shifted_gamma(gaps)}
@@ -444,8 +448,10 @@ LEDGER = [
      "VBAK.BSTNK (game day), VBAP", "per-customer gaps between F12 orders, steady months, promotions excluded"),
     ("D2", "Customer inter-order time, shifted-gamma fit (shift, shape, scale)",
      lambda d: d["inter_order_days"]["shifted_gamma_fit"], "as D1", "method of moments"),
-    ("D3", "Order size (units), mean / median", lambda d: f'{d["order_qty"]["mean"]} / {d["order_qty"]["median"]}',
-     "VBAP.KWMENG", "F12 items, steady months, promotions excluded"),
+    ("D3", "Order size per customer order (units), mean / median", lambda d: f'{d["order_qty"]["mean"]} / {d["order_qty"]["median"]}',
+     "VBAP.KWMENG summed per VBELN", "F12 lines of one order summed; steady months, promotions excluded"),
+    ("D5", "F12 lines per customer order (lines: orders)", lambda d: d["lines_per_order"],
+     "VBAP per VBELN", "orders hold 1-5 F12 lines"),
     ("D4", "Demand level (units per game day), mean", lambda d: d["daily_units_steady"]["mean"],
      "VBAP.KWMENG by game day", "steady months"),
     ("L1", "Lead time food ingredients (game days), q05 / median / q95",
@@ -521,7 +527,7 @@ LEDGER = [
 #   unobserved - not recorded in the data; must be assumed and varied
 #   context    - cleaning or validation information, not a model parameter
 CLASS = {"S1": "anchored", "S2": "anchored", "S3": "anchored (run-specific recipe)",
-         "D1": "bounded", "D2": "bounded", "D3": "bounded", "D4": "bounded (price and mix driven)",
+         "D1": "bounded", "D2": "bounded", "D3": "bounded", "D5": "bounded", "D4": "bounded (price and mix driven)",
          "L1": "bounded", "L2": "bounded", "P1": "policy", "P2": "policy",
          "M1": "policy", "M2": "bounded", "M3": "policy", "M4": "policy", "M5": "bounded",
          "M6": "bounded", "M7": "context", "M8": "bounded (background load)",

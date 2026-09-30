@@ -1,1 +1,2 @@
 __pycache__/
+model/twin/results/*.csv.gz

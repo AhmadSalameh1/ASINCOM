@@ -91,6 +91,8 @@ The three group-2 runs are combined in one place only: the year-to-year spread s
 
 **Would be overturned by:** Phase D validation failing to reproduce F12 queue and flow times on fraud 2 or fraud 3. If that happens, move to full multi-product detail.
 
+**Update (Phase C):** the three-product MRP replica showed that component purchasing depends on **all** products' plans (`docs/policy_acceptance.md`, rule R4). The twin therefore plans F16 and F15 at the **planning level**: their own replayed forecasts, replayed sales, total stock and MRP, still without customers or DCs (`docs/twin.md`). The decision stands: F12 is the only product modelled end to end. The representation of the other products is upgraded from "line load only" to "line load plus planning".
+
 **Remaining risk:** in a *material-shortage* disruption on a shared component (wheat, oats, packaging), other products' consumption can become binding. For those scenarios, add the other products' component consumption (their BOM × their production) as a second background load. The data supports this, since the BOMs of F15, F16 and F13 are known.
 
 ---

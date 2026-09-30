@@ -29,7 +29,7 @@ Both must implement exactly what is written here. A cross-check script compares 
 | Plant finished-goods stock (F12) | `I_plant` | B14, B15 |
 | 3 DCs d ∈ {North, South, West} | `I_d` | B5, B14, C1 |
 | 71 customers k, each with a fixed DC d(k) | next order day | S1, S2, B5 |
-| Other products (F16, F15) | line-occupying orders only | DR-2, M8 |
+| Other products (F16, F15) | planning level: open forecast, total stock, their orders on the shared line | DR-2 (updated), M8, rule R4 |
 
 **Initial state:** all stocks 0, no open orders (B16).
 
@@ -39,7 +39,8 @@ Both must implement exactly what is written here. A cross-check script compares 
 - Split receipts occur only in scrap events (B8). They are a disruption mechanism, not part of nominal operation.
 
 ### 3.2 Production (shared line)
-- Released orders are processed first-in, first-out on one line at up to **24,000 units per day** (M6, B12). An order occupies the line for `ceil(qty / 24,000)` days, and output accrues daily (B12).
+- Released orders are processed first-in, first-out on one serial line at up to **24,000 units per day** (M6, B12). An order ending mid-day hands over to the next.
+- **An order starts only when components for its whole batch are in stock** (78 of 78 recorded starts), and **a product switch costs one idle day** (recorded gap between orders: median 1 day on a switch, 0 otherwise). This is line rule `erpsim` in the twin (`docs/twin.md`).
 - On each production day, the F12 output `q` consumes `BOM_c × q` of each component c (S3, B11). If a component is short, output is limited to what the components allow.
   - This is never binding in steady operation (K1). It is kept so that material-shortage disruptions act correctly.
 - Other products' orders occupy the line with their own batch sizes (M8). They consume no F12 components (DR-2). Adding their shared-component use is a switch for material-shortage scenarios.
