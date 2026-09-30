@@ -7,6 +7,15 @@ One step = one game day (DR-1). Order of events within a day (spec section 1):
   4. customer orders and sales (sale = min(order, DC stock), excess lost; B2-B4)
   5. decisions                 (forecast updates -> MRP for production and purchasing; policy rules R1-R6)
 
+Disruptions (Phase E, docs/disruptions.md) are injected through `scenario`, a dict with optional keys:
+  line_down      : [[start, end], ...]                   production line unavailable (days inclusive)
+  supplier_delay : {"window": [s, e], "relative": r, "materials": [...] | None}
+                   POs created in the window arrive ceil(r x sampled lead) days later
+  quality        : {"window": [s, e], "block_share": b, "extra_delay": d, "materials": [...] | None}
+                   receipts due in the window lose share b (blocked) and the rest arrives d days late
+  demand         : {"window": [s, e], "factor": f}       customer order quantities multiplied by f
+  transit        : {"window": [s, e], "days": k}         plant -> DC shipments leaving in the window arrive k days later
+
 The twin knows nothing about SAP: everything comes from an input file built by
 data/build_twin_inputs.py. Quantities are real units (the UPPAAL model divides by 100).
 
@@ -53,12 +62,13 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
         self.mrp_timing, self.dc_split, self.policy = mrp_timing, dc_split, policy
         self._changeover_days = changeover_days
+        self.scenario = scenario or {}
         self.rec_orders = defaultdict(list)
         for o in inp["recorded_production_orders"] + inp["other_production_orders"]:
             self.rec_orders[o["day"]].append(o)
@@ -117,11 +127,37 @@ class Twin:
         self.next_order = {c["id"]: c["first_order_day"] for c in self.inp["customers"]}
         self.dc_of = {c["id"]: c["dc"] for c in self.inp["customers"]}
         self.log = []
+        self.in_transit = []
+        self.blocked = defaultdict(float)
         self.order_log = []
         self.today = None
         self.last_product = None
         self.changeover_left = 0
         self.changeover_days = self._changeover_days
+
+    # ------------------------------------------------------------------ disruptions
+    @staticmethod
+    def _in(window, day):
+        return window is not None and window[0] <= day <= window[1]
+
+    def _applies(self, key, day, material=None):
+        e = self.scenario.get(key)
+        if not e or not self._in(e.get("window"), day):
+            return None
+        mats = e.get("materials")
+        if material is not None and mats and material not in mats:
+            return None
+        return e
+
+    def _new_po(self, material, qty, day, lead=None, quality_exempt=False):
+        lead = self._lead(material) if lead is None else lead
+        e = self._applies("supplier_delay", day, material)
+        if e:
+            lead += math.ceil(e["relative"] * lead)
+        po = {"material": material, "qty": qty, "due": day + lead}
+        if quality_exempt:
+            po["quality_done"] = True     # a replacement delivery is not blocked again (observed events are single)
+        self.open_pos.append(po)
 
     # ------------------------------------------------------------------ helpers
     def _gap(self):
@@ -157,16 +193,34 @@ class Twin:
     # ------------------------------------------------------------------ day steps
     def _receipts(self, day):
         due = [p for p in self.open_pos if p["due"] <= day]
-        for p in due:
-            self.comp[p["material"]] += p["qty"]
         self.open_pos = [p for p in self.open_pos if p["due"] > day]
-        return sum(p["qty"] for p in due)
+        got = 0.0
+        for p in due:
+            e = None if p.get("quality_done") else self._applies("quality", day, p["material"])
+            if e:
+                blocked = p["qty"] * e["block_share"]
+                self.blocked[p["material"]] += blocked
+                if self.policy == "replay" and blocked > 0:
+                    # minimal reaction of the accepted MRP replica (rule R5): blocked stock is not available, so
+                    # the net requirement rises by the blocked quantity and a replacement PO is placed today
+                    self._new_po(p["material"], blocked, day, quality_exempt=True)
+                rest = p["qty"] - blocked
+                if e.get("extra_delay", 0) > 0:
+                    self.open_pos.append({"material": p["material"], "qty": rest, "due": day + e["extra_delay"],
+                                          "quality_done": True})
+                    continue
+                p = dict(p, qty=rest)
+            self.comp[p["material"]] += p["qty"]
+            got += p["qty"]
+        return got
 
     def _can_start(self, o):
         return all(self.comp[c] + 1e-6 >= r * o["remaining"] for c, r in o["recipe"].items() if r > 0)
 
     def _produce(self):
         cap, out_f12, out_other = self.cap, 0.0, 0.0
+        if any(self._in(w, self.today) for w in self.scenario.get("line_down", [])):
+            return out_f12, out_other
         if self.line_rule == "erpsim":
             # changeover = capacity lost when the line switches product (in units, may span days)
             used = min(self.changeover_left, cap)
@@ -233,13 +287,26 @@ class Twin:
                 i += 1
         return out_f12, out_other
 
+    def _to_dc(self, d, q):
+        e = self._applies("transit", self.today)
+        if e:
+            self.in_transit.append({"dc": d, "qty": q, "due": self.today + e["days"]})
+        else:
+            self.dc[d] += q
+
+    def _arrivals(self):
+        arrived = [t for t in self.in_transit if t["due"] <= self.today]
+        self.in_transit = [t for t in self.in_transit if t["due"] > self.today]
+        for t in arrived:
+            self.dc[t["dc"]] += t["qty"]
+
     def _push(self, carried):
         if self.push_rule == "replay":
             sent = 0.0
             for t in self.rec_transfers.get(self.today, []):
                 q = min(t["qty"], self.plant - sent)
                 if q > 0:
-                    self.dc[t["dc"]] += q
+                    self._to_dc(t["dc"], q)
                     sent += q
             self.plant -= sent
             return sent
@@ -260,15 +327,19 @@ class Twin:
             tot = sum(alloc.values()) or 1.0
             for i, d in enumerate(DCS):
                 q = (ship - sent) if i == len(DCS) - 1 else math.floor(ship * alloc[d] / tot)
-                self.dc[d] += q
+                self._to_dc(d, q)
                 sent += q
         else:
             for i, d in enumerate(DCS):
                 q = (ship - sent) if i == len(DCS) - 1 else math.floor(ship * self.push["dc_shares"].get(d, 0))
-                self.dc[d] += q
+                self._to_dc(d, q)
                 sent += q
         self.plant -= sent
         return sent
+
+    def _demand_factor(self, day):
+        e = self._applies("demand", day)
+        return e["factor"] if e else 1.0
 
     def _sales(self, day):
         sold, lost = defaultdict(float), defaultdict(float)
@@ -277,16 +348,17 @@ class Twin:
                 dc = self.dc_of.get(o["customer"])
                 if dc is None:
                     continue
-                s = min(o["qty"], self.dc[dc])
+                qty = o["qty"] * self._demand_factor(day)
+                s = min(qty, self.dc[dc])
                 self.dc[dc] -= s
                 sold[dc] += s
-                lost[dc] += o["qty"] - s
+                lost[dc] += qty - s
             return sold, lost
         for k, nd in self.next_order.items():
             if nd != day:
                 continue
             dc = self.dc_of[k]
-            q = self._qty()
+            q = self._qty() * self._demand_factor(day)
             s = min(q, self.dc[dc])
             self.dc[dc] -= s
             sold[dc] += s
@@ -311,8 +383,10 @@ class Twin:
                    for o in self.rec_orders.get(day, [])]
         self.queue.extend(created)
         for p_ in self.rec_pos.get(day, []):
-            due = day + 1 if p_.get("pre_start") else day + self._lead(p_["material"])   # initial stock at start
-            self.open_pos.append({"material": p_["material"], "qty": p_["qty"], "due": due})
+            if p_.get("pre_start"):                                                       # initial stock at start
+                self.open_pos.append({"material": p_["material"], "qty": p_["qty"], "due": day + 1})
+            else:
+                self._new_po(p_["material"], p_["qty"], day)
         return bool(created or self.rec_pos.get(day)), len(created)
 
     def _decide(self, day):
@@ -354,7 +428,7 @@ class Twin:
                 if net > 1e-6:
                     r = self.inp["po_rounding"][c]
                     q = math.ceil(round(net, 6) / r) * r
-                    self.open_pos.append({"material": c, "qty": q, "due": day + self._lead(c)})
+                    self._new_po(c, q, day)
         return mrp, len(created)
 
     # ------------------------------------------------------------------ run
@@ -362,6 +436,7 @@ class Twin:
         first, last = self.inp["days"]["first"], self.inp["days"]["last"]
         for day in range(first - 1, last + 1):
             self.today = day
+            self._arrivals()
             received = self._receipts(day)
             carried = self.plant
             out_f12, out_other = self._produce()

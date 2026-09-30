@@ -1,0 +1,85 @@
+{
+  "usaid_scms": {
+    "shipments": 10324,
+    "share_late": 0.1149,
+    "delay_days_if_late": {
+      "q50": 12.0,
+      "q75": 24.75,
+      "q90": 51.0,
+      "q95": 70.0,
+      "mean": 21.369,
+      "n": 1186
+    },
+    "shipments_with_planned_lead": 4254,
+    "relative_delay_if_late": {
+      "q50": 0.124,
+      "q75": 0.372,
+      "q90": 0.746,
+      "q95": 0.963,
+      "mean": 0.313,
+      "n": 255
+    },
+    "share_late_by_mode": {
+      "Air": 0.096,
+      "Air Charter": 0.1154,
+      "Ocean": 0.1752,
+      "Truck": 0.1608
+    }
+  },
+  "dataco": {
+    "order_items": 180519,
+    "share_late": 0.5728,
+    "late_delivery_risk_flag_mean": 0.5483,
+    "excess_days_if_late": {
+      "q50": 1.0,
+      "q75": 2.0,
+      "q90": 3.0,
+      "q95": 4.0,
+      "mean": 1.617,
+      "n": 103400
+    },
+    "relative_excess_if_late": {
+      "q50": 0.5,
+      "q75": 1.0,
+      "q90": 1.5,
+      "q95": 2.0,
+      "mean": 0.8,
+      "n": 98743
+    },
+    "days_observed": 1127,
+    "demand_surge": {
+      "threshold": "> 1.5 x rolling 28-day median",
+      "share_of_days": 0.0,
+      "episodes": 0,
+      "episode_length_days": {
+        "q50": NaN,
+        "q75": NaN,
+        "q90": NaN,
+        "q95": NaN,
+        "mean": NaN,
+        "n": 0
+      },
+      "size_ratio_on_surge_days": {
+        "q50": NaN,
+        "q75": NaN,
+        "q90": NaN,
+        "q95": NaN,
+        "mean": NaN,
+        "n": 0
+      }
+    },
+    "demand_drop": {
+      "threshold": "< 0.5 x rolling 28-day median",
+      "share_of_days": 0.0,
+      "episodes": 0,
+      "size_ratio_on_drop_days": {
+        "q50": NaN,
+        "q75": NaN,
+        "q90": NaN,
+        "q95": NaN,
+        "mean": NaN,
+        "n": 0
+      }
+    }
+  }
+}
