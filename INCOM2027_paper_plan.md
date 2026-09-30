@@ -56,14 +56,16 @@ Pipeline: `data/derive_calibration.py` → `data/calibration/`:
 |---|---|---|
 | C0 integrity | Checks for duplicates, rejected orders, deleted POs, reversal movements | none found |
 | C1 fraud documents | Drops labelled fraud sales orders and POs | none in normal 2 (12 SO / 5 PO in fraud 2; 29 SO / 5 PO in fraud 3) |
-| C2 steady-state window | Demand statistics only from months where every DC ends ≤ 5 % of days with zero stock. Outside it, sales are capped by stock, so **sales ≠ demand**. | months 3–9 (start-up 1–2; end of game 10–12 with stock-outs) |
+| C2 steady-state window | Demand statistics only from months where every DC ends ≤ 5 % of days with zero stock. Outside it, sales are capped by stock, so **sales ≠ demand**. | months 4–9 (start-up 1–3; end of game 10–12 with stock-outs) |
+| C4 pre-start POs | Drops POs created before the first trading tick (game initialisation) from lead times | 2 POs |
+| C5 scrap POs | Drops scrap-labelled POs from normal lead times; kept as quality-event evidence | 3 POs |
 | C3 promotions | Drops promotion-labelled orders from baseline demand | 23 F12 items |
 
 ### 2.3 Evidence classes (from the ledger)
 | Class | Meaning | Examples |
 |---|---|---|
 | **anchored** | Structural fact read from master or transaction data | 71 customers; customer → DC assignment (N 21 / S 30 / W 20); BOM (**run-specific**: fraud 2 uses wheat 0.20 / oats 0.50) |
-| **bounded** | Statistical parameter; ensemble range from the three years | inter-order time (mean 8.4 / 10.6 / 9.2 d), order size (486 / 453 / 432), food lead time (median 2.5 / 2.2 / 3.0 d), production time (median 4.2 / 3.1 / 4.5 d) |
+| **bounded** | Statistical parameter; ensemble range from the three years | inter-order time (mean 8.2 / 10.6 / 9.2 d), order size (491 / 453 / 432), food lead time (1–6 days, median 2 / 2 / 3), production processing (median 1 / 2 / 1.5 d) |
 | **policy** | Player decision. Kept as the nominal policy; the L2 decision layer may change it. | reorder points, PO sizes, production batch (16k or 48k), transfer size, peak DC stock (**not a capacity**: 132k / 77k / 58k across years) |
 | **unobserved** | Not recorded in the data; assumed and varied | plant → DC transport time (ERPsim transfers are instantaneous) |
 
@@ -78,12 +80,12 @@ For each automaton and edge, record the ledger ID of the flow that proves it.
 
 ### 2.5 Phase C–D: build and validate the undisrupted model
 - **Build:** a new UPPAAL model (V12). Each constant and distribution carries its ledger ID in a comment.
-- **Decisions needed from Ahmad:**
-  - time resolution (suggest 1 tu = ¼ game day)
-  - product scope (suggest F12 on its observed 33–47 % share of the production line)
-  - the nominal policy (suggest the normal 2 player policy)
-- **Validation** on fraud 2 and fraud 3 (steady months, their own recipe):
-  - lead-time, inter-order, production-time and DC-stock distributions (two-sample KS tests, quantile coverage)
+- **Modelling decisions:** each is justified in `docs/decision_records.md` with its evidence, the result that would overturn it, and the remaining risk.
+  - **DR-1 time unit = 1 game day.** 95 % of engine postings fall on day ticks; lead times are whole days; line capacity is 24,000 units per day.
+  - **DR-2 F12 in detail, plus the other products as background load on the shared line.** The line is busy on 82–93 % of steady days, so contention is real. Shared components never run out, so material coupling does not bind.
+  - **DR-3 nominal policy = the normal 2 players' decisions.** Validation replays each year's own policy, so it tests the physics.
+- **Validation** on fraud 2 and fraud 3 (steady months, their own recipe and policy):
+  - lead-time, inter-order, queue, processing and DC-stock distributions (two-sample KS tests, quantile coverage)
   - monthly throughput
 
 ### 2.6 Phase E: realistic disruptions
@@ -91,12 +93,12 @@ A disruption is admitted only if (a) it acts through a mechanism that exists in 
 
 | Disruption | Mechanism in the model | Evidence for its parameters |
 |---|---|---|
-| **Production stoppage** | Line unavailable | **Observed in all three years:** months without production (normal 2: months 10–11; fraud 2: months 3–4; fraud 3: month 6), with the resulting DC stock-outs. This is a real episode for **validating** the disruption model. |
+| **Production stoppage** | Shared line unavailable | **Observed in two of the three years:** months without F12 production (normal 2: months 10–11; fraud 2: months 3–4), with the resulting DC stock-outs. These are real episodes for **validating** the disruption model. |
 | Supplier delay | Lead-time distribution shifted or scaled | USAID SCMS delivery-delay distribution (dimensionless: delay / planned lead time) |
 | Supply shortage | Partial goods receipt | USAID short or partial shipments; literature |
 | Demand surge or drop | Customer ordering rate scaled | DataCo order-volume bursts; the price-driven demand variation between the three years |
 | Downstream delay | Plant → DC transfer time > 0 | DataCo late-delivery share and excess days |
-| Quality loss | Part of a receipt or batch scrapped | Scrap events are labelled in normal 2 (quantities not recorded separately); literature |
+| Quality loss | Part of a receipt or batch scrapped; late receipt | Scrap events are labelled in normal 2. Their receipts arrive later than normal (ledger Q1). Scrapped quantities are not recorded separately, so the loss share comes from literature. |
 
 Only after this do the AI layers (Section 3) run: predict the effect of injected disruptions, then decide the response.
 
@@ -202,7 +204,7 @@ Real data **sets parameter ranges and the real-anchored test twins**. It is neve
 
 | Week | Dates | Work | Deliverable |
 |---|---|---|---|
-| 1 | 30 Sep–6 Oct | **Phase A** cleaning and evidence ledger (first pass done). **Phase B** structure proof from document flows. Decide Section 2.5 choices. Send the pitch to the professor. Read COOL-MC. | Ledger, cleaning log, flow diagram |
+| 1 | 30 Sep–6 Oct | **Phase A** cleaning and evidence ledger (done). Decision records DR-1 to DR-3 (done). **Phase B** structure proof from document flows. Send the pitch to the professor. Read COOL-MC. | Ledger, cleaning log, flow diagram |
 | 2 | 7–13 Oct | **Phase C:** build V12 from the ledger (controllable practices, cost variable, ledger IDs in comments). | V12 model |
 | 3 | 14–20 Oct | **Phase D:** validate the undisrupted V12 against fraud 2 and fraud 3. **Phase E:** disruption modules; fit USAID / DataCo statistics; check the stoppage module against the observed episodes. | Validation table, disruption table |
 | 4 | 21–27 Oct | Ensemble generator (LHS over bounded and unobserved parameters), trace generation, **Morris then Sobol** sensitivity. | Fig. 2 |
@@ -253,7 +255,7 @@ paper/          IFAC LaTeX + figures
 
 ## 9. Immediate next steps
 
-1. **Ahmad:** decide the Section 2.5 choices (time resolution, product scope, nominal policy).
+1. Decisions DR-1 to DR-3 are recorded in `docs/decision_records.md`. Resolve its open items during Phase D.
 2. Phase B: mine the document flows and draw the proven process structure.
 3. Send the professor the pitch (Section 1) together with the evidence-first approach (Section 2).
 4. Read COOL-MC (arXiv 2603.02396) for positioning.

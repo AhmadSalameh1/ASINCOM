@@ -40,7 +40,10 @@ DAYS_PER_ROUND = 20
 DC_NAMES = {"02N": "North", "02S": "South", "02W": "West"}
 PLANT_SLOC = "02"
 TABLES = ["vbak", "vbap", "likp", "lips", "ekpo", "mseg", "mkpf", "cdhdr",
-          "afko", "jcds", "stpo", "mast"]
+          "afko", "jcds", "stpo", "mast", "aufm"]
+# Engine postings of a tick fall in a short burst around the tick's first sales order:
+# goods receipts a few seconds before it, sales/production/transfer postings just after.
+TICK_BEFORE_S, TICK_AFTER_S = 6, 15
 STAT_CREATED, STAT_RELEASED, STAT_DELIVERED = "I0001", "I0002", "I0012"
 # A month is "steady" when no DC ends more than this share of its days with zero stock.
 STEADY_MAX_ZERO_STOCK_SHARE = 0.05
@@ -129,20 +132,38 @@ def month_of(day):
 
 
 class GameClock:
+    """ERPsim advances in whole game days (ticks). The engine posts sales orders,
+    goods receipts, production and transfers in a burst at each tick; players'
+    decisions (POs, production orders) happen between ticks. Each played day has
+    at least one sales order, so the tick times are the first sales order of each
+    game day (decoded from VBAK.BSTNK)."""
+
     def __init__(self, vbak):
         b = vbak.BSTNK.astype(str)
         vbak["gday"] = (b.str[5:7].astype(int) - 1) * DAYS_PER_ROUND + b.str[7:9].astype(int)
         vbak["sec"] = vbak.ERZET.apply(secs)
         first = vbak.groupby("gday").sec.min().sort_index()
         self.starts, self.days = first.values, first.index.values
+        self.missing_days = sorted(set(range(self.days[0], self.days[-1] + 1)) - set(self.days))
 
-    def __call__(self, s):
-        i = np.searchsorted(self.starts, s, side="right") - 1
-        if i < 0:  # start-up postings before the first sales order
-            return float(self.days[0] - 1)
-        nxt = self.starts[i + 1] if i + 1 < len(self.starts) else self.starts[i] + 60
-        # fraction of the day; long gaps (pauses between rounds) are capped
-        return self.days[i] + min((s - self.starts[i]) / max(min(nxt - self.starts[i], 120), 1), 0.999)
+    def _at(self, i):
+        return int(self.days[min(max(i, 0), len(self.days) - 1)])
+
+    def posting_tick(self, s):
+        """Tick of an engine posting: the tick whose burst [start - TICK_BEFORE_S,
+        start + TICK_AFTER_S] contains it; postings outside any burst (e.g. during a
+        pause between rounds) belong to the next tick."""
+        i = np.searchsorted(self.starts, s + TICK_BEFORE_S, side="right") - 1
+        if i >= 0 and s - self.starts[i] <= TICK_AFTER_S:
+            return self._at(i)
+        return self._at(i + 1)
+
+    def decision_tick(self, s):
+        """First tick after a player decision, when the engine acts on it."""
+        return self._at(np.searchsorted(self.starts, s, side="right"))
+
+    def seconds_to_tick(self, s):
+        return float(s - self.starts[np.searchsorted(self.days, self.posting_tick(s))])
 
 
 def stock_path(moves):
@@ -173,7 +194,13 @@ def derive(tb, ev):
 
     # ---- integrity checks ----
     ms = mseg.merge(mkpf[["MBLNR", "CPUTM"]], on="MBLNR")
-    ms["gday"] = ms.CPUTM.apply(lambda t: clock(secs(t)))
+    ms["gday"] = ms.CPUTM.apply(lambda t: clock.posting_tick(secs(t)))
+    ms["to_tick"] = ms.CPUTM.apply(lambda t: clock.seconds_to_tick(secs(t)))
+    engine = ms[ms.BWART.isin([101, 261, 301, 601])].drop_duplicates("MBLNR")
+    out["clock"] = {"played_days": int(len(clock.days)), "first_day": int(clock.days[0]),
+                    "last_day": int(clock.days[-1]), "days_without_sales_inside_play": clock.missing_days,
+                    "engine_postings_within_tolerance_of_tick": round(float(
+                        engine.to_tick.between(-TICK_BEFORE_S, TICK_AFTER_S).mean()), 3)}
     out["integrity"] = {
         "duplicate_sales_items": int(vbap.duplicated(["VBELN", "POSNR"]).sum()),
         "duplicate_goods_movement_lines": int(ms.duplicated(["MBLNR", "ZEILE"]).sum()),
@@ -265,15 +292,29 @@ def derive(tb, ev):
     # ---- purchasing: lead time, PO size, reorder point ----
     po_created = cdhdr[cdhdr.OBJECTCLAS == "EINKBELEG"].copy()
     po_created["EBELN"] = po_created.OBJECTID.astype(np.int64)
-    po_created["po_day"] = po_created.UTIME.apply(lambda t: clock(secs(t)))
+    po_created["po_sec"] = po_created.UTIME.apply(secs)
+    po_created["po_day"] = po_created.po_sec.apply(clock.decision_tick)
     receipts = ms[(ms.BWART == 101) & ms.EBELN.notna()].copy()
     receipts["EBELN"] = receipts.EBELN.astype(np.int64)
     receipts = receipts[~receipts.EBELN.isin(ev["fraud_po"])]
-    lead = receipts.merge(po_created[["EBELN", "po_day"]], on="EBELN")
+    lead = receipts.merge(po_created[["EBELN", "po_day", "po_sec"]], on="EBELN")
+    pre = lead.po_sec < clock.starts[0]
+    scrap = lead.EBELN.isin(ev["scrap_po"])
+    log.append(("C4 pre-start POs", "drop POs created before the first trading tick (game initialisation)",
+                f"{lead[pre].EBELN.nunique()} POs / {int(pre.sum())} receipts removed from lead-time statistics"))
+    log.append(("C5 scrap-labelled POs", "drop scrap-event POs from normal lead-time statistics "
+                "(kept separately as quality-event evidence)",
+                f"{lead[scrap & ~pre].EBELN.nunique()} POs / {int((scrap & ~pre).sum())} receipts removed"))
+    out["scrap_po_lead_days"] = summary((lead[scrap].gday - lead[scrap].po_day))
+    lead = lead[~pre & ~scrap].copy()
     lead["lead"] = lead.gday - lead.po_day
     food = [m for m in materials if m.startswith("AA-R")]
     pack = [m for m in materials if m.startswith("AA-P")]
     out["lead_time_days"] = {m: summary(lead[lead.MATNR == m].lead) for m in materials}
+    out["lead_time_pmf_food"] = {int(k): int(v) for k, v in
+                                 lead[lead.MATNR.isin(food)].lead.value_counts().sort_index().items()}
+    out["lead_time_pmf_packaging"] = {int(k): int(v) for k, v in
+                                      lead[lead.MATNR.isin(pack)].lead.value_counts().sort_index().items()}
     out["lead_time_days_food"] = summary(lead[lead.MATNR.isin(food)].lead) | \
         {"shifted_gamma_fit": shifted_gamma(lead[lead.MATNR.isin(food)].lead)}
     out["lead_time_days_packaging"] = summary(lead[lead.MATNR.isin(pack)].lead) | \
@@ -285,8 +326,10 @@ def derive(tb, ev):
         mv["stock"], opening = stock_path(mv)
         pos = po_created[po_created.EBELN.isin(ek[ek.MATNR == m].EBELN)]
         at_po = [mv[mv.gday <= d].stock.iloc[-1] if (mv.gday <= d).any() else opening for d in pos.po_day]
+        day_end = mv.groupby("gday").stock.last().reindex(clock.days).ffill().fillna(opening)
         comp[m] = {"opening_stock_lower_bound": float(opening), "peak_stock": float(mv.stock.max()),
-                   "stock_when_po_created": summary(at_po)}
+                   "stock_when_po_created": summary(at_po),
+                   "share_of_days_ending_at_zero": round(float((day_end <= 0).mean()), 4)}
     out["component_stock"] = comp
     if ev["scrap_po"]:
         sc = ms[ms.EBELN.isin(ev["scrap_po"])]
@@ -301,13 +344,37 @@ def derive(tb, ev):
     out["product_share_of_production_orders"] = round(len(orders_p) / len(afko), 3)
     st = jcds[jcds.OBJNR.astype(str).str.startswith("OR")].copy()
     st["AUFNR"] = st.OBJNR.astype(str).str[2:].astype(np.int64)
-    st["day"] = st.UTIME.apply(lambda t: clock(secs(t)))
+    st["day"] = st.UTIME.apply(lambda t: clock.decision_tick(secs(t)))
     rel = st[st.STAT == STAT_RELEASED].groupby("AUFNR").day.min()
-    dlvd = st[st.STAT == STAT_DELIVERED].groupby("AUFNR").day.min()
-    dur = (dlvd - rel).dropna()
-    dur = dur[dur.index.isin(orders_p.AUFNR)]
-    out["production_days"] = summary(dur)
-    out["production_days_steady"] = summary(dur[month_of(rel[dur.index].astype(int)).isin(steady)])
+    # processing: first component issue (261) -> last finished-goods receipt (101), per order (AUFM)
+    am = tb["aufm"].merge(mkpf[["MBLNR", "CPUTM"]], on="MBLNR")
+    am["tick"] = am.CPUTM.apply(lambda t: clock.posting_tick(secs(t)))
+    start = am[am.BWART == 261].groupby("AUFNR").tick.min()
+    end = am[am.BWART == 101].groupby("AUFNR").tick.max()
+    orders_all = afko[["AUFNR", "PLNBEZ", "GAMNG"]].set_index("AUFNR").join(
+        pd.DataFrame({"release": rel, "start": start, "end": end}), how="inner").dropna()
+    orders_all["queue_days"] = orders_all.start - orders_all.release
+    orders_all["processing_days"] = orders_all.end - orders_all.start
+    orders_all["flow_days"] = orders_all.end - orders_all.release
+    mine = orders_all[orders_all.PLNBEZ == PRODUCT]
+    mine_steady = mine[month_of(mine.release.astype(int)).isin(steady)]
+    out["production_processing_days"] = summary(mine.processing_days)
+    out["production_queue_days"] = summary(mine.queue_days)
+    out["production_flow_days_steady"] = summary(mine_steady.flow_days)
+    rate = mine[mine.processing_days > 0]
+    out["line_rate_units_per_day"] = summary(rate.GAMNG / rate.processing_days)
+    busy = set()
+    for r in orders_all.itertuples():
+        busy |= set(range(int(r.start), int(r.end) + 1))
+    steady_days = [d for d in clock.days if month_of(d) in steady]
+    out["line"] = {"busy_share_played_days": round(len(busy & set(clock.days)) / len(clock.days), 3),
+                   "busy_share_steady_days": round(len(busy & set(steady_days)) / max(len(steady_days), 1), 3)}
+    other = orders_all[orders_all.PLNBEZ != PRODUCT]
+    out["other_products_on_line"] = {p: {"orders": int(len(g)), "batch": summary(g.GAMNG),
+                                         "processing_days": summary(g.processing_days)}
+                                     for p, g in other.groupby("PLNBEZ")}
+    other_releases = other.sort_values("release").release
+    out["other_products_release_gap_days"] = summary(other_releases.diff().dropna())
     prod_moves = ms[(ms.MATNR == PRODUCT) & (ms.BWART == 101) & (ms.LGORT == PLANT_SLOC) & ms.EBELN.isna()]
     out["units_produced_by_month"] = {int(k): float(v) for k, v in
                                       prod_moves.groupby(month_of(prod_moves.gday.astype(int))).MENGE.sum().items()}
@@ -351,12 +418,22 @@ LEDGER = [
      "VBAP.KWMENG", "F12 items, steady months, promotions excluded"),
     ("D4", "Demand level (units per game day), mean", lambda d: d["daily_units_steady"]["mean"],
      "VBAP.KWMENG by game day", "steady months"),
-    ("L1", "Lead time food ingredients (days), q05 / median / q95",
+    ("L1", "Lead time food ingredients (game days), q05 / median / q95",
      lambda d: f'{d["lead_time_days_food"]["q05"]} / {d["lead_time_days_food"]["median"]} / {d["lead_time_days_food"]["q95"]}',
-     "CDHDR (PO created) -> MSEG 101 (goods receipt)", "game-clock difference, fraud POs excluded"),
+     "CDHDR (PO created) -> MSEG 101 (goods receipt)", "ticks from the first tick after PO creation to the receipt tick; fraud POs excluded"),
     ("L2", "Lead time packaging (days), q05 / median / q95",
      lambda d: f'{d["lead_time_days_packaging"]["q05"]} / {d["lead_time_days_packaging"]["median"]} / {d["lead_time_days_packaging"]["q95"]}',
      "as L1", "as L1"),
+    ("L3", "Lead time PMF food (days: receipts)", lambda d: d["lead_time_pmf_food"],
+     "as L1", "tick counts; cleaning rules C4, C5"),
+    ("L4", "Lead time PMF packaging (days: receipts)", lambda d: d["lead_time_pmf_packaging"],
+     "as L1", "tick counts; cleaning rules C4, C5"),
+    ("Q1", "Scrap-event POs: lead time (days), median / max",
+     lambda d: f'{d["scrap_po_lead_days"].get("median")} / {d["scrap_po_lead_days"].get("max")}',
+     "labelled scrap POs, CDHDR -> MSEG 101", "quality-event evidence"),
+    ("K1", "Components: share of days ending at zero stock (max over F12 components)",
+     lambda d: max(v["share_of_days_ending_at_zero"] for v in d["component_stock"].values()),
+     "MSEG 101/261 stock paths", "0 means shared components never constrained production"),
     ("P1", "PO size R02 / R05 / R06 / P01 (mean units)",
      lambda d: " / ".join(f'{d["po_qty"][m]["mean"]:.0f}' for m in ["AA-R02", "AA-R05", "AA-R06", "AA-P01"]),
      "EKPO.MENGE", "mean per material, fraud POs excluded"),
@@ -366,9 +443,19 @@ LEDGER = [
      "MSEG 101/261 stock path at CDHDR PO time", "player policy, not a physical parameter"),
     ("M1", "Production batch (units): values (count)", lambda d: d["production_batch"]["values"],
      "AFKO.GAMNG", "F12 production orders"),
-    ("M2", "Production time (days), median / q75, steady months",
-     lambda d: f'{d["production_days_steady"].get("median")} / {d["production_days_steady"].get("q75")}',
-     "JCDS status I0002 released -> I0012 delivered", "game-clock difference"),
+    ("M2", "Production processing time (days), median / q95",
+     lambda d: f'{d["production_processing_days"]["median"]} / {d["production_processing_days"]["q95"]}',
+     "AUFM 261 (first component issue) -> 101 (last receipt), engine ticks", "F12 orders"),
+    ("M5", "Production queue time before start (days), median / q75",
+     lambda d: f'{d["production_queue_days"]["median"]} / {d["production_queue_days"]["q75"]}',
+     "JCDS I0002 (release) -> AUFM first 261", "waiting for the shared line"),
+    ("M6", "Line rate (units per processing day), median", lambda d: d["line_rate_units_per_day"]["median"],
+     "AFKO.GAMNG / processing days", "F12 orders with processing > 0 days"),
+    ("M7", "Shared-line busy share, steady months", lambda d: d["line"]["busy_share_steady_days"],
+     "AUFM start/end of all products' orders", "days with any order in processing"),
+    ("M8", "Other products on the line: orders per product", lambda d:
+     {p: v["orders"] for p, v in d["other_products_on_line"].items()},
+     "AFKO.PLNBEZ, same work centre", "background load for the line model"),
     ("M3", "Production trigger: plant stock at order creation, median", lambda d:
      d["plant_stock"]["stock_when_production_order_created"]["median"],
      "MSEG 101/301 plant stock path at JCDS I0001", "player policy"),
@@ -381,6 +468,9 @@ LEDGER = [
     ("C1", "Peak DC stock North / South / West (no physical capacity is recorded in ERPsim)",
      lambda d: " / ".join(f'{d["dc_stock"][n]["peak_stock"]:.0f}' for n in DC_NAMES.values()),
      "MSEG 301/601 stock path per DC", "peak level"),
+    ("W0", "Clock: engine postings within tolerance of a day tick", lambda d:
+     d["clock"]["engine_postings_within_tolerance_of_tick"],
+     "MSEG/MKPF.CPUTM vs VBAK tick times", "evidence that the engine runs in whole game days"),
     ("W1", "Steady-state months", lambda d: d["steady_months"],
      "DC stock paths", f"months with <= {STEADY_MAX_ZERO_STOCK_SHARE:.0%} zero-stock days at every DC"),
     ("E1", "Observed episode: months without production", lambda d: d["months_without_production"],
@@ -397,7 +487,9 @@ LEDGER = [
 CLASS = {"S1": "anchored", "S2": "anchored", "S3": "anchored (run-specific recipe)",
          "D1": "bounded", "D2": "bounded", "D3": "bounded", "D4": "bounded (price and mix driven)",
          "L1": "bounded", "L2": "bounded", "P1": "policy", "P2": "policy",
-         "M1": "policy", "M2": "bounded", "M3": "policy", "M4": "policy",
+         "M1": "policy", "M2": "bounded", "M3": "policy", "M4": "policy", "M5": "bounded",
+         "M6": "bounded", "M7": "context", "M8": "bounded (background load)",
+         "L3": "bounded", "L4": "bounded", "Q1": "context (event evidence)", "K1": "context", "W0": "context",
          "T1": "policy", "T2": "unobserved", "C1": "policy", "W1": "context", "E1": "context"}
 
 
