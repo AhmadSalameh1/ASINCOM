@@ -21,7 +21,7 @@ from derive_calibration import (DAYS_PER_ROUND, DC_NAMES, PLANT_SLOC, PRODUCT, G
 
 TABLES = {"vbak": ["vbak"], "vbap": ["vbap"], "likp": ["likp"], "lips": ["lips"], "mseg": ["mseg"],
           "mkpf": ["mkpf"], "cdhdr": ["cdhdr"], "afko": ["afko"], "jcds": ["jcds"], "resb": ["resb"],
-          "pbhi": ["pbhi"], "pbim": ["pbimt", "pbim"], "marc": ["marc"], "ekpo": ["ekpo"]}
+          "pbhi": ["pbhi"], "pbim": ["pbimt", "pbim"], "marc": ["marc"], "ekpo": ["ekpo"], "aufm": ["aufm"]}
 COMPONENTS = ["AA-R01", "AA-R02", "AA-R03", "AA-R04", "AA-R05", "AA-R06", "AA-P01", "AA-P02"]
 OTHER_PRODUCTS_PREFIX = "AA-F"
 
@@ -126,6 +126,10 @@ def build(root, run, calibration_dir):
                    "recipe": {c: round(float(recipe.loc[a].get(c, 0)), 6) for c in COMPONENTS if recipe.loc[a].get(c, 0) > 0}}
                   for a in created.index if a in recipe.index]
     orders_all.sort(key=lambda o: o["day"])
+    # MRP runs = days on which the players created POs or production orders (planning lag after
+    # forecast updates is player behaviour, replayed per DR-3)
+    po_days = set(int(d) for d in po[po.psec >= clock.starts[0]].pday)
+    inp["mrp_run_days"] = sorted(po_days | set(int(d) for d in created.values))
     inp["recorded_production_orders"] = [o for o in orders_all if o["product"] == PRODUCT]
     inp["other_production_orders"] = [o for o in orders_all if o["product"] != PRODUCT]
     inp["evidence"]["production"] = "B10-B13, M1, M6, M8; RESB recipes (rule R4)"
@@ -165,6 +169,27 @@ def build(root, run, calibration_dir):
     inp["dc_push"] = {"daily_fraction_of_plant_stock": round(alpha, 4), "dc_shares": shares}
     inp["evidence"]["dc_push"] = "fitted on steady months of MSEG 301 (spec section 4, item 3)"
 
+    # ---- recorded reference values for validation (not used by the simulation) ----
+    zs = cal["zero_stock_day_share_by_month"]
+    inp["recorded_dc_stockout_months"] = sorted({int(m) for dc in zs.values() for m, v in dc.items() if v > 0})
+    am = tb["aufm"].merge(tb["mkpf"][["MBLNR", "CPUTM"]], on="MBLNR")
+    am["day"] = am.CPUTM.apply(lambda t: clock.posting_tick(secs(t)))
+    start = am[am.BWART == 261].groupby("AUFNR").day.min()
+    f12o = [a for a in created.index if afko.PLNBEZ.get(a) == PRODUCT and a in start.index]
+    # V6 as defined in the protocol: last F12 forecast update before the order's conversion -> start
+    upd = sorted((int(r.sec), int(r.day)) for r in pb.itertuples() if r.MATNR == PRODUCT)
+    csec = cr.groupby("AUFNR").UTIME.min().apply(secs)
+    upd_to_start = []
+    for a_ in f12o:
+        prev = [d for sec_, d in upd if sec_ <= csec[a_]]
+        if prev:
+            upd_to_start.append(int(start[a_] - prev[-1]))
+    inp["recorded_mrp_to_start_median"] = float(np.median(upd_to_start)) if upd_to_start else None
+    s12 = start[f12o].sort_values()
+    gaps = s12.diff()
+    if len(gaps.dropna()):
+        hi = int(s12[gaps.idxmax()])
+        inp["recorded_production_pause"] = [int(hi - gaps.max()), hi]
     # ---- recorded series for comparison (not used by the simulation) ----
     sales_day = f12.groupby("gday").KWMENG.sum()
     inp["recorded"] = {

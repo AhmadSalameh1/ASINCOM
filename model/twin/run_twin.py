@@ -29,14 +29,17 @@ def main():
     ap.add_argument("--demand", default="sample", choices=["sample", "replay"])
     ap.add_argument("--line", default="erpsim", choices=["fifo_block", "fifo_skip", "erpsim"])
     ap.add_argument("--others", default="mrp", choices=["mrp", "replay"])
+    ap.add_argument("--push", default="lag1", choices=["lag1", "fraction"])
+    ap.add_argument("--mrp", default="recorded", choices=["recorded", "update"])
+    ap.add_argument("--split", default="fixed", choices=["cover", "fixed"])
     a = ap.parse_args()
     inp = json.load(open(a.inputs))
-    run = f'{inp["run"]}_{a.demand}_{a.line}_{a.others}'
+    run = f'{inp["run"]}_{a.demand}_{a.line}_{a.others}_{a.push}_{a.mrp}_{a.split}'
     os.makedirs(a.out, exist_ok=True)
 
     runs, queue = [], []
     for s in range(a.seeds):
-        tw = Twin(inp, seed=s, demand_mode=a.demand, line_rule=a.line, others=a.others)
+        tw = Twin(inp, seed=s, demand_mode=a.demand, line_rule=a.line, others=a.others, push_rule=a.push, mrp_timing=a.mrp, dc_split=a.split)
         df = tw.run()
         df["seed"] = s
         runs.append(df)
@@ -54,7 +57,7 @@ def main():
     per_seed = sim.groupby(["seed", "month"])[["sales", "production_f12", "transferred", "lost"]].sum()
     q = per_seed.groupby("month").quantile([0.05, 0.5, 0.95]).unstack()
 
-    lines = [f"# Twin vs recorded year: {run}\n", f"{a.seeds} seeds, forecast replay, demand {a.demand}, line rule {a.line}, other products {a.others}.\n",
+    lines = [f"# Twin vs recorded year: {run}\n", f"{a.seeds} seeds, forecast replay, demand {a.demand}, line rule {a.line}, other products {a.others}, push {a.push}, MRP timing {a.mrp}, DC split {a.split}.\n",
              "Monthly totals of F12 units: recorded vs simulated median [5 %, 95 %].\n",
              "| month | sales rec | sales sim | production rec | production sim | transfers rec | transfers sim | lost sim |",
              "|---|---|---|---|---|---|---|---|"]

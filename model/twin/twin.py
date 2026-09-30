@@ -21,6 +21,17 @@ Modes
                                (78 of 78 recorded starts), and switching to another product costs one
                                idle day (recorded gap between orders: median 1 day on a product switch,
                                0 days otherwise)
+  mrp_timing    "recorded" : MRP (purchasing + order conversion) runs on the recorded days on which the players
+                             created POs / production orders; forecast updates only change the open forecast.
+                             Recorded conversion follows the forecast update by 2-5 days (player behaviour).
+                "update"   : MRP runs on the forecast-update day (superseded)
+  push_rule     "lag1"     : output is held one day at the plant and then shipped in full (recorded: transfers
+                             correlate 0.72 with the previous day's output, 0.12 with the same day's)
+                "fraction" : a fixed daily fraction of plant stock is shipped (fitted; superseded)
+  dc_split      "cover" : each shipment is allocated to equalise the DCs' days of cover (stock / recent daily
+                          sales); recorded: the largest share went to the lowest-cover DC on 65 % of transfer
+                          days (random: 33 %)
+                "fixed" : fixed fitted shares (superseded)
   others        "mrp"    : the other products (F16, F15) are planned by the same MRP from their own replayed
                            forecasts and replayed sales (planning level: total stock, no customers or DCs)
                 "replay" : their recorded production orders are replayed as background line load
@@ -35,10 +46,13 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp"):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed"):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
-        self.demand_mode, self.line_rule, self.others = demand_mode, line_rule, others
+        self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
+        self.mrp_timing, self.dc_split = mrp_timing, dc_split
+        self.recent_sales = {d: [] for d in DCS}
+        self.mrp_days = set(inp.get("mrp_run_days", []))
         self.planning_products = [p for p in inp.get("planning_products", [inp["product"]])
                                   if p == inp["product"] or others == "mrp"]
         self.recorded_by_product = defaultdict(list)
@@ -196,13 +210,31 @@ class Twin:
                 i += 1
         return out_f12, out_other
 
-    def _push(self):
-        ship = math.floor(self.plant * self.push["daily_fraction_of_plant_stock"])
+    def _push(self, carried):
+        if self.push_rule == "lag1":
+            ship = carried                     # everything that was already at the plant before today's output
+        else:
+            ship = math.floor(self.plant * self.push["daily_fraction_of_plant_stock"])
         sent = 0.0
-        for d in DCS:
-            q = math.floor(ship * self.push["dc_shares"].get(d, 0))
-            self.dc[d] += q
-            sent += q
+        if self.dc_split == "cover" and ship > 0:
+            rate = {d: max(np.mean(self.recent_sales[d][-20:]) if self.recent_sales[d] else 1.0, 1.0) for d in DCS}
+            # water-filling: raise the lowest days-of-cover level until the shipment is used up
+            lo, hi = 0.0, (sum(self.dc.values()) + ship) / min(rate.values()) + 1
+            for _ in range(60):
+                mid = (lo + hi) / 2
+                need = sum(max(0.0, mid * rate[d] - self.dc[d]) for d in DCS)
+                lo, hi = (mid, hi) if need < ship else (lo, mid)
+            alloc = {d: max(0.0, lo * rate[d] - self.dc[d]) for d in DCS}
+            tot = sum(alloc.values()) or 1.0
+            for i, d in enumerate(DCS):
+                q = (ship - sent) if i == len(DCS) - 1 else math.floor(ship * alloc[d] / tot)
+                self.dc[d] += q
+                sent += q
+        else:
+            for i, d in enumerate(DCS):
+                q = (ship - sent) if i == len(DCS) - 1 else math.floor(ship * self.push["dc_shares"].get(d, 0))
+                self.dc[d] += q
+                sent += q
         self.plant -= sent
         return sent
 
@@ -248,6 +280,8 @@ class Twin:
                 run_for.append(u["material"])
             elif u["material"] in self.direct_forecast:
                 self.direct_forecast[u["material"]] = u["open_qty"]
+        if self.mrp_timing == "recorded":
+            run_for = list(self.planning_products) if day in self.mrp_days else []
         created = []
         for p in dict.fromkeys(run_for):                            # R2, R3 (one run per product per day)
             open_prod = sum(o["remaining"] for o in self.queue if o["product"] == p)
@@ -284,9 +318,12 @@ class Twin:
         for day in range(first - 1, last + 1):
             self.today = day
             received = self._receipts(day)
+            carried = self.plant
             out_f12, out_other = self._produce()
-            sent = self._push()
+            sent = self._push(carried)
             sold, lost = self._sales(day)
+            for d in DCS:
+                self.recent_sales[d].append(sold[d] + lost[d])
             self.open_forecast[self.product] = max(0.0, self.open_forecast[self.product] - sum(sold.values()))  # R1
             self._other_sales(day)
             mrp, n_created = self._decide(day)
