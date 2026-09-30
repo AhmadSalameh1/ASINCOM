@@ -581,6 +581,15 @@
       "months_with_zero_days": []
     }
   },
+  "scrap_blocked": [
+    {
+      "po": 4500000016,
+      "material": "AA-R02",
+      "blocked": 1235.0,
+      "received": 30000.0,
+      "share": 0.0412
+    }
+  ],
   "scrap_events": [
     {
       "po": 4500000016,

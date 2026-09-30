@@ -109,7 +109,7 @@ A disruption is admitted only if (a) it acts through a mechanism that exists in 
 | Supply shortage | Partial goods receipt | USAID short or partial shipments; literature |
 | Demand surge or drop | Customer ordering rate scaled | DataCo order-volume bursts; the price-driven demand variation between the three years |
 | Downstream delay | Plant → DC transfer time > 0 | DataCo late-delivery share and excess days |
-| Quality loss | Part of a receipt or batch scrapped; late receipt | Scrap events are labelled in normal 2. Their receipts arrive later than normal (ledger Q1). Scrapped quantities are not recorded separately, so the loss share comes from literature. |
+| Quality loss | Part of a receipt set aside (blocked or held in inspection, never released); late receipt | **Measured:** the 6 labelled scrap events in the three years lose **0.2–4.1 %** of the affected receipt (ledger Q2) and arrive later than normal (Q1) |
 
 Only after this do the AI layers (Section 3) run: predict the effect of injected disruptions, then decide the response.
 

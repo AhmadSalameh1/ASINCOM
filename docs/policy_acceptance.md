@@ -29,7 +29,29 @@ Replica: **net = open forecast − F12 stock (plant + DCs) − open production o
 
 **Conclusion:** the production decisions of the normal 2 players are reproduced by SAP's documented MRP logic, driven only by their recorded forecasts. No parameter was fitted.
 
-## 4. Purchasing: not yet accepted
+## 4. Purchasing: accepted with a three-product MRP replica (`data/mrp_replica.py`)
+Component purchasing is shared by all products, so the replica plans **F12, F16 and F15 together**, each from its own recorded forecast history. Each rule is an SAP mechanism found in the data; none is a fitted parameter.
+
+| Rule | Mechanism | Evidence that made it necessary |
+|---|---|---|
+| R1 | Open forecast = last PLNMG − sales **since that update** | ENTMG is not always equal to cumulative sales (F16), so consumption must be counted from the update |
+| R2–R3 | Product net requirement and lot-for-lot with MARC min/max/rounding | Section 3 |
+| R4a | Component need of open production orders = **reserved** quantity (RESB) until the final issue is posted | An F16 order reserved 14,400 kg but issued 7,200; MRP kept buying the open 7,200, a constant offset in six consecutive runs |
+| R4b | Planned orders use the **BOM in force** (the recipe of the next converted order) | The F16 recipe changed mid-game; POs match the new recipe exactly |
+| R4c | Direct forecasts on packaging (100,000 boxes and bags) add to requirements | PBHI entries for AA-P01 and AA-P02 |
+| R5 | **Blocked stock** (INSMK `3`, from scrap events) is not available | Constant offsets of 100 kg (R01) and 1,000 (P02) matched blocked stock in MARD exactly |
+| R6 | PO = net rounded to the MARC rounding value | MARC |
+
+**Result (normal 2): 29 of 37 MRP runs reproduced exactly for every component** (191 of 245 component-run pairs).
+- The 8 runs not reproduced: 5 are in the **last 21 minutes of the game**, where end-of-game buying departs from MRP.
+- 3 (139, 62 and 56 minutes before the end) show the same relative error on every component, so the planned product quantity differs, most likely through manual planned-order edits that aren't in the data.
+
+**Conclusion:** the players' purchasing is SAP MRP driven by their forecasts, reproduced exactly in 78 % of runs, with every miss localised. Together with Section 3, **the whole nominal policy is SAP logic plus recorded forecasts**. The only fitted element left is the DC push rule.
+
+### Side result: measured quality-loss size (ledger Q2)
+Scrap events set part of a receipt aside: as blocked stock (normal 2), or as quality-inspection stock that is never released (fraud 2, fraud 3). Across the 6 events in the three years, **0.2 % to 4.1 % of the affected receipt is lost**, and the receipt arrives later than normal (Q1). This sets the evidence-based range for the quality-loss disruption in Phase E.
+
+## 4b. First purchasing test (superseded)
 - **Observed sequence:** at each MRP run the component POs are created first, and the planned orders are converted to production orders shortly afterwards.
 - **Test** (packaging, 1 box per unit for all products, so recipe changes don't matter): box POs = units of the next production-order burst.
   - **8 of 32 PO bursts match exactly, including all of the first 4.**

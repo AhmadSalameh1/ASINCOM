@@ -607,6 +607,29 @@
       ]
     }
   },
+  "scrap_blocked": [
+    {
+      "po": 4500000025,
+      "material": "AA-R01",
+      "blocked": 100.0,
+      "received": 6400.0,
+      "share": 0.0156
+    },
+    {
+      "po": 4500000046,
+      "material": "AA-P02",
+      "blocked": 1000.0,
+      "received": 48000.0,
+      "share": 0.0208
+    },
+    {
+      "po": 4500000067,
+      "material": "AA-R01",
+      "blocked": 100.0,
+      "received": 6400.0,
+      "share": 0.0156
+    }
+  ],
   "scrap_events": [
     {
       "po": 4500000025,

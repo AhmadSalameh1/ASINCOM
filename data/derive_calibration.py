@@ -347,6 +347,20 @@ def derive(tb, ev):
                    "months_with_zero_days": sorted({int(month_of(d)) for d in day_end[day_end <= 0].index})}
     out["component_stock"] = comp
     if ev["scrap_po"]:
+        # quality loss: the part of each scrap-event receipt set aside as blocked stock (INSMK '3')
+        # or as quality-inspection stock (INSMK 'X') that is never released (movement 321)
+        sp = ms[ms.EBELN.isin(ev["scrap_po"]) & (ms.BWART == 101)]
+        released = ms[(ms.BWART == 321) & (ms.SHKZG == "S")].groupby("MATNR").MENGE.sum().to_dict()
+        blocked_share = []
+        for (po_, mat), g in sp.groupby(["EBELN", "MATNR"]):
+            qi = g[g.INSMK.astype(str) == "X"].MENGE.sum()
+            rel = min(qi, released.get(mat, 0.0))
+            released[mat] = released.get(mat, 0.0) - rel
+            blk = g[g.INSMK.astype(str) == "3"].MENGE.sum() + qi - rel
+            if blk > 0:
+                blocked_share.append({"po": int(po_), "material": mat, "blocked": float(blk),
+                                      "received": float(g.MENGE.sum()), "share": round(blk / g.MENGE.sum(), 4)})
+        out["scrap_blocked"] = blocked_share
         sc = ms[ms.EBELN.isin(ev["scrap_po"])]
         out["scrap_events"] = [{"po": int(p), "materials": sorted(g.MATNR.unique().tolist()),
                                 "movement_types": {int(k): int(v) for k, v in g.BWART.value_counts().items()}}
@@ -447,6 +461,9 @@ LEDGER = [
     ("Q1", "Scrap-event POs: lead time (days), median / max",
      lambda d: f'{d["scrap_po_lead_days"].get("median")} / {d["scrap_po_lead_days"].get("max")}',
      "labelled scrap POs, CDHDR -> MSEG 101", "quality-event evidence"),
+    ("Q2", "Scrap events: share of the affected receipt lost (blocked or never-released inspection stock)",
+     lambda d: "; ".join(f'{x["material"]}: {x["share"]:.1%} ({x["blocked"]:.0f})' for x in d.get("scrap_blocked", [])) or "none",
+     "MSEG 101 INSMK '3' / 'X' on scrap-labelled POs, net of 321 releases", "quality-loss size for Phase E"),
     ("K1", "Components: share of steady-month days ending at zero stock (max over F12 components)",
      lambda d: max(v["share_of_steady_days_ending_at_zero"] for v in d["component_stock"].values()),
      "MSEG 101/261 stock paths (chronological)", "near 0 means shared components do not constrain steady operation"),
@@ -508,7 +525,7 @@ CLASS = {"S1": "anchored", "S2": "anchored", "S3": "anchored (run-specific recip
          "L1": "bounded", "L2": "bounded", "P1": "policy", "P2": "policy",
          "M1": "policy", "M2": "bounded", "M3": "policy", "M4": "policy", "M5": "bounded",
          "M6": "bounded", "M7": "context", "M8": "bounded (background load)",
-         "L3": "bounded", "L4": "bounded", "Q1": "context (event evidence)", "K1": "context", "K2": "context", "W0": "context",
+         "L3": "bounded", "L4": "bounded", "Q1": "context (event evidence)", "Q2": "context (event evidence)", "K1": "context", "K2": "context", "W0": "context",
          "T1": "policy", "T2": "unobserved", "C1": "policy", "W1": "context", "E1": "context"}
 
 

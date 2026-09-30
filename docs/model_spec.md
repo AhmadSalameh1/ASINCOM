@@ -72,7 +72,8 @@ The Phase C analysis shows how the players decided:
 **Policy acceptance status** (`docs/policy_acceptance.md`):
 - PBHI decoded: PLNMG = the new open forecast set by the player.
 - **Production: accepted.** The MRP replica, with MARC lot rules (min 16k, max 48k, rounding 1k), explains 20 of 21 recorded forecast updates exactly.
-- **Purchasing: not yet accepted.** 8 of 32 PO bursts match exactly. A multi-product MRP replica with component netting is the next test.
+- **Purchasing: accepted.** A three-product MRP replica (`data/mrp_replica.py`, rules R1–R6) reproduces 29 of 37 MRP runs exactly for every component. Five of the 8 misses are in the last 21 minutes of the game.
+- The twin's purchasing module **is** this replica. For experiments it runs on simulated state, with the other products' forecasts as background (DR-2).
 
 ## 5. Parameters
 The values come from `calibration_normal_2.json`. Ensemble ranges come from the spread across the three runs (DR-0).
