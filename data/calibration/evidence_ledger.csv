@@ -8,19 +8,20 @@ D3,bounded,"Order size (units), mean / median",491.243 / 492.0,453.224 / 451.0,4
 D4,bounded (price and mix driven),"Demand level (units per game day), mean","7,686.333","5,244.45","4,332.638",VBAP.KWMENG by game day,steady months
 L1,bounded,"Lead time food ingredients (game days), q05 / median / q95",1.0 / 2.0 / 4.0,1.0 / 2.0 / 6.35,1.0 / 3.0 / 4.0,CDHDR (PO created) -> MSEG 101 (goods receipt),ticks from the first tick after PO creation to the receipt tick; fraud POs excluded
 L2,bounded,"Lead time packaging (days), q05 / median / q95",1.0 / 4.0 / 5.0,1.0 / 3.0 / 5.0,1.0 / 2.0 / 5.0,as L1,as L1
-L3,bounded,Lead time PMF food (days: receipts),"1: 35, 2: 17, 3: 18, 4: 29","0: 1, 1: 42, 2: 16, 3: 27, 4: 16, 5: 3, 6: 3, 7: 3, 15: 3","1: 22, 2: 24, 3: 27, 4: 26",as L1,"tick counts; cleaning rules C4, C5"
+L3,bounded,Lead time PMF food (days: receipts),"1: 35, 2: 17, 3: 18, 4: 29","0: 1, 1: 42, 2: 16, 3: 27, 4: 16, 5: 3, 6: 3, 7: 3, 15: 3","1: 22, 2: 24, 3: 21, 4: 26",as L1,"tick counts; cleaning rules C4, C5"
 L4,bounded,Lead time PMF packaging (days: receipts),"1: 16, 2: 6, 3: 12, 4: 20, 5: 16, 6: 2","1: 16, 2: 10, 3: 16, 4: 8, 5: 12, 6: 2","1: 18, 2: 18, 3: 8, 4: 6, 5: 14",as L1,"tick counts; cleaning rules C4, C5"
 Q1,context (event evidence),"Scrap-event POs: lead time (days), median / max",2.0 / 5.0,3.0 / 5.0,3.0 / 3.0,"labelled scrap POs, CDHDR -> MSEG 101",quality-event evidence
-K1,context,Components: share of days ending at zero stock (max over F12 components),0,0,0,MSEG 101/261 stock paths,0 means shared components never constrained production
-P1,policy,PO size R02 / R05 / R06 / P01 (mean units),15256 / 26993 / 29307 / 79605,15648 / 24032 / 31222 / 85811,16144 / 44599 / 44599 / 128250,EKPO.MENGE,"mean per material, fraud POs excluded"
-P2,policy,Reorder point R02 / R05 / R06 / P01 (median stock at PO creation),21075 / 56750 / 56750 / 216500,32000 / 46400 / 52650 / 212000,51500 / 59700 / 59700 / 234000,MSEG 101/261 stock path at CDHDR PO time,"player policy, not a physical parameter"
+K1,context,Components: share of steady-month days ending at zero stock (max over F12 components),0.008,0,0,MSEG 101/261 stock paths (chronological),near 0 means shared components do not constrain steady operation
+K2,context,Components: months with any zero-stock day (union over F12 components),"[1, 2, 4, 11, 12]",[],[],as K1,start-up (stock starts empty) and end-of-game effects
+P1,policy,PO size R02 / R05 / R06 / P01 (mean units),15256 / 26993 / 29307 / 79605,15648 / 24032 / 31222 / 85811,16503 / 45459 / 45459 / 128250,EKPO.MENGE,"mean per material, fraud POs excluded"
+P2,policy,Reorder point R02 / R05 / R06 / P01 (median stock at PO creation),8062 / 35200 / 35200 / 150000,14800 / 27000 / 33600 / 188000,28000 / 38400 / 38400 / 186000,MSEG 101/261 stock path at CDHDR PO time,"player policy, not a physical parameter"
 M1,policy,Production batch (units): values (count),"48000: 20, 16000: 10, 40000: 2, 44000: 1, 27000: 1, 47000: 1, 35000: 1, 38000: 1","48000: 15, 16000: 7, 36000: 1, 22000: 1, 20000: 1, 37000: 1, 40000: 1, 46000: 1, 45000: 1, 38000: 1","48000: 17, 16000: 5, 44000: 2, 22000: 2, 36000: 1, 40000: 1, 20000: 1, 32000: 1, 23000: 1",AFKO.GAMNG,F12 production orders
 M2,bounded,"Production processing time (days), median / q95",1.0 / 24.6,2.0 / 19.2,1.5 / 18.65,"AUFM 261 (first component issue) -> 101 (last receipt), engine ticks",F12 orders
 M5,bounded,"Production queue time before start (days), median / q75",2.0 / 4.0,1.0 / 3.0,1.0 / 2.0,JCDS I0002 (release) -> AUFM first 261,waiting for the shared line
 M6,bounded,"Line rate (units per processing day), median","24,000","24,000","24,000",AFKO.GAMNG / processing days,F12 orders with processing > 0 days
 M7,context,"Shared-line busy share, steady months",0.933,0.821,0.894,AUFM start/end of all products' orders,days with any order in processing
 M8,bounded (background load),Other products on the line: orders per product,"AA-F15: 6, AA-F16: 35","AA-F13: 7, AA-F15: 6, AA-F16: 41","AA-F15: 6, AA-F16: 48","AFKO.PLNBEZ, same work centre",background load for the line model
-M3,policy,"Production trigger: plant stock at order creation, median","21,194","16,000","24,000",MSEG 101/301 plant stock path at JCDS I0001,player policy
+M3,policy,"Production trigger: plant stock at order creation, median",0,0,"8,000",MSEG 101/301 plant stock path at JCDS I0001,player policy
 M4,policy,Share of production orders for F12,0.474,0.353,0.33,AFKO.PLNBEZ,line shared with F16/F15
 T1,policy,"Plant -> DC transfer size (units), mean","8,329.341","7,189.542","7,024.845",MSEG 301 inbound to 02N/02S/02W,F12
 T2,unobserved,Plant -> DC transport time,not observable,not observable,not observable,MSEG 301,ERPsim posts transfers as one instantaneous document

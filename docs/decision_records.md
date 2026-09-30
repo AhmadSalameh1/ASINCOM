@@ -36,13 +36,15 @@ Each decision is stated with the options considered, the evidence for the choice
 |---|---|
 | F12 only, with a fixed share of line capacity | Rejected: it cannot reproduce queueing behind other products' orders (M5) or show how a line stoppage hits F12 through the queue. |
 | **F12 detailed + other products as line background load** | Chosen |
-| All products in full detail | Rejected: shared components never constrain production (K1 = 0), so modelling the other products' customers and materials adds state space without changing F12's behaviour under normal operation. |
+| All products in full detail | Rejected: shared components do not constrain steady operation (K1 ≤ 0.8 %), so modelling the other products' customers and materials adds state space without changing F12's behaviour under normal operation. |
 
 **Evidence**
 - **Shared line:** F12, F15 and F16 use the same work centre (routing operations on work centre 10000000). The line is busy on **93 % / 82 % / 89 %** of steady-month days (M7), and F12 orders wait a median **2 / 1 / 1 days** before they start (M5). Line contention is therefore real and must be modelled.
-- **Shared components do not bind:** no F12 component (blueberries, wheat, oats, box, bag) ends any played day at zero stock in any of the three years (**K1 = 0 / 0 / 0**). Competition for materials does not constrain production in normal operation.
+- **Shared components do not bind in steady operation:** in the steady months, F12 components end a day at zero stock on **0.8 % / 0 % / 0 %** of days (K1; in normal 2 a single packaging day). Zero-stock days occur only at game start, when stock starts empty until the first deliveries arrive, and at the end of the game (K2; normal 2 months 1–2, 4, 11–12). Competition for materials does not constrain production in normal operation.
 - **Line rate:** 24,000 units per day in all three years (M6), so line occupancy per order is `batch / 24,000` days.
 - **F12 is a major product:** 47 % / 35 % / 33 % of production orders (M4).
+
+**Also supported by Phase B** (`data/structure/structure_evidence.md`): all products are routed to the same work centre (B13); output is at most 24,000 units per tick outside batched catch-up postings (B12); and the F12 network is closed, so produced = transferred = sold + closing stock with zero residual in all three years (B15).
 
 **Would be overturned by:** Phase D validation failing to reproduce F12 queue and flow times on fraud 2 or fraud 3. If that happens, move to full multi-product detail.
 

@@ -69,20 +69,31 @@ Pipeline: `data/derive_calibration.py` → `data/calibration/`:
 | **policy** | Player decision. Kept as the nominal policy; the L2 decision layer may change it. | reorder points, PO sizes, production batch (16k or 48k), transfer size, peak DC stock (**not a capacity**: 132k / 77k / 58k across years) |
 | **unobserved** | Not recorded in the data; assumed and varied | plant → DC transport time (ERPsim transfers are instantaneous) |
 
-### 2.4 Phase B: structure proof (next)
-Mine the process flows from the SAP document flow (VBFA, EKBE, AFKO/AUFM) and draw the model's automata only from observed flows:
-- order → delivery → goods issue at the DC
-- DC replenishment → plant-to-DC transfer
-- production order → component issue (261) → finished-goods receipt (101)
-- PO → goods receipt
+### 2.4 Phase B: structure proof (done)
+`data/derive_structure.py` → `data/structure/structure_evidence.md`. There are 17 structural claims, each tested in all three years, and the proven structure is drawn as a diagram. What the model must implement:
 
-For each automaton and edge, record the ledger ID of the flow that proves it.
+| Claim | Result (normal 2 / fraud 2 / fraud 3) |
+|---|---|
+| **B1–B3** Order → delivery → goods issue → invoice is one chain; delivered in full; in the same tick | 100 % / 100 % / 100 % |
+| **B4** An order is clipped to the DC stock; the excess is **lost** (no backorders) | sales that empty a DC are much smaller than usual (median 320 vs 482, …) |
+| **B5** Each customer is served by one fixed DC | 100 % |
+| **B6–B7** Purchasing: requisition → PO → full receipt | 98–100 %; the only short POs were created 3 days before game end |
+| **B8** Split receipts occur only in scrap events | 3/3, 2/3, 1/1. One unexplained PO (fraud 2, 4500000018). |
+| **B10** Production orders deliver their full quantity | 100 % / 95 % / 89 %; every incomplete order was released in the last 5 days |
+| **B11** Components are consumed per BOM | the recipe changes during the game (fraud 2 changed the F12 recipe) → use per-period consumption |
+| **B12–B13** Production is a daily flow of ≤ 24,000 units/tick on **one shared line** for all products | 96–98 % of ticks; the rest are batched catch-up postings |
+| **B14** Distribution is plant → DC only, as instantaneous transfers; no returns | all transfer documents |
+| **B15** The network is closed: produced = to DCs = sold + closing stock | residual 0 in all three years |
+| **B16** The game starts with empty stock | every stock path's minimum is 0 |
+| **B17** The observed production pause is a **planning gap** (no production started), not a breakdown | 52 / 60 / 25 days |
+
+Cleaning rule **C1a**: the label file lists one fraud-3 PO as `450000015`, a typo for 4500000015.
 
 ### 2.5 Phase C–D: build and validate the undisrupted model
 - **Build:** a new UPPAAL model (V12). Each constant and distribution carries its ledger ID in a comment.
 - **Modelling decisions:** each is justified in `docs/decision_records.md` with its evidence, the result that would overturn it, and the remaining risk.
   - **DR-1 time unit = 1 game day.** 95 % of engine postings fall on day ticks; lead times are whole days; line capacity is 24,000 units per day.
-  - **DR-2 F12 in detail, plus the other products as background load on the shared line.** The line is busy on 82–93 % of steady days, so contention is real. Shared components never run out, so material coupling does not bind.
+  - **DR-2 F12 in detail, plus the other products as background load on the shared line.** The line is busy on 82–93 % of steady days, so contention is real. Shared components run out on at most 0.8 % of steady days (zero-stock days are start-up and end-of-game effects), so material coupling does not bind.
   - **DR-3 nominal policy = the normal 2 players' decisions.** Validation replays each year's own policy, so it tests the physics.
 - **Validation** on fraud 2 and fraud 3 (steady months, their own recipe and policy):
   - lead-time, inter-order, queue, processing and DC-stock distributions (two-sample KS tests, quantile coverage)
@@ -93,7 +104,7 @@ A disruption is admitted only if (a) it acts through a mechanism that exists in 
 
 | Disruption | Mechanism in the model | Evidence for its parameters |
 |---|---|---|
-| **Production stoppage** | Shared line unavailable | **Observed in two of the three years:** months without F12 production (normal 2: months 10–11; fraud 2: months 3–4), with the resulting DC stock-outs. These are real episodes for **validating** the disruption model. |
+| **Production stoppage** | Shared line unavailable | **Observed production pauses** (B17: 52 and 60 days without F12 production starts in normal 2 and fraud 2), with the resulting DC stock-outs. They are planning gaps, not breakdowns, but the downstream propagation is real, so they **validate how the model propagates a stoppage**. |
 | Supplier delay | Lead-time distribution shifted or scaled | USAID SCMS delivery-delay distribution (dimensionless: delay / planned lead time) |
 | Supply shortage | Partial goods receipt | USAID short or partial shipments; literature |
 | Demand surge or drop | Customer ordering rate scaled | DataCo order-volume bursts; the price-driven demand variation between the three years |
@@ -204,7 +215,7 @@ Real data **sets parameter ranges and the real-anchored test twins**. It is neve
 
 | Week | Dates | Work | Deliverable |
 |---|---|---|---|
-| 1 | 30 Sep–6 Oct | **Phase A** cleaning and evidence ledger (done). Decision records DR-1 to DR-3 (done). **Phase B** structure proof from document flows. Send the pitch to the professor. Read COOL-MC. | Ledger, cleaning log, flow diagram |
+| 1 | 30 Sep–6 Oct | **Phase A** cleaning and evidence ledger (done). Decision records DR-1 to DR-3 (done). **Phase B** structure proof (done). Send the pitch to the professor. Read COOL-MC. | Ledger, cleaning log, flow diagram |
 | 2 | 7–13 Oct | **Phase C:** build V12 from the ledger (controllable practices, cost variable, ledger IDs in comments). | V12 model |
 | 3 | 14–20 Oct | **Phase D:** validate the undisrupted V12 against fraud 2 and fraud 3. **Phase E:** disruption modules; fit USAID / DataCo statistics; check the stoppage module against the observed episodes. | Validation table, disruption table |
 | 4 | 21–27 Oct | Ensemble generator (LHS over bounded and unobserved parameters), trace generation, **Morris then Sobol** sensitivity. | Fig. 2 |
@@ -256,6 +267,6 @@ paper/          IFAC LaTeX + figures
 ## 9. Immediate next steps
 
 1. Decisions DR-1 to DR-3 are recorded in `docs/decision_records.md`. Resolve its open items during Phase D.
-2. Phase B: mine the document flows and draw the proven process structure.
+2. Phase C: build V12 from the evidence ledger and the proven structure (Section 2.4).
 3. Send the professor the pitch (Section 1) together with the evidence-first approach (Section 2).
 4. Read COOL-MC (arXiv 2603.02396) for positioning.

@@ -75,6 +75,14 @@ def load_run(root, run, reference_headers):
     return out
 
 
+def fix_po_number(x):
+    """Rule C1a: PO numbers are 10 digits (45000000NN). The label file lists one
+    fraud-3 PO as '450000015', a 9-digit typo for 4500000015; restore the zero."""
+    if len(x) == 9 and x.startswith("45"):
+        return x[:2] + "0" + x[2:]
+    return x
+
+
 def labelled_documents(root):
     """Documents named in the dataset's label file, per run."""
     sheets = pd.read_excel(os.path.join(root, "fraud_labels_all_data.xlsx"), sheet_name=None, header=None)
@@ -83,7 +91,7 @@ def labelled_documents(root):
         ev = {"fraud_po": set(), "fraud_so": set(), "sale_so": set(), "scrap_po": set()}
         for _, row in df.iloc[2:].iterrows():
             label = str(row[0])
-            po = {int(x) for x in re.findall(r"\d+", str(row[2])) if len(x) >= 9}
+            po = {int(fix_po_number(x)) for x in re.findall(r"\d+", str(row[2])) if len(x) >= 9}
             so = {int(x) for x in re.findall(r"\d+", str(row[3]))} if str(row[3]) != "nan" else set()
             if label.startswith("Sale"):
                 ev["sale_so"] |= so
@@ -167,15 +175,18 @@ class GameClock:
 
 
 def stock_path(moves):
-    """Stock level from signed movements. The opening stock is not in the data;
-    the path is shifted by its lower bound so it never goes negative."""
+    """Stock level from signed, chronologically ordered movements. The runs start
+    with empty stock (structure check B16: every path's minimum is 0), so the
+    returned opening stock is 0; it stays as a guard against incomplete data."""
     level = moves.d.cumsum()
     opening = max(0.0, -level.min())
     return level + opening, opening
 
 
 def signed(moves):
-    moves = moves.sort_values(["gday", "MBLNR"]).copy()
+    # chronological order: wall-clock second, then document number and line
+    # (document numbers alone are not chronological across number ranges)
+    moves = moves.sort_values(["sec", "MBLNR", "ZEILE"]).copy()
     moves["d"] = np.where(moves.SHKZG == "S", moves.MENGE, -moves.MENGE)
     return moves
 
@@ -194,7 +205,8 @@ def derive(tb, ev):
 
     # ---- integrity checks ----
     ms = mseg.merge(mkpf[["MBLNR", "CPUTM"]], on="MBLNR")
-    ms["gday"] = ms.CPUTM.apply(lambda t: clock.posting_tick(secs(t)))
+    ms["sec"] = ms.CPUTM.apply(secs)
+    ms["gday"] = ms.sec.apply(clock.posting_tick)
     ms["to_tick"] = ms.CPUTM.apply(lambda t: clock.seconds_to_tick(secs(t)))
     engine = ms[ms.BWART.isin([101, 261, 301, 601])].drop_duplicates("MBLNR")
     out["clock"] = {"played_days": int(len(clock.days)), "first_day": int(clock.days[0]),
@@ -215,7 +227,7 @@ def derive(tb, ev):
     n0 = len(vbak)
     vbak = vbak[~vbak.VBELN.isin(ev["fraud_so"])]
     ek = ekpo[~ekpo.EBELN.isin(ev["fraud_po"])]
-    log.append(("C1 fraud documents", "drop sales orders and POs named in the label file",
+    log.append(("C1 fraud documents", "drop sales orders and POs named in the label file (C1a: 9-digit PO typo 450000015 read as 4500000015)",
                 f"{n0 - len(vbak)} sales orders, {ekpo.EBELN.nunique() - ek.EBELN.nunique()} POs removed"))
 
     # ---- structure: BOM, network ----
@@ -325,11 +337,14 @@ def derive(tb, ev):
         mv = signed(ms[(ms.MATNR == m) & ms.BWART.isin([101, 261])])
         mv["stock"], opening = stock_path(mv)
         pos = po_created[po_created.EBELN.isin(ek[ek.MATNR == m].EBELN)]
-        at_po = [mv[mv.gday <= d].stock.iloc[-1] if (mv.gday <= d).any() else opening for d in pos.po_day]
+        at_po = [mv[mv.sec <= t].stock.iloc[-1] if (mv.sec <= t).any() else opening for t in pos.po_sec]
         day_end = mv.groupby("gday").stock.last().reindex(clock.days).ffill().fillna(opening)
         comp[m] = {"opening_stock_lower_bound": float(opening), "peak_stock": float(mv.stock.max()),
                    "stock_when_po_created": summary(at_po),
-                   "share_of_days_ending_at_zero": round(float((day_end <= 0).mean()), 4)}
+                   "share_of_days_ending_at_zero": round(float((day_end <= 0).mean()), 4),
+                   "share_of_steady_days_ending_at_zero": round(float(
+                       (day_end[month_of(day_end.index).isin(steady)] <= 0).mean()), 4),
+                   "months_with_zero_days": sorted({int(month_of(d)) for d in day_end[day_end <= 0].index})}
     out["component_stock"] = comp
     if ev["scrap_po"]:
         sc = ms[ms.EBELN.isin(ev["scrap_po"])]
@@ -380,8 +395,9 @@ def derive(tb, ev):
                                       prod_moves.groupby(month_of(prod_moves.gday.astype(int))).MENGE.sum().items()}
     plant = signed(fg[(fg.LGORT == PLANT_SLOC) & fg.BWART.isin([101, 301])])
     plant["stock"], opening = stock_path(plant)
-    created = st[(st.STAT == STAT_CREATED) & st.AUFNR.isin(orders_p.AUFNR)].groupby("AUFNR").day.min()
-    at_order = [plant[plant.gday <= d].stock.iloc[-1] if (plant.gday <= d).any() else opening for d in created]
+    st["sec"] = st.UTIME.apply(secs)
+    created = st[(st.STAT == STAT_CREATED) & st.AUFNR.isin(orders_p.AUFNR)].groupby("AUFNR").sec.min()
+    at_order = [plant[plant.sec <= t].stock.iloc[-1] if (plant.sec <= t).any() else opening for t in created]
     out["plant_stock"] = {"opening_stock_lower_bound": float(opening), "peak_stock": float(plant.stock.max()),
                           "stock_when_production_order_created": summary(at_order)}
 
@@ -431,9 +447,12 @@ LEDGER = [
     ("Q1", "Scrap-event POs: lead time (days), median / max",
      lambda d: f'{d["scrap_po_lead_days"].get("median")} / {d["scrap_po_lead_days"].get("max")}',
      "labelled scrap POs, CDHDR -> MSEG 101", "quality-event evidence"),
-    ("K1", "Components: share of days ending at zero stock (max over F12 components)",
-     lambda d: max(v["share_of_days_ending_at_zero"] for v in d["component_stock"].values()),
-     "MSEG 101/261 stock paths", "0 means shared components never constrained production"),
+    ("K1", "Components: share of steady-month days ending at zero stock (max over F12 components)",
+     lambda d: max(v["share_of_steady_days_ending_at_zero"] for v in d["component_stock"].values()),
+     "MSEG 101/261 stock paths (chronological)", "near 0 means shared components do not constrain steady operation"),
+    ("K2", "Components: months with any zero-stock day (union over F12 components)",
+     lambda d: sorted({m for v in d["component_stock"].values() for m in v["months_with_zero_days"]}),
+     "as K1", "start-up (stock starts empty) and end-of-game effects"),
     ("P1", "PO size R02 / R05 / R06 / P01 (mean units)",
      lambda d: " / ".join(f'{d["po_qty"][m]["mean"]:.0f}' for m in ["AA-R02", "AA-R05", "AA-R06", "AA-P01"]),
      "EKPO.MENGE", "mean per material, fraud POs excluded"),
@@ -489,7 +508,7 @@ CLASS = {"S1": "anchored", "S2": "anchored", "S3": "anchored (run-specific recip
          "L1": "bounded", "L2": "bounded", "P1": "policy", "P2": "policy",
          "M1": "policy", "M2": "bounded", "M3": "policy", "M4": "policy", "M5": "bounded",
          "M6": "bounded", "M7": "context", "M8": "bounded (background load)",
-         "L3": "bounded", "L4": "bounded", "Q1": "context (event evidence)", "K1": "context", "W0": "context",
+         "L3": "bounded", "L4": "bounded", "Q1": "context (event evidence)", "K1": "context", "K2": "context", "W0": "context",
          "T1": "policy", "T2": "unobserved", "C1": "policy", "W1": "context", "E1": "context"}
 
 
