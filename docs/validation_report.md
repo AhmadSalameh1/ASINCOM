@@ -12,7 +12,7 @@
 - In fraud 3, the failures trace to one input fault (below). Once it is corrected, as a diagnostic only, two narrow failures remain.
 - **The player-policy models are validated separately:** the MRP replica is accepted (production 20/21, purchasing 29/37), and **the push rule is not accepted** (A1-transfers 17.6 % on normal 2).
 
-## Round 2 (Amendment 2; 50 seeds; `model/twin/validation/*_replay_replay_fixed_replay.*`)
+## Round 2 (Amendment 2; 50 seeds; `model/twin/validation/*_replay_replay_fixed.*`; round 1: `*_lag1_fixed.*`)
 | | V1 | A1 sales | A1 production | A1 transfers | V5 | V6 | V7 | V8 | Failures |
 |---|---|---|---|---|---|---|---|---|---|
 | normal 2 (calibration) | ✅ −2.2 % / 0.0 % | ✅ 2.2 % | ✅ 6.9 % | ✅ 2.2 % | ✅ 11/12 | ✅ 6 vs 5 | ❌ R02 5.8 % | ✅ | 1 |
