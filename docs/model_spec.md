@@ -69,7 +69,10 @@ The Phase C analysis shows how the players decided:
 2. **the forecast input**: replayed from PBHI for validation (Phase D), and a stated forecast rule (e.g. recent sales × cover) for experiments. The fit of that rule to the recorded forecasts will be reported;
 3. **a push distribution rule** fitted to the MSEG 301 pattern (ship within 0–1 days of output, split across the DCs), with its fit reported.
 
-To be completed before coding: decode the PBHI fields (PLNMG, ENTMG) exactly, and confirm that the MRP replica reproduces the recorded requisition and production-order quantities when fed the recorded forecasts. This is the policy acceptance test.
+**Policy acceptance status** (`docs/policy_acceptance.md`):
+- PBHI decoded: PLNMG = the new open forecast set by the player.
+- **Production: accepted.** The MRP replica, with MARC lot rules (min 16k, max 48k, rounding 1k), explains 20 of 21 recorded forecast updates exactly.
+- **Purchasing: not yet accepted.** 8 of 32 PO bursts match exactly. A multi-product MRP replica with component netting is the next test.
 
 ## 5. Parameters
 The values come from `calibration_normal_2.json`. Ensemble ranges come from the spread across the three runs (DR-0).
