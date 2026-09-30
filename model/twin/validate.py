@@ -32,9 +32,12 @@ def main():
     ap.add_argument("inputs")
     ap.add_argument("--seeds", type=int, default=50)
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "validation"))
-    ap.add_argument("--push", default="lag1")
+    ap.add_argument("--push", default="replay")
     ap.add_argument("--split", default="fixed")
     ap.add_argument("--mrp", default="recorded")
+    ap.add_argument("--policy", default="replay", choices=["mrp", "replay"])
+    ap.add_argument("--line", default="erpsim")
+    ap.add_argument("--changeover", type=float, default=0.6)
     a = ap.parse_args()
     inp = json.load(open(a.inputs))
     run = inp["run"]
@@ -42,7 +45,7 @@ def main():
     rec = recorded_series(inp)
     sims, starts = [], []
     for s in range(a.seeds):
-        tw = Twin(inp, seed=s, demand_mode="replay", push_rule=a.push, dc_split=a.split, mrp_timing=a.mrp)
+        tw = Twin(inp, seed=s, demand_mode="replay", push_rule=a.push, dc_split=a.split, mrp_timing=a.mrp, policy=a.policy, line_rule=a.line, changeover_days=a.changeover)
         df = tw.run().set_index("day")
         df["seed"] = s
         sims.append(df)
@@ -55,7 +58,7 @@ def main():
                     starts.append(o["start"] - prev[-1])
     sim = pd.concat(sims)
     res, lines = {}, [f"# Validation metrics: {run}\n",
-                      f"{a.seeds} seeds; demand, forecast and MRP days replayed; push {a.push}, DC split {a.split}.\n"]
+                      f"{a.seeds} seeds; demand, forecast and MRP days replayed; policy {a.policy}, push {a.push}, DC split {a.split}.\n"]
 
     # V1 year totals
     tot = sim.groupby("seed")[list(rec.columns)].sum().median()
@@ -121,9 +124,9 @@ def main():
         lines.append(f"\n## V8 production pause (days {pause[0]}-{pause[1]}) → DC stock-outs\n- recorded stock-out months "
                      f"in/after the pause {sorted(rec_so & after)}, twin {sorted(twin_so & after)} → "
                      f"**{'PASS' if res['V8'] else 'FAIL'}**")
-    with open(os.path.join(a.out, f"{run}_{a.push}_{a.split}.md"), "w") as fh:
+    with open(os.path.join(a.out, f"{run}_{a.policy}_{a.push}_{a.split}.md"), "w") as fh:
         fh.write("\n".join(lines) + "\n")
-    json.dump({k: bool(v) for k, v in res.items()}, open(os.path.join(a.out, f"{run}_{a.push}_{a.split}.json"), "w"))
+    json.dump({k: bool(v) for k, v in res.items()}, open(os.path.join(a.out, f"{run}_{a.policy}_{a.push}_{a.split}.json"), "w"))
     print("\n".join(lines))
 
 

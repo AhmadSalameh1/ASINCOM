@@ -122,10 +122,26 @@ def build(root, run, calibration_dir):
     recipe = resb.pivot_table(index="AUFNR", columns="MATNR", values="BDMNG", aggfunc="sum").fillna(0).div(
         afko.GAMNG, axis=0).dropna(how="all").fillna(0)
     created = cr.groupby("AUFNR").day.min()
+    # physical consumption per unit = components actually issued (AUFM 261) / order quantity; it differs from
+    # the reservation for the few orders that were partly issued (structure check B11)
+    issued = tb["aufm"][tb["aufm"].BWART == 261].groupby(["AUFNR", "MATNR"]).MENGE.sum().unstack().fillna(0)
+    issued = issued.div(afko.GAMNG.reindex(issued.index), axis=0)
     orders_all = [{"day": int(created[a]), "product": afko.PLNBEZ[a], "qty": int(afko.GAMNG[a]),
-                   "recipe": {c: round(float(recipe.loc[a].get(c, 0)), 6) for c in COMPONENTS if recipe.loc[a].get(c, 0) > 0}}
+                   "recipe": {c: round(float(recipe.loc[a].get(c, 0)), 6) for c in COMPONENTS if recipe.loc[a].get(c, 0) > 0},
+                   "issued_recipe": {c: round(float(issued.loc[a].get(c, 0)), 6) for c in COMPONENTS
+                                     if a in issued.index and issued.loc[a].get(c, 0) > 0}}
                   for a in created.index if a in recipe.index]
     orders_all.sort(key=lambda o: o["day"])
+    # recorded purchasing decisions (all real POs; goods physically moved), for policy replay
+    rp = ekpo_all = tb["ekpo"][["EBELN", "MATNR", "MENGE"]].merge(po[["EBELN", "pday", "psec"]], on="EBELN")
+    # pre-start POs (game initialisation) are excluded from lead-time statistics (rule C4) but are real goods:
+    # they are replayed as arriving at the start of trading
+    rp = rp[rp.MATNR.isin(COMPONENTS)]
+    first_day = int(clock.days[0])
+    inp["recorded_pos"] = [{"day": int(r.pday) if r.psec >= clock.starts[0] else first_day - 1,
+                            "material": r.MATNR, "qty": float(r.MENGE),
+                            "pre_start": bool(r.psec < clock.starts[0])}
+                           for r in rp.sort_values("psec").itertuples()]
     # MRP runs = days on which the players created POs or production orders (planning lag after
     # forecast updates is player behaviour, replayed per DR-3)
     po_days = set(int(d) for d in po[po.psec >= clock.starts[0]].pday)
@@ -167,6 +183,8 @@ def build(root, run, calibration_dir):
     shares = (tin[month_of(tin.day).isin(steady)].groupby("LGORT").MENGE.sum())
     shares = {DC_NAMES[k]: round(float(v / shares.sum()), 4) for k, v in shares.items()}
     inp["dc_push"] = {"daily_fraction_of_plant_stock": round(alpha, 4), "dc_shares": shares}
+    per_dc = tin.groupby(["day", "LGORT"]).MENGE.sum()
+    inp["recorded_transfers"] = [{"day": int(d), "dc": DC_NAMES[l], "qty": float(q)} for (d, l), q in per_dc.items()]
     inp["evidence"]["dc_push"] = "fitted on steady months of MSEG 301 (spec section 4, item 3)"
 
     # ---- recorded reference values for validation (not used by the simulation) ----

@@ -56,5 +56,33 @@ Here "band" means the 5–95 % range across seeds.
 
 These known weaknesses are carried into the validation; they are not tuned away.
 
+## Amendment 2: validation round 2 (made on normal 2 only, before the round-2 run on fraud 2 and fraud 3)
+**Disclosure:** round 1 (`docs/validation_report.md`) has been run and its fraud 2 and fraud 3 results were seen. Round 2 therefore has weaker evidential value than round 1, and both rounds are reported.
+
+**Design change (why round 1 was the wrong test):** DR-3 says the validation must replay each year's own policy, so that it tests the **physics**. Round 1 instead generated the player decisions with policy models (the MRP replica, the push rule). The normal 2 diagnosis showed that most failures came from those decisions, especially the just-in-time conversion of planned orders, not from the physics. Round 2 therefore separates the two:
+- **Physics validation (round 2):** all recorded player decisions are replayed:
+  - production-order conversions (day, product, quantity)
+  - POs (day, material, quantity)
+  - transfers per DC (day, DC, quantity, clipped to plant stock)
+
+  Simulated: supplier lead times (sampled), the production line (`erpsim`, changeover 0.6 day), component consumption, the plant and DC stock paths, and sales clipped to DC stock.
+- **Policy-model validation (separate):** the MRP replica is tested against the recorded decisions (`docs/policy_acceptance.md`: production 20/21, purchasing 29/37). The push rule `lag1` is tested against the recorded transfers given the recorded production: on normal 2 it gives **A1-transfers 17.6 %, a FAIL**, so the push policy model is not accepted.
+
+**Two data-handling faults fixed (found on normal 2):**
+1. Pre-start POs (game initialisation) had been dropped from the replay. Rule C4 was meant for lead-time statistics only, and these POs are real opening stock.
+2. Replayed orders now consume what was **actually issued** (AUFM), not what was reserved.
+
+**Changeover 0.6 day:** recorded idle time between producing days is 0.84 days across a product switch vs 0.25 without one, and output on the switch day is 16k vs 24k. Results on normal 2 are insensitive to it (0, 0.6 or 1 day).
+
+**Metrics and verdict rule:** unchanged (Amendment 1). A1-transfers becomes weak under transfer replay (only the clipping can create a difference); it is reported with that caveat.
+
+**Frozen round-2 configuration:** `policy=replay`, `push_rule=replay`, `line_rule=erpsim`, `changeover_days=0.6`, `demand_mode=replay`, 50 seeds.
+
+**Normal 2 result under this configuration (20 seeds):**
+- V1: sales −2.2 %, production 0.0 %
+- A1: sales 2.2 %, production 7.1 %, transfers 2.2 %
+- V5: 11/12; V6: 6 vs 5 days; V8: pass
+- V7: blueberries (R02) 5.5 %, fail; all other components 0 %
+
 ## Output
 `model/twin/validation/` holds one report per year. `docs/validation_report.md` gives the verdict.

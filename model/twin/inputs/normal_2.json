@@ -8905,6 +8905,1532 @@
   "AA-P01": 1000,
   "AA-P02": 1000
  },
+ "recorded_pos": [
+  {
+   "day": 4,
+   "material": "AA-R01",
+   "qty": 4000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-R02",
+   "qty": 16000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-R03",
+   "qty": 4000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-R04",
+   "qty": 4000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-R05",
+   "qty": 26000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-R06",
+   "qty": 26000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-P01",
+   "qty": 80000.0,
+   "pre_start": true
+  },
+  {
+   "day": 4,
+   "material": "AA-P02",
+   "qty": 80000.0,
+   "pre_start": true
+  },
+  {
+   "day": 11,
+   "material": "AA-R01",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-R02",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-R04",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-R05",
+   "qty": 10400.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-R06",
+   "qty": 10400.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-P01",
+   "qty": 32000.0,
+   "pre_start": false
+  },
+  {
+   "day": 11,
+   "material": "AA-P02",
+   "qty": 32000.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R01",
+   "qty": 9600.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R02",
+   "qty": 38400.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R03",
+   "qty": 9600.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R04",
+   "qty": 9600.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R05",
+   "qty": 62400.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-R06",
+   "qty": 62400.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-P01",
+   "qty": 192000.0,
+   "pre_start": false
+  },
+  {
+   "day": 17,
+   "material": "AA-P02",
+   "qty": 192000.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R02",
+   "qty": 25600.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R03",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R05",
+   "qty": 41600.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-R06",
+   "qty": 41600.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-P01",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 24,
+   "material": "AA-P02",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 33,
+   "material": "AA-R02",
+   "qty": 12300.0,
+   "pre_start": false
+  },
+  {
+   "day": 33,
+   "material": "AA-R05",
+   "qty": 14350.0,
+   "pre_start": false
+  },
+  {
+   "day": 33,
+   "material": "AA-R06",
+   "qty": 14350.0,
+   "pre_start": false
+  },
+  {
+   "day": 33,
+   "material": "AA-P01",
+   "qty": 41000.0,
+   "pre_start": false
+  },
+  {
+   "day": 33,
+   "material": "AA-P02",
+   "qty": 41000.0,
+   "pre_start": false
+  },
+  {
+   "day": 38,
+   "material": "AA-R02",
+   "qty": 15300.0,
+   "pre_start": false
+  },
+  {
+   "day": 38,
+   "material": "AA-R05",
+   "qty": 17850.0,
+   "pre_start": false
+  },
+  {
+   "day": 38,
+   "material": "AA-R06",
+   "qty": 17850.0,
+   "pre_start": false
+  },
+  {
+   "day": 38,
+   "material": "AA-P01",
+   "qty": 51000.0,
+   "pre_start": false
+  },
+  {
+   "day": 38,
+   "material": "AA-P02",
+   "qty": 51000.0,
+   "pre_start": false
+  },
+  {
+   "day": 42,
+   "material": "AA-R02",
+   "qty": 5700.0,
+   "pre_start": false
+  },
+  {
+   "day": 42,
+   "material": "AA-R05",
+   "qty": 6650.0,
+   "pre_start": false
+  },
+  {
+   "day": 42,
+   "material": "AA-R06",
+   "qty": 6650.0,
+   "pre_start": false
+  },
+  {
+   "day": 42,
+   "material": "AA-P01",
+   "qty": 19000.0,
+   "pre_start": false
+  },
+  {
+   "day": 42,
+   "material": "AA-P02",
+   "qty": 19000.0,
+   "pre_start": false
+  },
+  {
+   "day": 46,
+   "material": "AA-R02",
+   "qty": 60000.0,
+   "pre_start": false
+  },
+  {
+   "day": 46,
+   "material": "AA-R05",
+   "qty": 70000.0,
+   "pre_start": false
+  },
+  {
+   "day": 46,
+   "material": "AA-R06",
+   "qty": 70000.0,
+   "pre_start": false
+  },
+  {
+   "day": 46,
+   "material": "AA-P01",
+   "qty": 200000.0,
+   "pre_start": false
+  },
+  {
+   "day": 46,
+   "material": "AA-P02",
+   "qty": 200000.0,
+   "pre_start": false
+  },
+  {
+   "day": 56,
+   "material": "AA-R02",
+   "qty": 33600.0,
+   "pre_start": false
+  },
+  {
+   "day": 56,
+   "material": "AA-R05",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 56,
+   "material": "AA-R06",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 56,
+   "material": "AA-P01",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 56,
+   "material": "AA-P02",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R01",
+   "qty": 11200.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R02",
+   "qty": 8400.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R03",
+   "qty": 2800.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R04",
+   "qty": 11200.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R05",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-R06",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-P01",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 59,
+   "material": "AA-P02",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 61,
+   "material": "AA-P01",
+   "qty": 100000.0,
+   "pre_start": false
+  },
+  {
+   "day": 61,
+   "material": "AA-P02",
+   "qty": 100000.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R01",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R02",
+   "qty": 15000.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R03",
+   "qty": 1200.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R04",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R05",
+   "qty": 30100.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-R06",
+   "qty": 30100.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-P01",
+   "qty": 86000.0,
+   "pre_start": false
+  },
+  {
+   "day": 67,
+   "material": "AA-P02",
+   "qty": 86000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R01",
+   "qty": 4000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R02",
+   "qty": 18000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R03",
+   "qty": 1000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R04",
+   "qty": 4000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R05",
+   "qty": 31500.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-R06",
+   "qty": 31500.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-P01",
+   "qty": 90000.0,
+   "pre_start": false
+  },
+  {
+   "day": 70,
+   "material": "AA-P02",
+   "qty": 90000.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R02",
+   "qty": 24000.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R05",
+   "qty": 44800.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-R06",
+   "qty": 44800.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-P01",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 75,
+   "material": "AA-P02",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R01",
+   "qty": 4200.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R02",
+   "qty": 17180.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R03",
+   "qty": 1030.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R04",
+   "qty": 4100.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R05",
+   "qty": 30800.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-R06",
+   "qty": 30800.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-P01",
+   "qty": 88000.0,
+   "pre_start": false
+  },
+  {
+   "day": 85,
+   "material": "AA-P02",
+   "qty": 88000.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R02",
+   "qty": 24000.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R05",
+   "qty": 44800.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-R06",
+   "qty": 44800.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-P01",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 89,
+   "material": "AA-P02",
+   "qty": 128000.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R01",
+   "qty": 9000.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R02",
+   "qty": 6750.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R03",
+   "qty": 2250.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R04",
+   "qty": 9000.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R05",
+   "qty": 31500.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-R06",
+   "qty": 31500.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-P01",
+   "qty": 90000.0,
+   "pre_start": false
+  },
+  {
+   "day": 93,
+   "material": "AA-P02",
+   "qty": 90000.0,
+   "pre_start": false
+  },
+  {
+   "day": 97,
+   "material": "AA-R02",
+   "qty": 19200.0,
+   "pre_start": false
+  },
+  {
+   "day": 97,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 97,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 97,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 97,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-R01",
+   "qty": 3600.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-R03",
+   "qty": 900.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-R04",
+   "qty": 3600.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-R05",
+   "qty": 8050.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-R06",
+   "qty": 8050.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-P01",
+   "qty": 23000.0,
+   "pre_start": false
+  },
+  {
+   "day": 105,
+   "material": "AA-P02",
+   "qty": 23000.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R01",
+   "qty": 5300.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R02",
+   "qty": 2770.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R03",
+   "qty": 1320.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R04",
+   "qty": 5300.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R05",
+   "qty": 18550.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-R06",
+   "qty": 18550.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-P01",
+   "qty": 53000.0,
+   "pre_start": false
+  },
+  {
+   "day": 106,
+   "material": "AA-P02",
+   "qty": 53000.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R01",
+   "qty": 11200.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R02",
+   "qty": 8400.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R03",
+   "qty": 2800.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R04",
+   "qty": 11200.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R05",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-R06",
+   "qty": 39200.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-P01",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 114,
+   "material": "AA-P02",
+   "qty": 112000.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R01",
+   "qty": 1400.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R02",
+   "qty": 1050.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R03",
+   "qty": 350.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R04",
+   "qty": 1400.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R05",
+   "qty": 4900.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-R06",
+   "qty": 4900.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-P01",
+   "qty": 14000.0,
+   "pre_start": false
+  },
+  {
+   "day": 117,
+   "material": "AA-P02",
+   "qty": 14000.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R02",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 121,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R01",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R02",
+   "qty": 3600.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R03",
+   "qty": 1200.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R04",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R05",
+   "qty": 16800.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-R06",
+   "qty": 16800.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-P01",
+   "qty": 48000.0,
+   "pre_start": false
+  },
+  {
+   "day": 123,
+   "material": "AA-P02",
+   "qty": 48000.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R01",
+   "qty": 4400.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R02",
+   "qty": 3300.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R03",
+   "qty": 1100.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R04",
+   "qty": 4400.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R05",
+   "qty": 15400.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-R06",
+   "qty": 15400.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-P01",
+   "qty": 44000.0,
+   "pre_start": false
+  },
+  {
+   "day": 128,
+   "material": "AA-P02",
+   "qty": 45000.0,
+   "pre_start": false
+  },
+  {
+   "day": 130,
+   "material": "AA-R05",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 130,
+   "material": "AA-R06",
+   "qty": 11200.0,
+   "pre_start": false
+  },
+  {
+   "day": 130,
+   "material": "AA-P01",
+   "qty": 16000.0,
+   "pre_start": false
+  },
+  {
+   "day": 130,
+   "material": "AA-P02",
+   "qty": 16000.0,
+   "pre_start": false
+  },
+  {
+   "day": 132,
+   "material": "AA-R05",
+   "qty": 28800.0,
+   "pre_start": false
+  },
+  {
+   "day": 132,
+   "material": "AA-R06",
+   "qty": 67200.0,
+   "pre_start": false
+  },
+  {
+   "day": 132,
+   "material": "AA-P01",
+   "qty": 96000.0,
+   "pre_start": false
+  },
+  {
+   "day": 132,
+   "material": "AA-P02",
+   "qty": 96000.0,
+   "pre_start": false
+  },
+  {
+   "day": 137,
+   "material": "AA-R02",
+   "qty": 19200.0,
+   "pre_start": false
+  },
+  {
+   "day": 137,
+   "material": "AA-R05",
+   "qty": 33800.0,
+   "pre_start": false
+  },
+  {
+   "day": 137,
+   "material": "AA-R06",
+   "qty": 49000.0,
+   "pre_start": false
+  },
+  {
+   "day": 137,
+   "material": "AA-P01",
+   "qty": 102000.0,
+   "pre_start": false
+  },
+  {
+   "day": 137,
+   "material": "AA-P02",
+   "qty": 102000.0,
+   "pre_start": false
+  },
+  {
+   "day": 141,
+   "material": "AA-R02",
+   "qty": 25800.0,
+   "pre_start": false
+  },
+  {
+   "day": 141,
+   "material": "AA-R05",
+   "qty": 30100.0,
+   "pre_start": false
+  },
+  {
+   "day": 141,
+   "material": "AA-R06",
+   "qty": 30100.0,
+   "pre_start": false
+  },
+  {
+   "day": 141,
+   "material": "AA-P01",
+   "qty": 86000.0,
+   "pre_start": false
+  },
+  {
+   "day": 141,
+   "material": "AA-P02",
+   "qty": 86000.0,
+   "pre_start": false
+  },
+  {
+   "day": 145,
+   "material": "AA-R02",
+   "qty": 19200.0,
+   "pre_start": false
+  },
+  {
+   "day": 145,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 145,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 145,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 145,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R02",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 150,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R01",
+   "qty": 3600.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R02",
+   "qty": 2700.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R03",
+   "qty": 900.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R04",
+   "qty": 3600.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R05",
+   "qty": 31800.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-R06",
+   "qty": 57400.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-P01",
+   "qty": 100000.0,
+   "pre_start": false
+  },
+  {
+   "day": 158,
+   "material": "AA-P02",
+   "qty": 100000.0,
+   "pre_start": false
+  },
+  {
+   "day": 161,
+   "material": "AA-R02",
+   "qty": 27600.0,
+   "pre_start": false
+  },
+  {
+   "day": 161,
+   "material": "AA-R05",
+   "qty": 32200.0,
+   "pre_start": false
+  },
+  {
+   "day": 161,
+   "material": "AA-R06",
+   "qty": 32200.0,
+   "pre_start": false
+  },
+  {
+   "day": 161,
+   "material": "AA-P01",
+   "qty": 92000.0,
+   "pre_start": false
+  },
+  {
+   "day": 161,
+   "material": "AA-P02",
+   "qty": 92000.0,
+   "pre_start": false
+  },
+  {
+   "day": 166,
+   "material": "AA-R02",
+   "qty": 20400.0,
+   "pre_start": false
+  },
+  {
+   "day": 166,
+   "material": "AA-R05",
+   "qty": 23800.0,
+   "pre_start": false
+  },
+  {
+   "day": 166,
+   "material": "AA-R06",
+   "qty": 23800.0,
+   "pre_start": false
+  },
+  {
+   "day": 166,
+   "material": "AA-P01",
+   "qty": 68000.0,
+   "pre_start": false
+  },
+  {
+   "day": 166,
+   "material": "AA-P02",
+   "qty": 68000.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R02",
+   "qty": 1800.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R05",
+   "qty": 18900.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-R06",
+   "qty": 18900.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 198,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 201,
+   "material": "AA-R01",
+   "qty": 100.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R01",
+   "qty": 4600.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R02",
+   "qty": 3450.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R03",
+   "qty": 1150.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R04",
+   "qty": 4600.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R05",
+   "qty": 16100.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-R06",
+   "qty": 16100.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-P01",
+   "qty": 46000.0,
+   "pre_start": false
+  },
+  {
+   "day": 206,
+   "material": "AA-P02",
+   "qty": 46000.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R01",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R02",
+   "qty": 4800.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R03",
+   "qty": 1600.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R04",
+   "qty": 6400.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 213,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 221,
+   "material": "AA-R02",
+   "qty": 19200.0,
+   "pre_start": false
+  },
+  {
+   "day": 221,
+   "material": "AA-R05",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 221,
+   "material": "AA-R06",
+   "qty": 22400.0,
+   "pre_start": false
+  },
+  {
+   "day": 221,
+   "material": "AA-P01",
+   "qty": 64000.0,
+   "pre_start": false
+  },
+  {
+   "day": 221,
+   "material": "AA-P02",
+   "qty": 64000.0,
+   "pre_start": false
+  }
+ ],
  "mrp_run_days": [
   5,
   11,
@@ -8983,6 +10509,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -8995,13 +10528,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 22,
-   "product": "AA-F12",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9014,6 +10542,32 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 22,
+   "product": "AA-F12",
+   "qty": 48000,
+   "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9026,6 +10580,13 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9038,6 +10599,13 @@
    "product": "AA-F12",
    "qty": 16000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9055,6 +10623,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9067,13 +10642,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 50,
-   "product": "AA-F12",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9091,13 +10661,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 50,
-   "product": "AA-F12",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9110,6 +10675,51 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 50,
+   "product": "AA-F12",
+   "qty": 48000,
+   "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 50,
+   "product": "AA-F12",
+   "qty": 48000,
+   "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9127,13 +10737,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 58,
-   "product": "AA-F12",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9146,6 +10751,32 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 58,
+   "product": "AA-F12",
+   "qty": 48000,
+   "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9163,6 +10794,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9170,6 +10808,13 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9187,6 +10832,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9199,6 +10851,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9206,6 +10865,13 @@
    "product": "AA-F12",
    "qty": 16000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9223,6 +10889,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9235,6 +10908,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9242,6 +10922,13 @@
    "product": "AA-F12",
    "qty": 16000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9259,6 +10946,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9271,6 +10965,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9283,6 +10984,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 0.833333,
+    "AA-P02": 0.833333
    }
   },
   {
@@ -9295,6 +11003,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.1125,
+    "AA-R05": 0.13125,
+    "AA-R06": 0.13125,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9302,6 +11017,13 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9319,6 +11041,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9331,6 +11060,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9338,6 +11074,13 @@
    "product": "AA-F12",
    "qty": 16000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9355,6 +11098,13 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9367,13 +11117,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 168,
-   "product": "AA-F12",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9386,6 +11131,32 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 168,
+   "product": "AA-F12",
+   "qty": 48000,
+   "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9398,6 +11169,13 @@
    "product": "AA-F12",
    "qty": 48000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9410,6 +11188,13 @@
    "product": "AA-F12",
    "qty": 16000,
    "recipe": {
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R02": 0.3,
     "AA-R05": 0.35,
     "AA-R06": 0.35,
@@ -9432,6 +11217,16 @@
     "AA-R06": 0.3,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.3,
+    "AA-R06": 0.3,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9447,13 +11242,8 @@
     "AA-R06": 0.3,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 22,
-   "product": "AA-F16",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.1,
     "AA-R03": 0.1,
@@ -9469,6 +11259,41 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.3,
+    "AA-R06": 0.3,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.15,
+    "AA-R06": 0.15,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 22,
+   "product": "AA-F16",
+   "qty": 48000,
+   "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.3,
+    "AA-R06": 0.3,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.1,
     "AA-R03": 0.1,
@@ -9484,6 +11309,16 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.3,
+    "AA-R06": 0.3,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.1,
     "AA-R03": 0.1,
@@ -9499,6 +11334,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.1,
+    "AA-R03": 0.1,
+    "AA-R04": 0.1,
+    "AA-R05": 0.3,
+    "AA-R06": 0.3,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.1,
     "AA-R03": 0.1,
@@ -9522,6 +11367,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9529,6 +11384,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9552,13 +11417,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 72,
-   "product": "AA-F16",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9574,6 +11434,41 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 72,
+   "product": "AA-F16",
+   "qty": 48000,
+   "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9589,6 +11484,16 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9604,6 +11509,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9627,6 +11542,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9634,6 +11559,16 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9657,6 +11592,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9664,6 +11609,16 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9687,6 +11642,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9694,6 +11659,16 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9717,13 +11692,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 119,
-   "product": "AA-F16",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9739,6 +11709,41 @@
    "product": "AA-F16",
    "qty": 48000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 119,
+   "product": "AA-F16",
+   "qty": 48000,
+   "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9762,13 +11767,8 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
-   }
-  },
-  {
-   "day": 127,
-   "product": "AA-F16",
-   "qty": 48000,
-   "recipe": {
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9792,6 +11792,41 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   }
+  },
+  {
+   "day": 127,
+   "product": "AA-F16",
+   "qty": 48000,
+   "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 0.5,
+    "AA-P02": 0.5
    }
   },
   {
@@ -9799,6 +11834,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9822,6 +11867,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.254545,
+    "AA-R06": 0.254545,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9833,6 +11888,12 @@
     "AA-R06": 0.7,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9840,6 +11901,12 @@
    "product": "AA-F15",
    "qty": 48000,
    "recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R05": 0.3,
     "AA-R06": 0.7,
     "AA-P01": 1.0,
@@ -9851,6 +11918,12 @@
    "product": "AA-F15",
    "qty": 16000,
    "recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R05": 0.3,
     "AA-R06": 0.7,
     "AA-P01": 1.0,
@@ -9866,6 +11939,12 @@
     "AA-R06": 0.7,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9881,6 +11960,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9888,6 +11977,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9907,6 +12006,12 @@
     "AA-R06": 0.7,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9914,6 +12019,12 @@
    "product": "AA-F15",
    "qty": 16000,
    "recipe": {
+    "AA-R05": 0.3,
+    "AA-R06": 0.7,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R05": 0.3,
     "AA-R06": 0.7,
     "AA-P01": 1.0,
@@ -9933,6 +12044,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9948,6 +12069,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9955,6 +12086,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -9978,6 +12119,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -9993,6 +12144,16 @@
     "AA-R06": 0.35,
     "AA-P01": 1.0,
     "AA-P02": 1.0
+   },
+   "issued_recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
    }
   },
   {
@@ -10000,6 +12161,16 @@
    "product": "AA-F16",
    "qty": 16000,
    "recipe": {
+    "AA-R01": 0.1,
+    "AA-R02": 0.075,
+    "AA-R03": 0.025,
+    "AA-R04": 0.1,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35,
+    "AA-P01": 1.0,
+    "AA-P02": 1.0
+   },
+   "issued_recipe": {
     "AA-R01": 0.1,
     "AA-R02": 0.075,
     "AA-R03": 0.025,
@@ -10611,6 +12782,843 @@
    "West": 0.2956
   }
  },
+ "recorded_transfers": [
+  {
+   "day": 5,
+   "dc": "North",
+   "qty": 4.0
+  },
+  {
+   "day": 5,
+   "dc": "South",
+   "qty": 4.0
+  },
+  {
+   "day": 5,
+   "dc": "West",
+   "qty": 4.0
+  },
+  {
+   "day": 7,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 7,
+   "dc": "South",
+   "qty": 10000.0
+  },
+  {
+   "day": 7,
+   "dc": "West",
+   "qty": 9996.0
+  },
+  {
+   "day": 13,
+   "dc": "South",
+   "qty": 3000.0
+  },
+  {
+   "day": 13,
+   "dc": "West",
+   "qty": 1798.0
+  },
+  {
+   "day": 15,
+   "dc": "North",
+   "qty": 1782.0
+  },
+  {
+   "day": 15,
+   "dc": "South",
+   "qty": 1248.0
+  },
+  {
+   "day": 15,
+   "dc": "West",
+   "qty": 1752.0
+  },
+  {
+   "day": 17,
+   "dc": "North",
+   "qty": 4752.0
+  },
+  {
+   "day": 17,
+   "dc": "South",
+   "qty": 6000.0
+  },
+  {
+   "day": 17,
+   "dc": "West",
+   "qty": 3000.0
+  },
+  {
+   "day": 19,
+   "dc": "North",
+   "qty": 1124.0
+  },
+  {
+   "day": 19,
+   "dc": "South",
+   "qty": 827.0
+  },
+  {
+   "day": 19,
+   "dc": "West",
+   "qty": 709.0
+  },
+  {
+   "day": 23,
+   "dc": "North",
+   "qty": 5833.0
+  },
+  {
+   "day": 23,
+   "dc": "South",
+   "qty": 5833.0
+  },
+  {
+   "day": 23,
+   "dc": "West",
+   "qty": 4334.0
+  },
+  {
+   "day": 25,
+   "dc": "North",
+   "qty": 2047.0
+  },
+  {
+   "day": 25,
+   "dc": "South",
+   "qty": 4120.0
+  },
+  {
+   "day": 25,
+   "dc": "West",
+   "qty": 1666.0
+  },
+  {
+   "day": 27,
+   "dc": "North",
+   "qty": 64.0
+  },
+  {
+   "day": 27,
+   "dc": "South",
+   "qty": 58.0
+  },
+  {
+   "day": 27,
+   "dc": "West",
+   "qty": 45.0
+  },
+  {
+   "day": 30,
+   "dc": "North",
+   "qty": 8016.0
+  },
+  {
+   "day": 30,
+   "dc": "South",
+   "qty": 8015.0
+  },
+  {
+   "day": 30,
+   "dc": "West",
+   "qty": 7969.0
+  },
+  {
+   "day": 33,
+   "dc": "North",
+   "qty": 2833.0
+  },
+  {
+   "day": 33,
+   "dc": "South",
+   "qty": 3646.0
+  },
+  {
+   "day": 33,
+   "dc": "West",
+   "qty": 2031.0
+  },
+  {
+   "day": 36,
+   "dc": "North",
+   "qty": 6271.0
+  },
+  {
+   "day": 36,
+   "dc": "South",
+   "qty": 1195.0
+  },
+  {
+   "day": 36,
+   "dc": "West",
+   "qty": 7699.0
+  },
+  {
+   "day": 39,
+   "dc": "North",
+   "qty": 5827.0
+  },
+  {
+   "day": 39,
+   "dc": "South",
+   "qty": 5173.0
+  },
+  {
+   "day": 39,
+   "dc": "West",
+   "qty": 3274.0
+  },
+  {
+   "day": 42,
+   "dc": "North",
+   "qty": 6666.0
+  },
+  {
+   "day": 42,
+   "dc": "South",
+   "qty": 3316.0
+  },
+  {
+   "day": 42,
+   "dc": "West",
+   "qty": 9025.0
+  },
+  {
+   "day": 45,
+   "dc": "North",
+   "qty": 7290.0
+  },
+  {
+   "day": 45,
+   "dc": "South",
+   "qty": 4114.0
+  },
+  {
+   "day": 45,
+   "dc": "West",
+   "qty": 5050.0
+  },
+  {
+   "day": 48,
+   "dc": "North",
+   "qty": 5304.0
+  },
+  {
+   "day": 48,
+   "dc": "South",
+   "qty": 5120.0
+  },
+  {
+   "day": 48,
+   "dc": "West",
+   "qty": 5765.0
+  },
+  {
+   "day": 51,
+   "dc": "North",
+   "qty": 6686.0
+  },
+  {
+   "day": 51,
+   "dc": "South",
+   "qty": 10000.0
+  },
+  {
+   "day": 51,
+   "dc": "West",
+   "qty": 4669.0
+  },
+  {
+   "day": 54,
+   "dc": "North",
+   "qty": 6164.0
+  },
+  {
+   "day": 54,
+   "dc": "South",
+   "qty": 9827.0
+  },
+  {
+   "day": 54,
+   "dc": "West",
+   "qty": 4009.0
+  },
+  {
+   "day": 57,
+   "dc": "North",
+   "qty": 6088.0
+  },
+  {
+   "day": 57,
+   "dc": "South",
+   "qty": 8956.0
+  },
+  {
+   "day": 57,
+   "dc": "West",
+   "qty": 5129.0
+  },
+  {
+   "day": 60,
+   "dc": "North",
+   "qty": 30000.0
+  },
+  {
+   "day": 60,
+   "dc": "South",
+   "qty": 30000.0
+  },
+  {
+   "day": 60,
+   "dc": "West",
+   "qty": 30000.0
+  },
+  {
+   "day": 61,
+   "dc": "North",
+   "qty": 30000.0
+  },
+  {
+   "day": 61,
+   "dc": "South",
+   "qty": 30000.0
+  },
+  {
+   "day": 61,
+   "dc": "West",
+   "qty": 30000.0
+  },
+  {
+   "day": 62,
+   "dc": "North",
+   "qty": 30000.0
+  },
+  {
+   "day": 62,
+   "dc": "South",
+   "qty": 30000.0
+  },
+  {
+   "day": 62,
+   "dc": "West",
+   "qty": 30000.0
+  },
+  {
+   "day": 63,
+   "dc": "North",
+   "qty": 6625.0
+  },
+  {
+   "day": 63,
+   "dc": "South",
+   "qty": 6624.0
+  },
+  {
+   "day": 63,
+   "dc": "West",
+   "qty": 6624.0
+  },
+  {
+   "day": 64,
+   "dc": "North",
+   "qty": 6334.0
+  },
+  {
+   "day": 64,
+   "dc": "South",
+   "qty": 6333.0
+  },
+  {
+   "day": 64,
+   "dc": "West",
+   "qty": 6333.0
+  },
+  {
+   "day": 73,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 73,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 73,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 75,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 75,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 75,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 76,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 76,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 76,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 79,
+   "dc": "North",
+   "qty": 30000.0
+  },
+  {
+   "day": 79,
+   "dc": "South",
+   "qty": 30000.0
+  },
+  {
+   "day": 79,
+   "dc": "West",
+   "qty": 30000.0
+  },
+  {
+   "day": 80,
+   "dc": "North",
+   "qty": 3000.0
+  },
+  {
+   "day": 80,
+   "dc": "South",
+   "qty": 3000.0
+  },
+  {
+   "day": 80,
+   "dc": "West",
+   "qty": 3000.0
+  },
+  {
+   "day": 82,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 82,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 82,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 84,
+   "dc": "North",
+   "qty": 2667.0
+  },
+  {
+   "day": 84,
+   "dc": "South",
+   "qty": 2667.0
+  },
+  {
+   "day": 84,
+   "dc": "West",
+   "qty": 2666.0
+  },
+  {
+   "day": 86,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 86,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 86,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 87,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 87,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 87,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 89,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 89,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 89,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 90,
+   "dc": "North",
+   "qty": 7667.0
+  },
+  {
+   "day": 90,
+   "dc": "South",
+   "qty": 7667.0
+  },
+  {
+   "day": 90,
+   "dc": "West",
+   "qty": 7666.0
+  },
+  {
+   "day": 93,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 93,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 93,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 94,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 94,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 94,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 95,
+   "dc": "North",
+   "qty": 8000.0
+  },
+  {
+   "day": 95,
+   "dc": "South",
+   "qty": 8000.0
+  },
+  {
+   "day": 95,
+   "dc": "West",
+   "qty": 8000.0
+  },
+  {
+   "day": 99,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 99,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 99,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 106,
+   "dc": "North",
+   "qty": 4667.0
+  },
+  {
+   "day": 106,
+   "dc": "South",
+   "qty": 4667.0
+  },
+  {
+   "day": 106,
+   "dc": "West",
+   "qty": 4666.0
+  },
+  {
+   "day": 107,
+   "dc": "North",
+   "qty": 7000.0
+  },
+  {
+   "day": 107,
+   "dc": "South",
+   "qty": 7000.0
+  },
+  {
+   "day": 107,
+   "dc": "West",
+   "qty": 7000.0
+  },
+  {
+   "day": 141,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 141,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 141,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 143,
+   "dc": "North",
+   "qty": 10667.0
+  },
+  {
+   "day": 143,
+   "dc": "South",
+   "qty": 10667.0
+  },
+  {
+   "day": 143,
+   "dc": "West",
+   "qty": 10666.0
+  },
+  {
+   "day": 145,
+   "dc": "North",
+   "qty": 3334.0
+  },
+  {
+   "day": 145,
+   "dc": "South",
+   "qty": 3333.0
+  },
+  {
+   "day": 145,
+   "dc": "West",
+   "qty": 3333.0
+  },
+  {
+   "day": 147,
+   "dc": "North",
+   "qty": 16000.0
+  },
+  {
+   "day": 147,
+   "dc": "South",
+   "qty": 16000.0
+  },
+  {
+   "day": 147,
+   "dc": "West",
+   "qty": 16000.0
+  },
+  {
+   "day": 149,
+   "dc": "North",
+   "qty": 14667.0
+  },
+  {
+   "day": 149,
+   "dc": "South",
+   "qty": 14667.0
+  },
+  {
+   "day": 149,
+   "dc": "West",
+   "qty": 14666.0
+  },
+  {
+   "day": 153,
+   "dc": "North",
+   "qty": 6667.0
+  },
+  {
+   "day": 153,
+   "dc": "South",
+   "qty": 6667.0
+  },
+  {
+   "day": 153,
+   "dc": "West",
+   "qty": 6666.0
+  },
+  {
+   "day": 155,
+   "dc": "North",
+   "qty": 14667.0
+  },
+  {
+   "day": 155,
+   "dc": "South",
+   "qty": 14667.0
+  },
+  {
+   "day": 155,
+   "dc": "West",
+   "qty": 14666.0
+  },
+  {
+   "day": 168,
+   "dc": "North",
+   "qty": 13334.0
+  },
+  {
+   "day": 168,
+   "dc": "South",
+   "qty": 13333.0
+  },
+  {
+   "day": 168,
+   "dc": "West",
+   "qty": 13333.0
+  },
+  {
+   "day": 170,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 171,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 172,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 173,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 174,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 175,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 176,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 177,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 178,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 179,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 180,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 181,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 224,
+   "dc": "North",
+   "qty": 5334.0
+  },
+  {
+   "day": 224,
+   "dc": "South",
+   "qty": 5333.0
+  },
+  {
+   "day": 224,
+   "dc": "West",
+   "qty": 5333.0
+  },
+  {
+   "day": 225,
+   "dc": "North",
+   "qty": 6000.0
+  },
+  {
+   "day": 225,
+   "dc": "South",
+   "qty": 6000.0
+  },
+  {
+   "day": 225,
+   "dc": "West",
+   "qty": 6000.0
+  },
+  {
+   "day": 226,
+   "dc": "North",
+   "qty": 10000.0
+  },
+  {
+   "day": 226,
+   "dc": "South",
+   "qty": 10000.0
+  },
+  {
+   "day": 226,
+   "dc": "West",
+   "qty": 10000.0
+  }
+ ],
  "recorded_dc_stockout_months": [
   1,
   2,
