@@ -4,6 +4,49 @@ Each decision is stated with the options considered, the evidence for the choice
 
 ---
 
+## DR-0: Data selection: calibrate on normal 2, validate on fraud 2 and fraud 3, exclude normal 1 and fraud 1
+
+**Decision.**
+
+| Run | Role |
+|---|---|
+| **normal 2** | Calibration. Every nominal value in the model comes from this run. |
+| **fraud 2, fraud 3** | Independent validation. Fraud-labelled documents are removed (rule C1). |
+| **normal 1, fraud 1** | Not used in this paper. Kept as a possible cross-company test. |
+
+The three group-2 runs are combined in one place only: the year-to-year spread sets the ensemble ranges of the bounded parameters (Section 2.3 of the plan).
+
+**Options considered**
+| Option | Verdict |
+|---|---|
+| **Calibrate on normal 2, validate on fraud 2 and fraud 3** | Chosen |
+| Pool normal 2, fraud 2 and fraud 3 for calibration | Rejected: it leaves no independent data to validate against. It would also blend three different player policies (DR-3) into one that nobody played. |
+| Pool all five runs | Rejected: group 1 runs a different business (see evidence), so pooling would average two different supply chains. |
+| Calibrate on fraud 2 or fraud 3 | Rejected: normal 2 is the only group-2 run with no fraud at all, so it needs no document removal. |
+
+**Evidence: the two player groups run different businesses** (the article's Table 2, re-measured from `VBAK`/`VBAP`)
+
+| | normal 1 | fraud 1 | **normal 2** | fraud 2 | fraud 3 |
+|---|---|---|---|---|---|
+| Player group | 1 | 1 | **2** | 2 | 2 |
+| Customers | 194 | 194 | **71** | 71 | 71 |
+| Products sold | 12 | 12 | **3** | 4 | 3 |
+| F12 share of units | 10.1 % | 6.6 % | **47.6 %** | 36.3 % | 34.8 % |
+| Largest product share | F02 12.1 % | F02 45.2 % | **F12 47.6 %** | F16 52.2 % | F16 59.3 % |
+| Mean order-item size | 363 | 402 | **469** | 446 | 456 |
+
+- **Same market, different scope.** All 71 group-2 customers also appear among group 1's 194. Group 2 served only these large resellers, with large packs only. Group 1 also served 123 smaller retailers, with small packs across 12 products. The same finding is described in the article (Section 3).
+- **The group-2 runs are the same company in three years.** They share the same customers, the same DC assignment (B5: 21 / 30 / 20), the same shared line and capacity (B13, M6), and the same lead-time support (L3, L4). The structure checks B1–B16 hold in all three.
+- **The fraud runs are operationally normal.** Fraud touches 12 and 29 sales orders and 5 and 6 POs, out of about 2,700 orders and about 250 POs per year. Those documents are removed. The remaining material flow balances exactly (B15, residual 0).
+
+**Why validation on fraud 2 and fraud 3 is meaningful.** They are different years played by the same group, with their own demand realisations, recipe history (B11: fraud 2 changed the F12 recipe) and policy parameters (DR-3). A model calibrated on normal 2 that reproduces them, when given their policy, is therefore tested on data it has not seen.
+
+**Would be overturned by:** evidence that the group-2 years differ structurally, i.e. any structure check B1–B16 failing in fraud 2 or fraud 3. None does. The one unexplained exception (a split receipt on fraud-2 PO 4500000018) affects a single PO.
+
+**Remaining risk:** all validation data comes from one player group in one simulated market. Whether the method transfers to another company is not tested. Normal 1 and fraud 1 are the natural test for that in a follow-up (a journal extension).
+
+---
+
 ## DR-1: Time unit = 1 game day; decisions take effect at the next day tick
 
 **Decision.** One model time unit is one ERPsim game day. A game year is 240 time units, of which 229 are played in normal 2 (days 5–233). Physical events (deliveries, production, transfers, sales) happen on day ticks. Player decisions made between ticks take effect at the next tick.
