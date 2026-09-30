@@ -15,6 +15,8 @@ Modes
   demand_mode   "replay" : the recorded customer orders (day, customer, quantity) are replayed; sales are
                            still clipped to the twin's own DC stock. Isolates the supply-side physics.
                 "sample" : customers order at sampled intervals and sizes (D1-D3, D5; experiments)
+                "replay_all" : like "replay", plus the fraud-labelled orders (they physically took goods);
+                               diagnostic use only
   line_rule     "fifo_block" : the order at the head of the line waits for its components
                 "fifo_skip"  : an order short of components is skipped; the next one proceeds
                 "erpsim"     : FIFO; an order starts only when components for its whole batch are in stock
@@ -77,7 +79,8 @@ class Twin:
             self.recorded_by_product[p].sort(key=lambda o: o["day"])
         self.other_sales = {p: {int(d): q for d, q in v.items()} for p, v in inp.get("other_product_daily_sales", {}).items()}
         self.replay_orders = defaultdict(list)
-        for o in inp["demand"].get("recorded_orders", []):
+        extra = inp["demand"].get("recorded_fraud_orders", []) if demand_mode == "replay_all" else []
+        for o in inp["demand"].get("recorded_orders", []) + extra:
             self.replay_orders[o["day"]].append(o)
         self.inp = inp
         self.rng = np.random.default_rng(seed)
@@ -269,7 +272,7 @@ class Twin:
 
     def _sales(self, day):
         sold, lost = defaultdict(float), defaultdict(float)
-        if self.demand_mode == "replay":
+        if self.demand_mode in ("replay", "replay_all"):
             for o in self.replay_orders.get(day, []):
                 dc = self.dc_of.get(o["customer"])
                 if dc is None:

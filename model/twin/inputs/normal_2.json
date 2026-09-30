@@ -8860,7 +8860,8 @@
     "customer": 80153,
     "qty": 979.0
    }
-  ]
+  ],
+  "recorded_fraud_orders": []
  },
  "lead_time_pmf": {
   "food": {

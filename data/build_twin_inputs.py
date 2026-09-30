@@ -83,9 +83,19 @@ def build(root, run, calibration_dir):
     inp["demand"] = {"inter_order_days": pmf(orders.groupby("KUNNR").gday.diff().dropna().astype(int)),
                      "order_qty_samples": sorted(int(x) for x in base.groupby("VBELN").KWMENG.sum()),
                      "steady_months": steady}
+    # fraud-labelled orders are excluded from demand statistics (C1) but physically took goods; they are kept
+    # separately so that a physical-flow replay can include them (diagnostic run, docs/validation_report.md)
+    allv = tb["vbak"].copy()
+    GameClock(allv)
+    all12 = tb["vbap"].merge(allv[["VBELN", "KUNNR", "gday"]], on="VBELN")
+    all12 = all12[(all12.MATNR == PRODUCT) & all12.VBELN.isin(ev["fraud_so"])]
+    fr = all12.groupby(["VBELN", "KUNNR", "gday"]).KWMENG.sum().reset_index()
+    inp["demand"] = inp["demand"] if "demand" in inp else {}
+    fraud_orders = [{"day": int(r.gday), "customer": int(r.KUNNR), "qty": float(r.KWMENG)} for r in fr.itertuples()]
     rec_orders = f12[~f12.VBELN.isin(ev["fraud_so"])].groupby(["VBELN", "KUNNR", "gday"]).KWMENG.sum().reset_index()
     inp["demand"]["recorded_orders"] = [{"day": int(r.gday), "customer": int(r.KUNNR), "qty": float(r.KWMENG)}
                                         for r in rec_orders.sort_values("gday").itertuples()]
+    inp["demand"]["recorded_fraud_orders"] = fraud_orders
     inp["evidence"]["demand"] = "ledger D1-D3, D5 (order size = sum of the order's F12 lines); rules C2, C3"
 
     # ---- supplier lead times in ticks (L3, L4; rules C4, C5) ----
