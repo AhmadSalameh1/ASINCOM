@@ -64,13 +64,14 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample"):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
         self.mrp_timing, self.dc_split, self.policy = mrp_timing, dc_split, policy
         self._changeover_days = changeover_days
         self.scenario = scenario or {}
+        self.lead_mode = lead_mode   # "sample" or "median" (deterministic, for the UPPAAL cross-check)
         self.controller = controller
         if policy == "controller" and controller is None:
             raise ValueError("policy='controller' needs a controller object")
@@ -173,6 +174,8 @@ class Twin:
 
     def _lead(self, material):
         vals, p = self.lead["food" if material.startswith("AA-R") else "packaging"]
+        if self.lead_mode == "median":
+            return int(vals[np.searchsorted(np.cumsum(p), 0.5)])
         return int(self.rng.choice(vals, p=p))
 
     def _lots(self, q, product):

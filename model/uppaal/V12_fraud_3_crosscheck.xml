@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta><declaration>// ============================================================================
+// V12 supply-chain twin (UPPAAL SMC), generated from model/twin/inputs/fraud_3.json
+// Spec: docs/model_spec.md. Same data and step order as the Python twin (model/twin/twin.py),
+// policy replay (the players' recorded decisions). 1 time unit = 1 game day (DR-1).
+// ============================================================================
+const int FIRST = 7;
+const int LAST = 240;
+const int NDAY = 270;
+const int NDC = 3;                       // 0 North, 1 South, 2 West
+const int NC = 8;                        // components: AA-R01, AA-R02, AA-R03, AA-R04, AA-R05, AA-R06, AA-P01, AA-P02
+const double CAP = 24000.0;                  // line capacity per day (M6)
+const double CHANGEOVER = 0.6 * CAP;      // capacity lost on a product switch (0.6 day)
+
+// ---------------- switches ----------------
+const int LEAD_MODE = 1;                 // 0 = sampled lead times, 1 = PMF median (deterministic cross-check)
+
+// E1 supplier delay: POs created in [S1, E1] arrive ceil(REL/100 x lead) days later
+const bool EN_SUPPLIER_DELAY = false;
+const int SD_START = 101; const int SD_END = 120; const int SD_REL100 = 75;
+// E2 quality loss: receipts due in [S, E] of flagged materials lose the share Q_BLOCK; the rest arrives EXTRA days late;
+// the blocked quantity is re-ordered the same day (MRP rule R5)
+const bool EN_QUALITY = false;
+const int Q_START = 101; const int Q_END = 120; const double Q_BLOCK = 0.041; const int Q_EXTRA = 2;
+const bool Q_MAT[NC] = {true, true, true, true, true, true, false, false};
+// E3 line stoppage: line unavailable in [LD_START, LD_END]
+const bool EN_LINE_DOWN = false;
+const int LD_START = 101; const int LD_END = 110;
+// E4 demand shift: demand x DF in [DS_START, DS_END]
+const bool EN_DEMAND = false;
+const int DS_START = 101; const int DS_END = 120; const double DF = 1.19;
+// E5 transit delay: shipments leaving in [T_START, T_END] arrive T_DAYS later
+const bool EN_TRANSIT = false;
+const int T_START = 101; const int T_END = 120; const int T_DAYS = 4;
+
+// ---------------- recorded exogenous inputs and decisions ----------------
+const int DEMAND[NDC][NDAY] = {{0, 0, 0, 0, 0, 0, 0, 3134, 1090, 3406, 3411, 3045, 3072, 5286, 4166, 3763, 3478, 4140, 3929, 4347, 3059, 4937, 3917, 4284, 3165, 1759, 4219, 928, 1730, 2186, 1254, 763, 892, 2675, 1258, 873, 1251, 925, 1274, 2133, 417, 2227, 1730, 400, 1258, 1317, 1349, 1739, 1614, 869, 1247, 2192, 890, 1301, 1783, 845, 1341, 441, 1299, 3056, 948, 1654, 479, 873, 2643, 886, 1365, 1818, 931, 1302, 405, 2682, 1696, 1289, 1246, 884, 803, 2129, 438, 1737, 1701, 887, 839, 0, 0, 880, 2230, 1285, 914, 1689, 847, 864, 2537, 1245, 1351, 471, 1197, 1687, 1689, 2093, 462, 833, 2557, 840, 1666, 1221, 1180, 1842, 469, 2097, 1179, 1287, 1179, 1210, 426, 1696, 1295, 2063, 1262, 827, 866, 819, 2438, 1639, 1398, 1209, 880, 1271, 1660, 1330, 1238, 1295, 1707, 0, 2300, 3007, 903, 1986, 410, 429, 2911, 873, 778, 1588, 417, 902, 940, 1590, 1737, 410, 1333, 933, 892, 1201, 434, 2206, 1386, 804, 1332, 822, 2163, 1336, 1174, 839, 877, 1547, 438, 439, 1658, 378, 1633, 0, 1642, 2044, 807, 1204, 817, 799, 1633, 775, 828, 1279, 867, 797, 430, 1651, 829, 0, 2867, 853, 884, 1356, 433, 419, 739, 0, 740, 363, 702, 1178, 1645, 894, 1248, 2112, 378, 846, 788, 426, 382, 0, 1238, 0, 0, 0, 0, 0, 0, 437, 1624, 1760, 0, 0, 899, 0, 1110, 0, 0, 0, 0, 2293, 575, 2933, 1215, 3508, 2606, 4044, 3012, 387, 0, 1241, 2011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 4224, 3776, 5877, 2123, 6057, 1943, 4423, 3577, 4786, 2795, 5301, 3118, 4821, 3179, 4113, 3887, 5559, 2441, 2995, 1720, 1801, 1251, 1250, 3232, 1322, 1838, 1346, 811, 1677, 1789, 2705, 1364, 2267, 1807, 2104, 2556, 2277, 1283, 1296, 2075, 1724, 1703, 868, 2478, 1344, 2998, 875, 1992, 3502, 1668, 2161, 2236, 1728, 1333, 2980, 0, 3180, 891, 2094, 1389, 1248, 2224, 2733, 1767, 2175, 1658, 2706, 946, 1355, 2670, 1264, 0, 1839, 1328, 1285, 825, 0, 0, 2266, 2546, 2060, 1311, 1739, 1672, 1778, 2247, 1687, 2051, 0, 2209, 437, 2444, 1721, 2581, 2498, 1338, 1694, 766, 1743, 1819, 2574, 385, 2214, 484, 2236, 475, 1205, 2150, 2444, 809, 2222, 1706, 2166, 1910, 1629, 3021, 408, 1277, 0, 0, 1288, 921, 3174, 856, 1733, 2068, 1639, 1851, 1637, 1336, 1396, 2254, 891, 1746, 489, 2203, 481, 1759, 913, 369, 3449, 1613, 1645, 930, 1200, 1289, 2113, 446, 2579, 883, 2485, 407, 852, 1735, 1411, 1341, 2547, 1604, 1219, 790, 784, 2868, 845, 1287, 0, 0, 828, 1246, 1672, 1298, 1726, 2421, 1660, 889, 1658, 1232, 1987, 391, 0, 0, 0, 1580, 1768, 2083, 0, 1199, 2513, 824, 1537, 831, 329, 0, 2979, 425, 2397, 373, 2478, 1668, 1705, 2120, 1679, 1316, 1154, 0, 0, 0, 0, 0, 0, 0, 2001, 1164, 1199, 1169, 1881, 812, 1326, 0, 0, 0, 0, 0, 3707, 3132, 3305, 4984, 3694, 4870, 3031, 3814, 3427, 3880, 2186, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 642, 2492, 3583, 3749, 4117, 4899, 4065, 1813, 3927, 3465, 4708, 3493, 4065, 4479, 5624, 1933, 3977, 4346, 964, 3544, 1665, 874, 1238, 984, 480, 2147, 2137, 1317, 835, 1711, 1824, 898, 2218, 888, 881, 948, 1693, 1689, 1725, 2371, 1919, 1657, 0, 2173, 461, 2149, 0, 2121, 1757, 2212, 2185, 1387, 1271, 398, 881, 983, 1710, 865, 900, 2736, 1809, 1339, 1607, 1327, 808, 1380, 1768, 1274, 2210, 0, 2248, 1809, 1191, 901, 2159, 1354, 4514, 0, 439, 1779, 477, 1356, 1237, 2139, 1759, 1296, 1709, 423, 1282, 1206, 1635, 427, 1323, 2091, 1784, 1671, 1269, 1638, 886, 409, 1613, 865, 2178, 0, 2609, 1538, 1245, 1325, 1684, 801, 372, 1305, 765, 2041, 0, 2065, 1722, 1430, 948, 1769, 1697, 0, 1352, 744, 763, 432, 414, 1268, 1801, 1723, 1295, 1597, 417, 431, 1671, 434, 862, 774, 1295, 1281, 2036, 788, 2063, 823, 0, 1212, 0, 1740, 0, 1664, 832, 1317, 912, 885, 781, 0, 1814, 360, 1584, 0, 0, 1226, 1148, 793, 1206, 1649, 0, 807, 1691, 853, 854, 367, 843, 1670, 1146, 436, 1612, 429, 0, 1554, 0, 1089, 0, 1217, 834, 2017, 1228, 745, 1236, 0, 896, 1213, 1234, 0, 825, 1170, 1629, 1631, 782, 735, 776, 458, 1188, 1235, 399, 0, 1128, 788, 1333, 444, 1714, 0, 797, 1638, 411, 1611, 0, 903, 858, 1629, 463, 2011, 0, 0, 2980, 3578, 3782, 2459, 2915, 3703, 4625, 2178, 422, 1331, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};   // recorded customer orders per DC and day; unmet demand is lost (B2-B4)
+const int N_TR = 161;                  // recorded plant -&gt; DC transfers, instantaneous (B14)
+const int TR_DAY[N_TR] = {7, 7, 7, 8, 8, 8, 10, 10, 10, 12, 12, 12, 14, 14, 14, 16, 16, 16, 18, 18, 18, 20, 20, 20, 22, 22, 22, 24, 24, 24, 26, 26, 26, 28, 28, 28, 30, 30, 30, 32, 32, 32, 34, 34, 34, 36, 36, 36, 38, 38, 38, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46, 56, 56, 56, 58, 58, 58, 78, 78, 78, 80, 80, 80, 82, 82, 82, 84, 84, 84, 86, 86, 86, 88, 88, 88, 95, 95, 95, 97, 97, 97, 99, 99, 99, 101, 101, 101, 103, 103, 103, 126, 126, 126, 128, 128, 128, 130, 130, 130, 132, 132, 132, 134, 134, 134, 136, 136, 136, 138, 138, 138, 156, 156, 156, 172, 172, 172, 178, 178, 178, 187, 187, 189, 189, 191, 191, 198, 198, 200, 200, 202, 202, 204, 204, 204, 216, 216, 216, 218, 218, 218, 228, 228, 230, 230, 232, 232, 234, 234};
+const int TR_DC[N_TR] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 0, 1, 0, 1, 0, 1};
+const int TR_QTY[N_TR] = {8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 2667, 2667, 2666, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 8000, 4000, 4000, 4000, 8000, 8000, 8000, 8000, 8000, 8000, 4000, 4000, 4000, 8000, 8000, 8000, 8000, 8000, 8000, 5334, 5333, 5333, 2667, 2667, 2666, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 667, 667, 666, 10000, 10000, 10000, 10000, 10000, 10000, 9334, 9333, 9333, 10000, 10000, 10000, 8000, 8000, 8000, 5334, 5333, 5333, 10000, 10000, 10000, 6000, 10000, 10000, 6000, 10000, 10000, 6000, 10000, 10000, 6000, 10000, 10000, 2308, 3846, 3846, 3693, 6154, 6153, 5539, 9231, 9230, 4616, 7692, 7692, 5980, 10000, 2867, 1580, 489, 1084, 5298, 10000, 1880, 2979, 2539, 2822, 1496, 2493, 2493, 4001, 6666, 5333, 1751, 2916, 2333, 6000, 10000, 6000, 10000, 6000, 10000, 6000, 10000};
+const int N_ORD = 94;                  // recorded production orders, all products, one shared FIFO line (B11-B13)
+const int ORD_DAY[N_ORD] = {7, 7, 7, 7, 7, 7, 10, 16, 19, 19, 22, 22, 22, 22, 22, 31, 33, 33, 38, 41, 41, 41, 46, 46, 52, 52, 56, 56, 59, 59, 59, 64, 70, 70, 70, 74, 77, 80, 80, 80, 92, 92, 98, 98, 102, 102, 102, 108, 108, 117, 125, 125, 125, 126, 126, 128, 128, 135, 135, 135, 141, 141, 141, 145, 145, 145, 155, 156, 156, 161, 161, 164, 168, 168, 168, 168, 176, 186, 186, 196, 197, 215, 215, 227, 227, 240, 240, 240, 240, 240, 240, 240, 240, 240};
+const int ORD_PROD[N_ORD] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 0, 2, 0, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2};     // 0 = F12
+const double ORD_QTY[N_ORD] = {48000.0, 48000.0, 48000.0, 48000.0, 48000.0, 16000.0, 44000.0, 16000.0, 48000.0, 36000.0, 48000.0, 48000.0, 48000.0, 48000.0, 16000.0, 16000.0, 48000.0, 48000.0, 42000.0, 48000.0, 48000.0, 16000.0, 48000.0, 40000.0, 48000.0, 16000.0, 48000.0, 38000.0, 48000.0, 48000.0, 16000.0, 38000.0, 48000.0, 48000.0, 48000.0, 16000.0, 48000.0, 48000.0, 48000.0, 44000.0, 48000.0, 42000.0, 48000.0, 22000.0, 48000.0, 48000.0, 16000.0, 48000.0, 40000.0, 23000.0, 48000.0, 48000.0, 48000.0, 48000.0, 16000.0, 48000.0, 16000.0, 48000.0, 48000.0, 16000.0, 48000.0, 48000.0, 42000.0, 48000.0, 48000.0, 16000.0, 40000.0, 48000.0, 40000.0, 48000.0, 16000.0, 48000.0, 48000.0, 48000.0, 48000.0, 44000.0, 20000.0, 22000.0, 38000.0, 32000.0, 24000.0, 23000.0, 32000.0, 48000.0, 16000.0, 48000.0, 48000.0, 48000.0, 48000.0, 48000.0, 48000.0, 48000.0, 48000.0, 48000.0};
+const double ORD_REC[N_ORD][NC] = {{0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.058333, 0.1, 0.058333, 0.058333, 0.3, 0.3, 1.0, 1.0}, {0.1, 0.1, 0.1, 0.1, 0.3, 0.3, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 1.0, 1.0}, {0.0, 0.3, 0.0, 0.0, 0.35, 0.35, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0}};   // components issued per unit (issued recipe)
+const int N_REC_PO = 269;                  // recorded purchase orders; pre-start POs are the opening stock (B16)
+const int RPO_DAY[N_REC_PO] = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 11, 11, 14, 14, 14, 17, 17, 17, 17, 17, 17, 17, 17, 20, 20, 20, 20, 20, 20, 20, 20, 24, 24, 24, 24, 24, 30, 30, 30, 30, 30, 33, 33, 33, 33, 33, 33, 39, 39, 39, 39, 39, 39, 39, 39, 44, 44, 44, 44, 44, 44, 44, 44, 45, 45, 47, 47, 49, 49, 49, 49, 49, 49, 53, 53, 53, 53, 53, 53, 53, 53, 57, 57, 57, 57, 57, 57, 57, 57, 61, 61, 61, 61, 61, 61, 61, 61, 66, 66, 66, 66, 66, 66, 66, 66, 74, 74, 74, 74, 74, 75, 75, 75, 75, 75, 87, 87, 87, 87, 87, 87, 87, 87, 93, 93, 93, 93, 93, 93, 93, 94, 94, 94, 94, 94, 99, 99, 99, 99, 99, 99, 99, 99, 104, 104, 104, 104, 104, 104, 108, 108, 108, 108, 114, 114, 114, 114, 121, 121, 121, 121, 121, 125, 125, 125, 125, 125, 125, 125, 125, 130, 130, 130, 130, 138, 138, 138, 138, 138, 138, 138, 138, 141, 141, 141, 141, 141, 141, 143, 143, 143, 143, 143, 143, 150, 150, 153, 153, 159, 159, 160, 160, 160, 160, 160, 160, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 171, 171, 171, 181, 181, 181, 181, 181, 181, 181, 190, 190, 190, 190, 190, 213, 213, 213, 222, 222, 222, 222, 222, 231, 231, 231, 231, 231, 231, 231, 231, 237, 237, 237, 237, 237, 237, 237, 237};
+const int RPO_MAT[N_REC_PO] = {1, 4, 5, 6, 7, 1, 4, 5, 6, 7, 6, 7, 1, 4, 6, 5, 7, 1, 6, 7, 1, 5, 4, 0, 1, 2, 3, 4, 5, 7, 6, 1, 0, 3, 2, 5, 4, 7, 6, 1, 2, 3, 4, 5, 1, 4, 5, 6, 7, 0, 1, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 6, 7, 6, 7, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 1, 4, 5, 6, 7, 1, 4, 5, 6, 7, 0, 1, 2, 3, 4, 6, 7, 5, 3, 0, 2, 1, 0, 5, 4, 4, 7, 6, 1, 5, 0, 4, 3, 2, 5, 1, 6, 7, 0, 4, 3, 2, 5, 1, 6, 0, 2, 7, 0, 2, 6, 7, 7, 4, 5, 1, 6, 3, 4, 5, 1, 0, 2, 6, 7, 4, 5, 7, 6, 2, 4, 6, 0, 1, 7, 5, 3, 3, 4, 0, 5, 1, 2, 1, 0, 3, 2, 4, 5, 6, 7, 7, 6, 6, 7, 0, 1, 3, 2, 5, 4, 2, 4, 6, 0, 1, 7, 5, 3, 2, 4, 7, 0, 1, 3, 5, 6, 1, 4, 5, 6, 5, 4, 1, 7, 7, 6, 7, 1, 5, 6, 4, 4, 5, 1, 7, 1, 5, 6, 4, 0, 1, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 0, 1, 6, 7};
+const int RPO_QTY[N_REC_PO] = {33600, 39200, 39200, 112000, 112000, 43200, 50400, 50400, 144000, 144000, 100000, 100000, 13200, 15400, 44000, 15400, 44000, 13200, 144000, 144000, 20400, 39200, 39200, 11200, 7600, 11200, 11200, 29400, 29400, 68000, 68000, 9600, 9600, 9600, 9600, 28800, 28800, 96000, 96000, 3600, 5500, 5500, 14500, 14500, 30000, 24700, 24700, 112000, 112000, 4200, 4200, 12600, 12600, 42000, 42000, 11200, 11200, 9900, 9900, 33600, 33600, 112000, 112000, 8800, 8800, 8800, 8800, 26400, 26400, 88000, 88000, 88000, 88000, 88000, 88000, 6400, 6400, 6400, 6400, 19200, 19200, 8600, 8600, 8600, 8600, 25800, 25800, 62000, 62000, 11200, 11200, 11200, 11200, 33600, 33600, 112000, 112000, 3800, 3800, 3800, 3800, 11400, 11400, 38000, 38000, 16000, 16000, 16000, 16000, 48000, 48000, 160000, 160000, 26400, 30800, 30800, 88000, 88000, 30000, 35000, 35000, 100000, 100000, 9000, 9000, 9000, 9000, 27000, 90000, 90000, 27000, 3000, 3000, 3000, 3000, 3000, 9000, 9000, 15500, 70000, 70000, 18000, 15500, 5300, 33600, 11200, 8200, 33600, 11200, 112000, 112000, 5300, 33600, 11200, 8200, 33600, 11200, 88000, 3500, 600, 88000, 2300, 2300, 23000, 23000, 208000, 72500, 72500, 62300, 208000, 6300, 19200, 19200, 6400, 6400, 6400, 64000, 64000, 56000, 56000, 112000, 112000, 13800, 41400, 138000, 13800, 13800, 138000, 41400, 13800, 13800, 41400, 13800, 41400, 13800, 13800, 13800, 13800, 13800, 13800, 41400, 41400, 104000, 104000, 88000, 88000, 112000, 112000, 3800, 1200, 3800, 3600, 8000, 8000, 8800, 26400, 88000, 8800, 8800, 88000, 26400, 8800, 10000, 30000, 100000, 10000, 10000, 10000, 30000, 100000, 6000, 7000, 7000, 20000, 26700, 26700, 6600, 20000, 60000, 60000, 56000, 9600, 23200, 56000, 23200, 24050, 24050, 6900, 19000, 19200, 22400, 19000, 22400, 21700, 21700, 21700, 21700, 202600, 202600, 492000, 492000, 48300, 48300, 388400, 388400, 48300, 48300, 970000, 970000};
+const bool RPO_PRE[N_REC_PO] = {true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+const bool IS_FOOD[NC] = {true, true, true, true, true, true, false, false};
+// supplier lead-time PMFs in days, food and packaging (L3, L4)
+const int NF = 4; const int F_VAL[NF] = {1, 2, 3, 4}; const double F_CUM[NF] = {0.24342124342124344, 0.5657895657895657, 0.7631577631577631, 1.0}; const int F_MED = 2;
+const int NP = 5; const int P_VAL[NP] = {1, 2, 3, 4, 5}; const double P_CUM[NP] = {0.29230770769229236, 0.5692304307695693, 0.6923073076926923, 0.7846152153847846, 1.0}; const int P_MED = 2;
+
+// ---------------- state ----------------
+int[0, NDAY] day = FIRST - 1;
+double comp[NC];                         // available component stock (B16: starts empty)
+double plant = 0.0;
+double dc[NDC];
+double intransit[NDC][NDAY];
+const int N_PO_MAX = 669;
+double po_qty[N_PO_MAX]; int[0, NDAY + 60] po_due[N_PO_MAX]; int[0, NC] po_mat[N_PO_MAX]; bool po_open[N_PO_MAX]; bool po_qdone[N_PO_MAX];
+int[0, N_PO_MAX] n_po = 0;
+int[0, N_ORD] qhead = 0; int[0, N_ORD] qtail = 0; int[0, N_ORD] next_ord = 0; int[0, N_REC_PO] next_po = 0; int[0, N_TR] next_tr = 0;
+double remaining[N_ORD]; bool started[N_ORD];
+int[-1, 10] last_prod = -1;
+double changeover_left = 0.0;
+// KPIs
+double sold_total = 0.0; double lost_total = 0.0; double sold_day = 0.0; double lost_day = 0.0; double produced_f12 = 0.0;
+int[0, NDAY] stockout_days = 0;
+
+// ---------------- functions ----------------
+int lead(int m) {
+    double u; int i;
+    if (IS_FOOD[m]) {
+        if (LEAD_MODE == 1) return F_MED;
+        u = random(1.0);
+        for (i = 0; i &lt; NF; i++) { if (u &lt; F_CUM[i]) return F_VAL[i]; }
+        return F_VAL[NF - 1];
+    }
+    if (LEAD_MODE == 1) return P_MED;
+    u = random(1.0);
+    for (i = 0; i &lt; NP; i++) { if (u &lt; P_CUM[i]) return P_VAL[i]; }
+    return P_VAL[NP - 1];
+}
+
+void new_po(int m, double q, int due_offset, bool qdone) {
+    int l = due_offset;
+    if (l &lt; 0) {
+        l = lead(m);
+        if (EN_SUPPLIER_DELAY &amp;&amp; day &gt;= SD_START &amp;&amp; day &lt;= SD_END) l = l + (l * SD_REL100 + 99) / 100;
+    }
+    po_qty[n_po] = q; po_due[n_po] = day + l; po_mat[n_po] = m; po_open[n_po] = true; po_qdone[n_po] = qdone;
+    n_po++;
+}
+
+void arrivals() {
+    int d;
+    for (d = 0; d &lt; NDC; d++) { dc[d] += intransit[d][day]; intransit[d][day] = 0; }
+}
+
+void receipts() {
+    int i; double blocked; double rest; int m; int n = n_po;
+    for (i = 0; i &lt; n; i++) {
+        if (po_open[i] &amp;&amp; po_due[i] &lt;= day) {
+            po_open[i] = false; m = po_mat[i];
+            if (EN_QUALITY &amp;&amp; !po_qdone[i] &amp;&amp; Q_MAT[m] &amp;&amp; day &gt;= Q_START &amp;&amp; day &lt;= Q_END) {
+                blocked = po_qty[i] * Q_BLOCK;
+                rest = po_qty[i] - blocked;
+                if (blocked &gt; 0.0) new_po(m, blocked, -1, true);          // rule R5 replacement
+                if (Q_EXTRA &gt; 0) new_po(m, rest, Q_EXTRA, true);
+                else comp[m] += rest;
+            } else {
+                comp[m] += po_qty[i];
+            }
+        }
+    }
+}
+
+bool can_start(int o) {
+    int c;
+    for (c = 0; c &lt; NC; c++) {
+        if (ORD_REC[o][c] &gt; 0.0 &amp;&amp; comp[c] + 0.000001 &lt; ORD_REC[o][c] * remaining[o]) return false;
+    }
+    return true;
+}
+
+void produce() {
+    double cap = CAP; double used; double q; int o; int c;
+    if (EN_LINE_DOWN &amp;&amp; day &gt;= LD_START &amp;&amp; day &lt;= LD_END) return;
+    used = changeover_left &lt; cap ? changeover_left : cap;
+    changeover_left -= used; cap -= used;
+    while (qhead &lt; qtail &amp;&amp; cap &gt; 0.0) {
+        o = qhead;
+        if (!started[o]) {
+            if (!can_start(o)) return;                                // waits for its full batch
+            if (last_prod != -1 &amp;&amp; ORD_PROD[o] != last_prod) {
+                last_prod = ORD_PROD[o];
+                changeover_left = CHANGEOVER;
+                used = changeover_left &lt; cap ? changeover_left : cap;
+                changeover_left -= used; cap -= used;
+                if (cap &lt;= 0.0) return;
+            }
+            started[o] = true;
+        }
+        q = remaining[o] &lt; cap ? remaining[o] : cap;
+        for (c = 0; c &lt; NC; c++) comp[c] -= ORD_REC[o][c] * q;
+        remaining[o] -= q; cap -= q; last_prod = ORD_PROD[o];
+        if (ORD_PROD[o] == 0) { plant += q; produced_f12 += q; }
+        if (remaining[o] &lt;= 0.0) qhead++;
+    }
+}
+
+void to_dc(int d, double q) {
+    if (EN_TRANSIT &amp;&amp; day &gt;= T_START &amp;&amp; day &lt;= T_END) intransit[d][day + T_DAYS] += q;
+    else dc[d] += q;
+}
+
+void push() {
+    double sent = 0.0; double q;
+    while (next_tr &lt; N_TR &amp;&amp; TR_DAY[next_tr] &lt; day) next_tr++;
+    while (next_tr &lt; N_TR &amp;&amp; TR_DAY[next_tr] == day) {
+        q = TR_QTY[next_tr] &lt; plant - sent ? TR_QTY[next_tr] : plant - sent;
+        if (q &gt; 0.0) { to_dc(TR_DC[next_tr], q); sent += q; }
+        next_tr++;
+    }
+    plant -= sent;
+}
+
+void sales() {
+    int d; double dem; double s;
+    sold_day = 0.0; lost_day = 0.0;
+    for (d = 0; d &lt; NDC; d++) {
+        dem = DEMAND[d][day] * 1.0;
+        if (EN_DEMAND &amp;&amp; day &gt;= DS_START &amp;&amp; day &lt;= DS_END) dem = dem * DF;
+        s = dem &lt; dc[d] ? dem : dc[d];
+        dc[d] -= s; sold_day += s; lost_day += dem - s;
+    }
+    sold_total += sold_day; lost_total += lost_day;
+}
+
+void decide() {
+    int d;
+    bool out = false;
+    while (next_ord &lt; N_ORD &amp;&amp; ORD_DAY[next_ord] == day) {
+        remaining[next_ord] = ORD_QTY[next_ord]; started[next_ord] = false;
+        next_ord++; qtail = next_ord;
+    }
+    while (next_po &lt; N_REC_PO &amp;&amp; RPO_DAY[next_po] == day) {
+        if (RPO_PRE[next_po]) new_po(RPO_MAT[next_po], RPO_QTY[next_po], 1, false);   // opening stock
+        else new_po(RPO_MAT[next_po], RPO_QTY[next_po], -1, false);
+        next_po++;
+    }
+    for (d = 0; d &lt; NDC; d++) { if (dc[d] &lt;= 0.0) out = true; }
+    if (out) stockout_days++;
+}
+
+void step() {
+    arrivals();
+    receipts();
+    produce();
+    push();
+    sales();
+    decide();
+    day++;
+}
+</declaration><template><name>Day</name><declaration>clock x;</declaration>
+<location id="id0" x="0" y="0"><name x="-10" y="-34">Tick</name><label kind="invariant" x="-10" y="17">x &lt;= 1</label></location>
+<location id="id1" x="200" y="0"><name x="190" y="-34">End</name><label kind="invariant" x="190" y="17">x &lt;= 1</label></location>
+<init ref="id0"/>
+<transition><source ref="id0"/><target ref="id0"/><label kind="guard" x="-60" y="-100">x &gt;= 1 &amp;&amp; day &lt;= LAST</label><label kind="assignment" x="-60" y="-80">x = 0, step()</label><nail x="-50" y="-60"/><nail x="50" y="-60"/></transition>
+<transition><source ref="id0"/><target ref="id1"/><label kind="guard" x="60" y="10">x &gt;= 1 &amp;&amp; day &gt; LAST</label></transition>
+<transition><source ref="id1"/><target ref="id1"/><label kind="guard" x="160" y="-100">x &gt;= 1</label><label kind="assignment" x="160" y="-80">x = 0</label><nail x="150" y="-60"/><nail x="250" y="-60"/></transition>
+</template><system>D = Day();
+system D;</system><queries><query><formula>simulate [&lt;=236; 1] {sold_day, lost_day, lost_total, stockout_days, dc[0], dc[1], dc[2], plant, produced_f12, comp[0], comp[1], comp[2], comp[3], comp[4], comp[5], comp[6], comp[7]}</formula><comment>Cross-check trace: run on the _crosscheck file (LEAD_MODE = 1) and compare with crosscheck.py</comment></query><query><formula>E[&lt;=236; 200] (max: lost_total)</formula><comment>Expected lost demand over the year</comment></query><query><formula>E[&lt;=236; 200] (max: stockout_days)</formula><comment>Expected number of days with a DC stock-out</comment></query><query><formula>Pr[&lt;=236] (&lt;&gt; lost_total &gt; 50000)</formula><comment>Probability that lost demand exceeds 50,000 units</comment></query></queries></nta>

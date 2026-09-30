@@ -18,11 +18,17 @@ Disruptions are injected only once the physics is validated.
 | C spec + policy | spec; the players' forecast is their only decision; MRP replica reproduces production 20/21 and purchasing 29/37; quality loss 0.2–4.1 % (Q2) | `docs/model_spec.md`, `docs/policy_acceptance.md`, `data/mrp_replica.py` |
 | C twin | Python day-tick twin; modes: demand replay/sample, policy replay/mrp, push replay/lag1, line erpsim (full batch, 0.6-day changeover) | `model/twin/`, `docs/twin.md`, inputs `model/twin/inputs/*.json` via `data/build_twin_inputs.py` |
 | D validation | pre-registered protocol + 2 amendments. Round 1 (policy models) not validated. Round 2 (decisions replayed): **fraud 2 passes every metric**; fraud 3 fails 4, diagnosed (fraud orders took 67,431 real units); a diagnostic run leaves 2 narrow failures. MRP replica accepted; **push rule not accepted** | `docs/validation_protocol.md`, `docs/validation_report.md`, `model/twin/validation/`, `model/twin/diagnostic/` |
+| E disruptions | E1–E5 with evidence (USAID SCMS, ERPsim Q1/Q2, B17, DataCo), randomised timing, common random numbers, 3 years. Resilience is set by the players' policy (normal 2 fragile, fraud 2/3 robust) | `docs/disruptions.md`, `model/twin/disruptions.py`, `model/twin/disruptions/` |
+| Levers | only the players' 3 levers (conversions, POs, DC transfers); controller interface; a 5-day component buffer neutralises upstream disruptions in normal 2 but not stoppages or surges; fixed rules act non-monotonically | `docs/decision_levers.md`, `model/twin/controllers.py`, `model/twin/policies/` |
+| UPPAAL V12 | generated from the twin inputs; switchable disruptions; the deterministic mirror matches the twin exactly (3 years, all switches); **verifyta run pending (user, locally)** | `docs/uppaal.md`, `model/uppaal/` |
 
 ## Now
-- **A:** Phase E, realistic disruptions (evidence-based mechanisms and parameters, injected into the validated physics).
-- **B:** push/shipping policy, to become an AI-controlled decision.
-- **C:** UPPAAL V12 model from the same spec and inputs (UPPAAL is not installable here; the user runs it locally).
+- **User:** run `verifyta` on `model/uppaal/V12_<run>_crosscheck.xml` and `crosscheck.py compare` (`docs/uppaal.md` §4).
+- **Next:** AI layers on the validated twin:
+  - L1 predicts the extra loss from the disruption plus the policy state.
+  - L2 is a controller over the 3 levers.
+  - L3 explains.
+  - L4 certifies in UPPAAL.
 
 ## Working notes
 - Raw data: `erp_fraud_data.zip` (Google Drive, user's). It is extracted in the session scratchpad, which is not in the repo, so re-download it to rerun the scripts.
