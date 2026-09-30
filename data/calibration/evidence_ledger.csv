@@ -1,0 +1,21 @@
+id,class,element,normal_2,fraud_2,fraud_3,source,method
+S1,anchored,Customers,71,71,71,VBAK.KUNNR,distinct sold-to parties
+S2,anchored,Customers per DC (North/South/West),21/30/20,21/30/20,21/30/20,LIPS.LGORT x LIKP.KUNNR,modal DC per customer; all customers use exactly one DC
+S3,anchored (run-specific recipe),BOM per unit of AA-F12,"AA-R02: 0.3, AA-R05: 0.35, AA-R06: 0.35, AA-P01: 1, AA-P02: 1","AA-R02: 0.3, AA-R05: 0.2, AA-R06: 0.5, AA-P01: 1, AA-P02: 1","AA-R02: 0.3, AA-R05: 0.35, AA-R06: 0.35, AA-P01: 1, AA-P02: 1",MAST x STPO,bill-of-materials items
+D1,bounded,"Customer inter-order time (days), mean / median",8.406 / 7.0,10.597 / 8.0,9.155 / 9.0,"VBAK.BSTNK (game day), VBAP","per-customer gaps between F12 orders, steady months, promotions excluded"
+D2,bounded,"Customer inter-order time, shifted-gamma fit (shift, shape, scale)","shift: 1, shape: 1.118, scale: 6.623","shift: 1, shape: 0.572, scale: 16.787","shift: 1, shape: 1.439, scale: 5.669",as D1,method of moments
+D3,bounded,"Order size (units), mean / median",485.548 / 488.0,453.224 / 451.0,432.154 / 431.0,VBAP.KWMENG,"F12 items, steady months, promotions excluded"
+D4,bounded (price and mix driven),"Demand level (units per game day), mean","7,483.6","5,244.45","4,332.638",VBAP.KWMENG by game day,steady months
+L1,bounded,"Lead time food ingredients (days), q05 / median / q95",1.091 / 2.532 / 4.803,0.612 / 2.234 / 6.105,0.486 / 2.978 / 4.772,CDHDR (PO created) -> MSEG 101 (goods receipt),"game-clock difference, fraud POs excluded"
+L2,bounded,"Lead time packaging (days), q05 / median / q95",1.095 / 3.893 / 5.725,0.751 / 3.051 / 5.86,0.0 / 2.356 / 5.799,as L1,as L1
+P1,policy,PO size R02 / R05 / R06 / P01 (mean units),15256 / 26993 / 29307 / 79605,15648 / 24032 / 31222 / 85811,16144 / 44599 / 44599 / 128250,EKPO.MENGE,"mean per material, fraud POs excluded"
+P2,policy,Reorder point R02 / R05 / R06 / P01 (median stock at PO creation),22462 / 56400 / 56400 / 214000,29500 / 43800 / 50400 / 236000,45500 / 58500 / 58500 / 250000,MSEG 101/261 stock path at CDHDR PO time,"player policy, not a physical parameter"
+M1,policy,Production batch (units): values (count),"48000: 20, 16000: 10, 40000: 2, 44000: 1, 27000: 1, 47000: 1, 35000: 1, 38000: 1","48000: 15, 16000: 7, 36000: 1, 22000: 1, 20000: 1, 37000: 1, 40000: 1, 46000: 1, 45000: 1, 38000: 1","48000: 17, 16000: 5, 44000: 2, 22000: 2, 36000: 1, 40000: 1, 20000: 1, 32000: 1, 23000: 1",AFKO.GAMNG,F12 production orders
+M2,bounded,"Production time (days), median / q75, steady months",4.195 / 6.384,3.055 / 4.24,4.521 / 9.078,JCDS status I0002 released -> I0012 delivered,game-clock difference
+M3,policy,"Production trigger: plant stock at order creation, median",0,"11,000","12,000",MSEG 101/301 plant stock path at JCDS I0001,player policy
+M4,policy,Share of production orders for F12,0.474,0.353,0.33,AFKO.PLNBEZ,line shared with F16/F15
+T1,policy,"Plant -> DC transfer size (units), mean","8,329.341","7,189.542","7,024.845",MSEG 301 inbound to 02N/02S/02W,F12
+T2,unobserved,Plant -> DC transport time,not observable,not observable,not observable,MSEG 301,ERPsim posts transfers as one instantaneous document
+C1,policy,Peak DC stock North / South / West (no physical capacity is recorded in ERPsim),131804 / 143728 / 137592,77234 / 66562 / 70315,57570 / 43976 / 80988,MSEG 301/601 stock path per DC,peak level
+W1,context,Steady-state months,"[3, 4, 5, 6, 7, 8, 9]","[2, 3, 6, 7, 8, 9, 10]","[2, 3, 4, 5, 6, 7, 8, 9]",DC stock paths,months with <= 5% zero-stock days at every DC
+E1,context,Observed episode: months without production,"[10, 11]","[3, 4]",[6],MSEG 101 at plant,candidate real disruption for validation

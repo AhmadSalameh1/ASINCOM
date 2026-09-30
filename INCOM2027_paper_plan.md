@@ -36,69 +36,80 @@ Shorter alternative: *When the Twin Is Uncertain: Robust, Explainable and Certif
 
 ---
 
-## 2. Calibration from ERPsim data (V12)
+## 2. Evidence-first model build
 
-V12 is calibrated directly from the SAP tables of the ERPsim runs published by Tritscher et al. (2022). Everything below is produced by `data/derive_calibration.py`. The outputs are in `data/calibration/`: `calibration_normal_2.json` holds every derived quantity, and `across_runs.csv` holds the year-to-year comparison.
+**Principle:** every part of the model (entity, flow, rule) and every number in it traces to a row of the **evidence ledger**. Each row gives the source tables and columns, the filter, the method, and the value in all three game years. Nothing enters the model without a ledger ID. Disruptions are added only after the undisrupted model is validated against held-out data.
 
-### 2.1 The data
-| Item | Value |
-|---|---|
-| Calibration run | **normal 2**: one game year, **12 rounds × 20 days**, with sales on 229 game days (played in about 6.5 h of wall-clock time) |
-| Validation runs | **fraud 2** and **fraud 3**: same participant group, **same 71 customers**, same 12 rounds. Documents labelled as fraud are excluded. |
-| Game clock | Round and day are decoded from the customer PO number (`VBAK.BSTNK`). Events are placed on the game clock from their wall-clock time (about 58 real seconds per game day). |
-| Network | 71 customers, 1 plant, **3 DCs: South 30 customers, North 21, West 20**. Each customer is served by exactly one DC. |
-| Product | **AA-F12**: 48 % of units sold in normal 2, sharing the production line with AA-F16 and AA-F15 |
-| BOM (per unit) | AA-R02 blueberries 0.30 kg, AA-R05 wheat 0.35 kg, AA-R06 oats 0.35 kg, AA-P01 box ×1, AA-P02 bag ×1 |
-| Labelled events in normal 2 | 2 sales promotions (sales orders), 3 scrap events (on purchase orders) |
-| Quantity scale | Model quantity = real quantity ÷ 100 |
+Pipeline: `data/derive_calibration.py` → `data/calibration/`:
+- `evidence_ledger.md` / `.csv`: one row per parameter, with its evidence class
+- `cleaning_log.md`: every cleaning rule and what it removed, per run
+- `calibration_<run>.json`: every derived quantity, per run
 
-### 2.2 Derived parameters (normal 2; spread across the three runs in brackets)
-| Model element | Derived from | Value (game days / real units) | Across-run CV |
-|---|---|---|---|
-| Customer inter-order time (F12) | Per-customer gaps between F12 orders | mean 9.8 d, median 8; shifted gamma fit: 1 + Γ(0.88, 10.0) | 0.04 |
-| Customer order size (F12) | Order items | mean 477 (≈ 440–530 typical) | 0.06 |
-| F12 demand level | Units per game day | 5,796 (4,422–5,796) | 0.15 |
-| Raw-material lead time | PO creation → goods receipt | food ingredients median 2.6–2.7 d (1.1–5.2); packaging median 3.9 d (1.0–6.1) | 0.03 (median) |
-| Purchase order size | PO items per component | e.g. R02 mean 15.3k, R05 27.0k, R06 29.3k, P01 79.6k | 0.24 |
-| Component reorder point | Component stock when a PO is created | e.g. R02 median 22.5k, R05/R06 45k, P01/P02 150k | — |
-| Production batch | Production orders for F12 | **bimodal: 16k (10 orders) or 48k (20 orders)**, mean 37.6k | 0.01 |
-| Production time | Order release → delivered status | median 4.2 d, q25–q75 2.7–6.1 d | 0.17 |
-| Production trigger | Plant F12 stock at order creation | median 0: production is mostly started when plant stock is empty | — |
-| Plant → DC transfer size | Stock transfers to DCs | mean 8.3k (7.0k–8.3k) | 0.09 |
-| DC replenishment point | DC stock just before an inbound transfer | median 23k (North), 44k (South), … | — |
-| DC capacity | Peak DC stock | North 131.8k, South 143.7k, West 137.6k | — |
-| Horizon | One game year | 240 game days | — |
+### 2.1 Data
+- **Calibration run:** normal 2. One game year (12 months × 20 game days, sales on 229 days).
+- **Validation runs:** fraud 2 and fraud 3. Same participant group, same 71 customers, same 12 months. Documents labelled as fraud are excluded.
+- **Game clock:** decoded from the customer PO number (`VBAK.BSTNK`). Events are placed on the game clock by their wall-clock time.
+- **Scope:** product AA-F12 and its 5 components. Quantity scale 1:100.
 
-### 2.3 Not observable in the data (assumed and varied in the ensemble)
-| Element | Why it cannot be derived | Ensemble anchor |
+### 2.2 Phase A: cleaning (first pass done)
+| Rule | What it does | normal 2 |
 |---|---|---|
-| Plant → DC transport time | ERPsim posts transfers as one instantaneous document | Short fixed value, varied over a small range |
-| Demand shock **D** | The two labelled promotions did not raise observed sales (0.90× and 0.64× the preceding 20 days); ERPsim sales depend on price and available stock | DataCo daily order bursts |
-| Raw shortage **R** | No shortages occur in the run | USAID SCMS late or short deliveries |
-| Quality shock **Q** | Scrap events appear only as normal goods receipts; scrapped quantities are not recorded separately | Literature range |
-| Transport delay **F** | No downstream delays exist (transfers are instantaneous) | DataCo late-delivery share and excess days |
+| C0 integrity | Checks for duplicates, rejected orders, deleted POs, reversal movements | none found |
+| C1 fraud documents | Drops labelled fraud sales orders and POs | none in normal 2 (12 SO / 5 PO in fraud 2; 29 SO / 5 PO in fraud 3) |
+| C2 steady-state window | Demand statistics only from months where every DC ends ≤ 5 % of days with zero stock. Outside it, sales are capped by stock, so **sales ≠ demand**. | months 3–9 (start-up 1–2; end of game 10–12 with stock-outs) |
+| C3 promotions | Drops promotion-labelled orders from baseline demand | 23 F12 items |
 
-### 2.4 Resulting taxonomy
-- **Data-anchored (fixed):** network, customer-to-DC assignment, BOM, DC capacities, quantity scale.
-- **Data-bounded (ensemble range = variation across normal 2, fraud 2 and fraud 3, plus sampling uncertainty):** inter-order time, order size, demand level, lead times, PO sizes, production batch and time, transfer size, reorder points.
-- **Assumed (ensemble range from open data and literature):** D, R, Q, F and plant → DC transport time.
+### 2.3 Evidence classes (from the ledger)
+| Class | Meaning | Examples |
+|---|---|---|
+| **anchored** | Structural fact read from master or transaction data | 71 customers; customer → DC assignment (N 21 / S 30 / W 20); BOM (**run-specific**: fraud 2 uses wheat 0.20 / oats 0.50) |
+| **bounded** | Statistical parameter; ensemble range from the three years | inter-order time (mean 8.4 / 10.6 / 9.2 d), order size (486 / 453 / 432), food lead time (median 2.5 / 2.2 / 3.0 d), production time (median 4.2 / 3.1 / 4.5 d) |
+| **policy** | Player decision. Kept as the nominal policy; the L2 decision layer may change it. | reorder points, PO sizes, production batch (16k or 48k), transfer size, peak DC stock (**not a capacity**: 132k / 77k / 58k across years) |
+| **unobserved** | Not recorded in the data; assumed and varied | plant → DC transport time (ERPsim transfers are instantaneous) |
 
-### 2.5 Modelling decisions for Ahmad
-1. **Time unit.** The data is in game days. Choose the model's resolution, for example 1 tu = ¼ game day, which gives a 960 tu horizon; the lead-time and production spreads need sub-day resolution.
-2. **Product scope.** Either model only F12 on a production line with reduced capacity (48 % of line time), or add F16 as a second product. The first option is simpler and keeps the model tractable.
-3. **Policies vs parameters.** The reorder points and the production trigger are *player decisions*. Keep them as the nominal policy, and let the L2 decision layer choose alternatives.
+### 2.4 Phase B: structure proof (next)
+Mine the process flows from the SAP document flow (VBFA, EKBE, AFKO/AUFM) and draw the model's automata only from observed flows:
+- order → delivery → goods issue at the DC
+- DC replenishment → plant-to-DC transfer
+- production order → component issue (261) → finished-goods receipt (101)
+- PO → goods receipt
 
-**Twin validation (before any AI):** simulate nominal V12 and compare its lead-time, inter-order, production-time and DC-stock distributions with fraud 2 and fraud 3, using two-sample KS tests and quantile coverage.
+For each automaton and edge, record the ledger ID of the flow that proves it.
+
+### 2.5 Phase C–D: build and validate the undisrupted model
+- **Build:** a new UPPAAL model (V12). Each constant and distribution carries its ledger ID in a comment.
+- **Decisions needed from Ahmad:**
+  - time resolution (suggest 1 tu = ¼ game day)
+  - product scope (suggest F12 on its observed 33–47 % share of the production line)
+  - the nominal policy (suggest the normal 2 player policy)
+- **Validation** on fraud 2 and fraud 3 (steady months, their own recipe):
+  - lead-time, inter-order, production-time and DC-stock distributions (two-sample KS tests, quantile coverage)
+  - monthly throughput
+
+### 2.6 Phase E: realistic disruptions
+A disruption is admitted only if (a) it acts through a mechanism that exists in the validated model and (b) its frequency, severity and duration come from evidence:
+
+| Disruption | Mechanism in the model | Evidence for its parameters |
+|---|---|---|
+| **Production stoppage** | Line unavailable | **Observed in all three years:** months without production (normal 2: months 10–11; fraud 2: months 3–4; fraud 3: month 6), with the resulting DC stock-outs. This is a real episode for **validating** the disruption model. |
+| Supplier delay | Lead-time distribution shifted or scaled | USAID SCMS delivery-delay distribution (dimensionless: delay / planned lead time) |
+| Supply shortage | Partial goods receipt | USAID short or partial shipments; literature |
+| Demand surge or drop | Customer ordering rate scaled | DataCo order-volume bursts; the price-driven demand variation between the three years |
+| Downstream delay | Plant → DC transfer time > 0 | DataCo late-delivery share and excess days |
+| Quality loss | Part of a receipt or batch scrapped | Scrap events are labelled in normal 2 (quantities not recorded separately); literature |
+
+Only after this do the AI layers (Section 3) run: predict the effect of injected disruptions, then decide the response.
 
 ---
 
 ## 3. Method
 
 ### Step 0: V12 model (prerequisite)
-1. Lift hard-coded distribution parameters into named constants.
-2. **Make practices controllable:** change the `const bool ENABLE_P_*` flags into variables set by a `Controller` template on **controllable** edges at each decision epoch (for example each `TimeTicker` day). Disruptions stay **uncontrollable**. The UPPAAL 5.0 build already has TIGA/Stratego.
-3. Add a practice **cost** variable (activation plus running cost per practice).
-4. **Structural regression check:** before recalibrating, V12 with the V11.4.1 constants and fixed flags must reproduce the V11.4.1 17-query results within CI (CRN seeds). This shows the refactor changed no behaviour. Then apply the Section 2 calibration.
+Built from the evidence ledger (Section 2):
+1. Build the undisrupted model from the proven flows (Phase B) and ledger values (Phase C).
+2. **Practices are controllable:** the model has `Controller` template actions on **controllable** edges at each decision epoch. Disruptions stay on **uncontrollable** edges. The UPPAAL 5.0 build has TIGA/Stratego.
+3. Add a practice **cost** variable.
+4. Validate the undisrupted model against fraud 2 and fraud 3 (Phase D). Then add the disruption modules (Phase E), and check the production-stoppage module against the observed stoppage episodes.
 
 ### Step 1: The ensemble
 - **Sampling:** Latin hypercube over the assumed ranges, giving about 200 parameter vectors θ₁…θ₂₀₀. Split them into **train (60 %)**, **held-out interior (20 %)** and **held-out extreme corners (20 %)**, the last being the hardest shift.
@@ -191,10 +202,10 @@ Real data **sets parameter ranges and the real-anchored test twins**. It is neve
 
 | Week | Dates | Work | Deliverable |
 |---|---|---|---|
-| 1 | 30 Sep–6 Oct | Decide the Section 2.5 modelling choices and set ranges. Send the pitch to the professor. Read COOL-MC. Download DataCo and USAID. | Approved taxonomy table |
-| 2 | 7–13 Oct | **V12:** lift hard-coded constants, controllable practices, cost variable, **regression check vs V11.4.1**. | V12 plus regression table |
-| 3 | 14–20 Oct | Fit the data-bounded distributions from normal 2 (lead time, inter-order, order size), with year-to-year widths from fraud 2 and fraud 3. **Validate the nominal V12 twin against fraud 2 and fraud 3.** Fit dimensionless statistics from DataCo and USAID for the assumed disruption ranges. Ensemble generator (LHS → model files or `Init` sampling). | Twin-validation table, 200 + 5 θ, generator script |
-| 4 | 21–27 Oct | Trace generation. **Morris, then Sobol** sensitivity. | Fig. 2 |
+| 1 | 30 Sep–6 Oct | **Phase A** cleaning and evidence ledger (first pass done). **Phase B** structure proof from document flows. Decide Section 2.5 choices. Send the pitch to the professor. Read COOL-MC. | Ledger, cleaning log, flow diagram |
+| 2 | 7–13 Oct | **Phase C:** build V12 from the ledger (controllable practices, cost variable, ledger IDs in comments). | V12 model |
+| 3 | 14–20 Oct | **Phase D:** validate the undisrupted V12 against fraud 2 and fraud 3. **Phase E:** disruption modules; fit USAID / DataCo statistics; check the stoppage module against the observed episodes. | Validation table, disruption table |
+| 4 | 21–27 Oct | Ensemble generator (LHS over bounded and unobserved parameters), trace generation, **Morris then Sobol** sensitivity. | Fig. 2 |
 | 5 | 28 Oct–3 Nov | **L1:** training, conformal, ACI, coverage-vs-shift. | Fig. 3 |
 | 6–7 | 4–17 Nov | **L2:** Stratego nominal and robust, baselines, risk-triggered policy. **Main risk; see Section 7.** | Table 1 |
 | 8 | 18–24 Nov | **L3:** tree distillation, SHAP, stability. **L4:** tree → UPPAAL, two-level certificate, ensemble PRMM S5. | Fig. 4, Table 2 |
@@ -227,7 +238,7 @@ Compared with v1, the ensemble adds about one week. Weeks 6–8 are now tighter,
 ```
 model/          V12 controllable + parameterised model; link to V11.4.1 baseline
 params/         taxonomy table, ranges, LHS design, real-anchored θ
-data/           derive_calibration.py + calibration/ outputs (ERPsim); download + fitting scripts for DataCo / USAID (raw data not committed)
+data/           derive_calibration.py → calibration/ (evidence ledger, cleaning log, per-run JSON); DataCo / USAID fitting scripts (raw data not committed)
 ensemble/       model-file generator, parallel verifyta runner, trace export
 traces/         generated trajectories (gitignored; regenerable from seeds)
 sensitivity/    Morris / Sobol
@@ -242,6 +253,7 @@ paper/          IFAC LaTeX + figures
 
 ## 9. Immediate next steps
 
-1. **Ahmad:** go through the taxonomy in Section 2. Mark each parameter as ERPsim, assumed, or tuned-to-match-ERPsim, and write down any ranges you already considered during calibration.
-2. Send the professor the pitch in Section 1.
-3. Start V12: lift the hard-coded gamma parameters and run the regression check against V11.4.1.
+1. **Ahmad:** decide the Section 2.5 choices (time resolution, product scope, nominal policy).
+2. Phase B: mine the document flows and draw the proven process structure.
+3. Send the professor the pitch (Section 1) together with the evidence-first approach (Section 2).
+4. Read COOL-MC (arXiv 2603.02396) for positioning.
