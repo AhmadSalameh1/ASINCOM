@@ -61,11 +61,20 @@ def realised(d, choice, col="y_tot"):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "results"))
+    ap.add_argument("--only5", action="store_true", help="compute section 5 only and append it to the existing file")
     a = ap.parse_args()
     rng = np.random.default_rng(SEED)
     md = ["# Revision statistics (answers to the mock review)\n"]
     data = {r: load(r) for r in RUNS}
     cert = load("normal_2", cert=True)
+    if a.only5:
+        md = section5(data)
+        path = os.path.join(a.out, "revision_stats.md")
+        old = open(path).read().split("\n## 5.")[0].rstrip("\n")
+        with open(path, "w") as fh:
+            fh.write(old + "\n" + "\n".join(md) + "\n")
+        print("\n".join(md))
+        return
 
     # ---------------------------------------------------------------- 1. grouped split
     md.append("## 1. Random vs grouped (by start day) split, built on normal 2\n")
@@ -161,8 +170,15 @@ def main():
             if m.any():
                 md.append(f"| {sname} | {b} | {m.mean():.1%} | {np.mean(y[m] <= u[m]):.1%} | {np.mean(y[m] <= L_STAR + 1e-9):.1%} |")
         md.append(f"| {sname} | all | 100 % | {np.mean(y <= u):.1%} | {np.mean(y <= L_STAR + 1e-9):.1%} |")
+    md += section5(data)
+    with open(os.path.join(a.out, "revision_stats.md"), "w") as fh:
+        fh.write("\n".join(md) + "\n")
+    print("\n".join(md))
 
+
+def section5(data):
     # ---------------------------------------------------------------- 5. L1 ablation under the grouped split
+    md = []
     md.append("\n## 5. L1 point models, grouped split (held-out start days of normal 2), MAE in days\n")
     tr, cal, te = split_grouped(data["normal_2"])
     abl = ablation(tr, {"held-out": te})
@@ -172,9 +188,7 @@ def main():
     md.append(f"| per-type mean | {np.mean(np.abs(tm.predict(te) - te[TARGET].values)):.3f} | |")
     for _, r in abl.iterrows():
         md.append(f"| {r.model} | {r.MAE_days:.3f} | {r.spearman:.2f} |")
-    with open(os.path.join(a.out, "revision_stats.md"), "w") as fh:
-        fh.write("\n".join(md) + "\n")
-    print("\n".join(md))
+    return md
 
 
 if __name__ == "__main__":
