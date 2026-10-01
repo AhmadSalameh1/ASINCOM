@@ -24,13 +24,18 @@ Disruptions are injected only once the physics is validated.
 | AI layers L1–L4 | evidence-bounded disruption episodes × 8 lever actions; L1 conformal impact prediction; L2 risk-constrained levers; L3 tree + SHAP; L4 Clopper–Pearson service and do-no-harm certificates. Works in the build year; does not transfer to another team without adaptation | `docs/ai_layers.md`, `model/ai/`, `model/ai/results/` |
 | Prices | PR1–PR3 from VBAP and EKPO (cost side of L2) | `data/derive_prices.py`, `data/prices/` |
 | Paper figures | 7 figures (framework, validation, resilience, L1, L2, tree, certificates) built from the result files; draft captions and a 6-page selection | `paper/figures/` |
+| Paper draft | `paper/main.tex` (IFAC format, 6 pages with the stand-in class), bibliography, submission checklist | `paper/README.md` |
 | UPPAAL V12 | generated from the twin inputs and the certified trees: players' replay, three levers, 34 features, tree; switchable or evidence-sampled disruptions; mirror suite 591/591, stochastic mirror reproduces L4; **verifyta run pending (user, locally)** | `docs/uppaal.md`, `model/uppaal/` |
 
 ## Now
 - **User:**
   - Run `verifyta` on the `_crosscheck*.xml` files and `crosscheck.py compare` (`docs/uppaal.md` §3).
   - Run query 2 on the `_ai_tree` / `_ai_players` files, and compare with the table in `docs/uppaal.md` §2.
-- **Next:** write the paper (figures and captions are in `paper/figures/`).
+- **Next:** the submission checklist in `paper/README.md`:
+  - authors
+  - reference verification
+  - verifyta results
+  - compiling with the official class
 
 ## Working notes
 - Raw data: `erp_fraud_data.zip` (Google Drive, user's). It is extracted in the session scratchpad, which is not in the repo, so re-download it to rerun the scripts.
