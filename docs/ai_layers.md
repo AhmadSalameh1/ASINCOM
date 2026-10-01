@@ -195,7 +195,28 @@ The certified object is the **tree**, the explanation itself. Each certificate u
 4. **The certified level is reported rather than a pass/fail at an arbitrary p\*.** In normal 2, even the oracle meets L* in only about 84 % of episodes.
 
 ## 7. Robustness to the shipping rule (`robustness.py`, `results/robustness.md`)
-See the results file: the same pipeline is rebuilt on episodes generated with plain (pessimistic) transfer replay.
+The same pipeline is rebuilt on episodes generated with **plain** transfer replay (`episodes.py --plain-push`), the rule that strands stock at the plant.
+
+| (L* = 1; lost in days of demand / violation) | normal 2 held-out | fraud 2 | fraud 3 |
+|---|---|---|---|
+| deferred (nominal): players → L2 → oracle | 2.26 → **1.99** → 1.91 | 1.43 → 1.47 → 1.04 | 0.66 → 0.68 → 0.60 |
+| deferred: L1 coverage | 88.0 % | 84.9 % | 79.0 % |
+| plain: players → L2 → oracle | 4.39 → **2.37** → 2.30 | 3.91 → 1.63 → 1.49 | 1.10 → 0.63 → 0.53 |
+| plain: L1 coverage | 89.5 % | 94.8 % | 94.4 % |
+| plain: best fixed action | ship (2.38) | ship (1.50) | ship (0.53) |
+
+### What holds under both rules
+In the build year, L2 beats the players and comes close to the oracle.
+
+### What does not
+1. **Under plain replay, the artefact dominates.**
+   - The players lose about twice as much.
+   - Shipping the stranded stock is the best action in every year, and it even reduces inventory.
+   - Because that "repair" works for every team, prediction and decisions appear to transfer across teams: coverage is 95 %, and L2 gains 58 % / 43 % in the fraud years.
+2. **The transfer failure is therefore not caused by the Amendment 3 correction. The artefact hid it.** A study on the unvalidated replay would have reported an AI that transfers across teams, for a reason that does not exist in the real game.
+
+### Consequence for the paper
+This is direct evidence that **validating the twin against the recorded data, down to the replay rules, is a precondition for trustworthy AI on it**. The paper reports the nominal results and this check side by side.
 
 ## 8. What the paper can claim
 - A predict → decide → explain → certify pipeline on a supply-chain twin whose every part is backed by data, with disruptions drawn within evidence bounds and only the players' real levers.
@@ -204,6 +225,7 @@ See the results file: the same pipeline is rebuilt on episodes generated with pl
   - Prediction coverage, decision value and certificates all degrade when the twin of one team is used for another team's operations.
   - Explanation stability does not reveal this.
   - Recalibration (100 outcomes) restores coverage, and adaptation (a few hundred target episodes) restores decision value.
+- **Twin validity matters more than model choice:** an unvalidated replay rule would have produced a falsely transferable AI (section 7).
 - **Limits:** line stoppages cannot be mitigated with these levers, and that is stated.
 
 ## 9. Next
