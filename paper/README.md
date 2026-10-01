@@ -13,7 +13,7 @@
 3. **UPPAAL.**
    - Run `verifyta` on the `_crosscheck*.xml` files and confirm `RESULT: MATCH` (`docs/uppaal.md` §3).
    - Run query 2 on the `_ai_` files. Then replace "expected values" in the Discussion, and the hollow markers in Fig. 3 (`model/uppaal/smc_mirror.csv`), with the verifyta results.
-4. **Compile with the official class** and check the page limit. Optional figures not included for space: framework, validation, resilience and L1 coverage (`figures/fig1–fig4`).
+4. **Compile with the official class** and check the page limit. With the stand-in class page 6 is completely full; if the official class runs over, drop the framework figure (Fig. 1) first. Not included for space: validation, resilience and L1 coverage (`figures/fig2–fig4`).
 
 ## Where each number comes from
 | Paper section | Source |

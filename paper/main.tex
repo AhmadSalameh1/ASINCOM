@@ -58,7 +58,7 @@ This paper builds both from the same evidence. The twin is derived from the SAP 
 manufacturing game \citep{leger2006erpsim} released as open research data \citep{tritscher2022openerp}. Three game
 years of one company, played by teams with different policies, provide a natural test of transfer: everything is
 built on one year and checked on the other two. On this twin we stack four layers --- predict, decide, explain,
-certify --- and report where they hold and where they do not.
+certify --- and report where they hold and where they do not (Fig.~\ref{fig:framework}).
 
 The contributions are:
 (i) an \emph{evidence-first} twin: every parameter, structural rule and player decision is derived from the
@@ -71,6 +71,15 @@ whose certified object is the explanation itself; and
 (iv) a measured account of transfer: the layers work in their build year, degrade on another team's year, and
 recover with recalibration or adaptation on the target twin, while explanation stability does not reveal the
 degradation.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_framework.pdf}
+\caption{Evidence-first pipeline: every model element is derived from the SAP data of one game year and checked on
+two years played by another team; the Python twin and the generated UPPAAL model agree in 591 of 591 deterministic
+configurations; disruptions are sampled within evidence bounds and the AI layers may use only the players' levers.}
+\label{fig:framework}
+\end{figure*}
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Related work}
