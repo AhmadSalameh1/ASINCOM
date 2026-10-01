@@ -23,12 +23,13 @@ Disruptions are injected only once the physics is validated.
 | Amendment 3 | deferred transfer replay: plain replay stranded stock at the plant; round 3 reported with a diagnosis; Phase E and the lever comparison re-run | `docs/validation_protocol.md`, `docs/validation_report.md` |
 | AI layers L1–L4 | evidence-bounded disruption episodes × 8 lever actions; L1 conformal impact prediction; L2 risk-constrained levers; L3 tree + SHAP; L4 Clopper–Pearson service and do-no-harm certificates. Works in the build year; does not transfer to another team without adaptation | `docs/ai_layers.md`, `model/ai/`, `model/ai/results/` |
 | Prices | PR1–PR3 from VBAP and EKPO (cost side of L2) | `data/derive_prices.py`, `data/prices/` |
-| UPPAAL V12 | generated from the twin inputs; switchable disruptions; the deterministic mirror matches the twin exactly (3 years, all switches); **verifyta run pending (user, locally)** | `docs/uppaal.md`, `model/uppaal/` |
+| UPPAAL V12 | generated from the twin inputs and the certified trees: players' replay, three levers, 34 features, tree; switchable or evidence-sampled disruptions; mirror suite 591/591, stochastic mirror reproduces L4; **verifyta run pending (user, locally)** | `docs/uppaal.md`, `model/uppaal/` |
 
 ## Now
-- **User:** run `verifyta` on `model/uppaal/V12_<run>_crosscheck.xml` and `crosscheck.py compare` (`docs/uppaal.md` §4). The models were regenerated with deferred transfers.
+- **User:**
+  - Run `verifyta` on the `_crosscheck*.xml` files and `crosscheck.py compare` (`docs/uppaal.md` §3).
+  - Run query 2 on the `_ai_tree` / `_ai_players` files, and compare with the table in `docs/uppaal.md` §2.
 - **Next:**
-  - Add the three levers and the certified tree to the UPPAAL model (mirror-checked).
   - Make the paper figures.
   - Write the paper.
 

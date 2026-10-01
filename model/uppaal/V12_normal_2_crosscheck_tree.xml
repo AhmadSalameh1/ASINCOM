@@ -17,10 +17,10 @@ const double CHANGEOVER = 0.6 * CAP;      // capacity lost on a product switch (
 
 // ---------------- configuration ----------------
 const int LEAD_MODE = 1;                 // 0 = sampled lead times, 1 = PMF median (deterministic cross-check)
-const int SCEN_MODE = 0;                 // 0 switches below, 1 one fixed disruption (FIX_*), 2 sampled within evidence bounds
-const int CTRL_MODE = 0;                 // 0 players only, 1 fixed action ACT_FIXED, 2 certified tree (tree_normal_2)
+const int SCEN_MODE = 1;                 // 0 switches below, 1 one fixed disruption (FIX_*), 2 sampled within evidence bounds
+const int CTRL_MODE = 2;                 // 0 players only, 1 fixed action ACT_FIXED, 2 certified tree (tree_normal_2)
 const int ACT_FIXED = 0;                 // 0 none, 1 po5, 2 po10, 3 fg, 4 ship, 5 prio, 6 fg+prio, 7 po10+fg+prio
-const int RESP_START = 107;             // SCEN_MODE 0: notice day for a fixed action
+const int RESP_START = 79;             // SCEN_MODE 0: notice day for a fixed action
 
 // SCEN_MODE 0 switches. E1 supplier delay: POs created in [S, E] arrive ceil(REL/100 x lead) days later
 const bool EN_SUPPLIER_DELAY = false;
@@ -41,7 +41,7 @@ const bool EN_TRANSIT = false;
 const int T_START = 101; const int T_END = 120; const int T_DAYS = 4;
 
 // SCEN_MODE 1: one disruption (type 1..5 = E1..E5), notified and starting on FIX_START (window 20 days; E3: its length)
-const int FIX_TYPE = 3; const int FIX_START = 107;
+const int FIX_TYPE = 3; const int FIX_START = 79;
 const double FIX_E1_REL = 0.75; const double FIX_E2_SHARE = 0.041; const int FIX_E2_MAT = -1;  // -1 = all food
 const int FIX_E3_DAYS = 10; const double FIX_E4_FACTOR = 1.19; const int FIX_E5_DAYS = 4;
 

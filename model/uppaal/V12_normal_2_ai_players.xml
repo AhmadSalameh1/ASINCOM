@@ -16,8 +16,8 @@ const double CAP = 24000.0;                  // line capacity per day (M6)
 const double CHANGEOVER = 0.6 * CAP;      // capacity lost on a product switch (0.6 day)
 
 // ---------------- configuration ----------------
-const int LEAD_MODE = 1;                 // 0 = sampled lead times, 1 = PMF median (deterministic cross-check)
-const int SCEN_MODE = 0;                 // 0 switches below, 1 one fixed disruption (FIX_*), 2 sampled within evidence bounds
+const int LEAD_MODE = 0;                 // 0 = sampled lead times, 1 = PMF median (deterministic cross-check)
+const int SCEN_MODE = 2;                 // 0 switches below, 1 one fixed disruption (FIX_*), 2 sampled within evidence bounds
 const int CTRL_MODE = 0;                 // 0 players only, 1 fixed action ACT_FIXED, 2 certified tree (tree_normal_2)
 const int ACT_FIXED = 0;                 // 0 none, 1 po5, 2 po10, 3 fg, 4 ship, 5 prio, 6 fg+prio, 7 po10+fg+prio
 const int RESP_START = 107;             // SCEN_MODE 0: notice day for a fixed action

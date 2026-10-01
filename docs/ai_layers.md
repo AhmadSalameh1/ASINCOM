@@ -228,6 +228,12 @@ This is direct evidence that **validating the twin against the recorded data, do
 - **Twin validity matters more than model choice:** an unvalidated replay rule would have produced a falsely transferable AI (section 7).
 - **Limits:** line stoppages cannot be mitigated with these levers, and that is stated.
 
-## 9. Next
-- UPPAAL encoding of the certified tree as a controller template, on top of `model/uppaal` (the levers must first be added to the generator, then mirror-checked as in `docs/uppaal.md`).
-- Figures for the paper: the coverage-vs-shift curve (L1), the lost-demand vs inventory frontier (L2), the tree (L3), and the certificate table (L4).
+## 9. UPPAAL encoding (done; `docs/uppaal.md`)
+- The levers and the certified trees are generated into the UPPAAL model.
+- The 34 features are computed inside the model.
+- The mirror suite matches the twin in 591 / 591 configurations.
+- The model's random semantics reproduce the L4 service rates within sampling error.
+- `verifyta` runs locally (UPPAAL is not available here).
+
+## 10. Next
+Figures for the paper: the coverage-vs-shift curve (L1), the lost-demand vs inventory frontier (L2), the tree (L3), and the certificate table (L4, with the UPPAAL SMC column once run).

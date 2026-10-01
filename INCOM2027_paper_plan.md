@@ -129,7 +129,7 @@ Only after this do the AI layers (Section 3) run: predict the effect of injected
 >   - Adapting it with 400 target-twin episodes restores a 15 % gain.
 > - **L3:** the policy is distilled into a depth-3 tree. SHAP importance is stable across years even where prediction fails, so **stability is not evidence of transfer**.
 > - **L4:** Clopper–Pearson certificates of the tree on independent episodes, for service and for **do-no-harm**.
-> - **Stratego and the UPPAAL encoding of the tree** come next. The UPPAAL model (`docs/uppaal.md`) first needs the levers.
+> - **UPPAAL:** the levers and the certified tree are encoded in the generated model (`docs/uppaal.md`). UPPAAL SMC certifies the tree independently, on evidence-sampled disruptions. Stratego synthesis over the same levers remains an optional extension.
 >
 > The text below is the original plan, kept for reference.
 
