@@ -1,0 +1,17 @@
+model,set,MAE_days,spearman
+ridge (notice+state),normal 2 held-out (interior),1.1902788415823473,0.6137846009485263
+ridge (notice+state),fraud 2 (policy shift),2.408038970815337,0.18833379268776934
+ridge (notice+state),fraud 3 (policy shift),3.3877589359949085,0.2405562896600125
+ridge (notice+state),"STRESS, all years (severity shift)",2.999226800304221,0.45600756995554453
+gbm-notice,normal 2 held-out (interior),0.9395846561685189,0.6800070364935297
+gbm-notice,fraud 2 (policy shift),0.7743508584440708,0.39745543870753053
+gbm-notice,fraud 3 (policy shift),0.7074645547142362,0.46444878172551074
+gbm-notice,"STRESS, all years (severity shift)",1.1654707601915395,0.7216155531441374
+gbm-state,normal 2 held-out (interior),1.4585091083173813,0.26498612063507104
+gbm-state,fraud 2 (policy shift),1.4389220107404301,0.13665111554083023
+gbm-state,fraud 3 (policy shift),1.0673641056890457,0.06511376560167406
+gbm-state,"STRESS, all years (severity shift)",1.7636645211512905,0.11858774399690268
+gbm (notice+state),normal 2 held-out (interior),0.22102555037667954,0.7990787890002206
+gbm (notice+state),fraud 2 (policy shift),0.7765784058937859,0.38211941536740845
+gbm (notice+state),fraud 3 (policy shift),0.5127961970048466,0.4777822739281322
+gbm (notice+state),"STRESS, all years (severity shift)",1.1225172994732904,0.713603927513131

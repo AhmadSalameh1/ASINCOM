@@ -84,5 +84,21 @@ These known weaknesses are carried into the validation; they are not tuned away.
 - V5: 11/12; V6: 6 vs 5 days; V8: pass
 - V7: blueberries (R02) 5.5 %, fail; all other components 0 %
 
+## Amendment 3: deferred transfer replay (made after all round-2 results were seen)
+**Disclosure:** made after the round-2 results on all three years were known. It was found while building the AI decision layer, not by tuning to the validation metrics. Rounds 2 and 3 are both reported.
+
+**Finding:** under `push_rule=replay`, a recorded transfer is clipped to the plant stock on its day. Whenever the twin's output comes a little later than the recorded output, the clipped part is **never shipped**. The twin then strands stock at the plant:
+
+| | recorded | twin, plain replay |
+|---|---|---|
+| mean plant stock, normal 2 / fraud 2 / fraud 3 | 23.7k / 20.8k / 15.3k | 46.5k / 63.4k / 62.7k |
+| plant stock at year end | 0 | 30–72k |
+
+A response lever that "ships the plant stock" then mostly repairs this artefact. The players' own records show that they shipped everything they produced: the plant is empty at the end of every year.
+
+**Rule:** `push_rule=replay_deferred`. The part of a recorded transfer that cannot ship for lack of plant stock stays owed to its DC and ships as soon as stock allows. The quantity and destination are the players'; only the timing can be later than recorded, never earlier.
+
+**Configuration (round 3):** as Amendment 2, with `push_rule=replay_deferred`. The metrics and the verdict rule are unchanged.
+
 ## Output
 `model/twin/validation/` holds one report per year. `docs/validation_report.md` gives the verdict.

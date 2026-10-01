@@ -56,4 +56,4 @@ If verifyta reports a syntax error, the error is in the generator's text templat
 
 ## 5. Scope and next steps
 - The model reproduces the **validated open-loop physics** (round 2, decisions replayed). Controllers (L2) and the certification layer (L4) will be added as templates on top of the same `step()`: a controller template on controllable edges that sets the three levers (conversions, POs, transfers; `docs/decision_levers.md`).
-- The shipping rule is not a fixed model (`docs/validation_report.md`). In UPPAAL it therefore stays replayed until L2 supplies it.
+- The shipping rule is not a fixed model (`docs/validation_report.md`). In UPPAAL it therefore stays replayed, with deferral as in the twin (validation Amendment 3), until L2 supplies it.

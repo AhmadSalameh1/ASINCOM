@@ -14,6 +14,7 @@ Code: `model/twin/twin.py` (simulator) and `model/twin/run_twin.py` (many seeds,
 | `demand_mode` | `replay` / `sample` | `replay` replays the recorded customer orders (day, customer, quantity). Sales are still clipped to the twin's own DC stock, which isolates the supply-side physics for validation. `sample` draws inter-order times and order sizes from ledger D1–D5, for experiments. |
 | `line_rule` | **`erpsim`** (default) / `fifo_block` / `fifo_skip` | See below. |
 | `others` | **`mrp`** (default) / `replay` | How the other products (F16, F15) are represented. See below. |
+| `push_rule` | `replay_deferred` (nominal since validation Amendment 3) / `replay` / `lag1` / `fraction` | `replay_deferred` replays the recorded transfers; a part that cannot ship for lack of plant stock stays owed to its DC and ships as soon as stock allows. Plain `replay` strands that part at the plant (`docs/validation_report.md`, round 3). |
 | `lead_mode` | **`sample`** (default) / `median` | `median` fixes every supplier lead time at its PMF median. The twin is then deterministic, which is used only for the day-by-day cross-check with the UPPAAL model (`docs/uppaal.md`). |
 
 ## Three rules that the build process forced, each with its evidence

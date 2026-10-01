@@ -1,7 +1,7 @@
 """Cross-check of the UPPAAL V12 model against the Python twin (deterministic mode: every lead time at its median).
 
 Three checks, all against the same reference: the Python twin (model/twin/twin.py) run with policy, push and demand
-replay and lead_mode="median", with the disruption switches read from the XML (so any EN_* setting is checked).
+replay (transfers deferred, Amendment 3) and lead_mode="median", with the disruption switches read from the XML (so any EN_* setting is checked).
 
   mirror    Executes the generated XML itself in Python: every constant (data arrays, switches) is parsed from the
             XML's declaration and the day step is a line-by-line transcription of its UPPAAL functions. Checks the
@@ -65,7 +65,7 @@ def scenario_from(k, comps):
 
 
 def twin_trace(inp, k):
-    df = Twin(inp, seed=0, demand_mode="replay", policy="replay", push_rule="replay", lead_mode="median",
+    df = Twin(inp, seed=0, demand_mode="replay", policy="replay", push_rule="replay_deferred", lead_mode="median",
               scenario=scenario_from(k, inp["components"])).run()
     out = pd.DataFrame({"day": df.day, "sold_day": df.sales, "lost_day": df.lost, "lost_total": df.lost.cumsum(),
                         "stockout_days": df[[f"dc_{d}" for d in DCS]].le(0).any(axis=1).cumsum()})
@@ -90,6 +90,7 @@ class Mirror:
         self.plant = 0.0
         self.dc = [0.0] * ndc
         self.intransit = [[0.0] * nday for _ in range(ndc)]
+        self.owed = [0.0] * ndc
         self.po = []                    # [qty, due, mat, open, qdone]
         self.qhead = self.qtail = self.next_ord = self.next_po = self.next_tr = 0
         self.remaining = [0.0] * k["N_ORD"]
@@ -185,11 +186,14 @@ class Mirror:
         while self.next_tr < k["N_TR"] and k["TR_DAY"][self.next_tr] < self.day:
             self.next_tr += 1
         while self.next_tr < k["N_TR"] and k["TR_DAY"][self.next_tr] == self.day:
-            q = min(k["TR_QTY"][self.next_tr], self.plant - sent)
-            if q > 0.0:
-                self.to_dc(k["TR_DC"][self.next_tr], q)
-                sent += q
+            self.owed[k["TR_DC"][self.next_tr]] += k["TR_QTY"][self.next_tr]
             self.next_tr += 1
+        for d in range(k["NDC"]):
+            q = min(self.owed[d], self.plant - sent)
+            if q > 0.0:
+                self.to_dc(d, q)
+                self.owed[d] -= q
+                sent += q
         self.plant -= sent
 
     def sales(self):

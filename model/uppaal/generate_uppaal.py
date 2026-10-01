@@ -165,6 +165,7 @@ double comp[NC];                         // available component stock (B16: star
 double plant = 0.0;
 double dc[NDC];
 double intransit[NDC][NDAY];
+double owed[NDC];                        // transfers owed to each DC (deferred replay)
 const int N_PO_MAX = {n_po_max};
 double po_qty[N_PO_MAX]; int[0, NDAY + 60] po_due[N_PO_MAX]; int[0, NC] po_mat[N_PO_MAX]; bool po_open[N_PO_MAX]; bool po_qdone[N_PO_MAX];
 int[0, N_PO_MAX] n_po = 0;
@@ -264,12 +265,13 @@ void to_dc(int d, double q) {{
 }}
 
 void push() {{
-    double sent = 0.0; double q;
+    // recorded transfers, deferred (validation Amendment 3): what cannot ship for lack of plant stock stays owed
+    double sent = 0.0; double q; int d;
     while (next_tr < N_TR && TR_DAY[next_tr] < day) next_tr++;
-    while (next_tr < N_TR && TR_DAY[next_tr] == day) {{
-        q = TR_QTY[next_tr] < plant - sent ? TR_QTY[next_tr] : plant - sent;
-        if (q > 0.0) {{ to_dc(TR_DC[next_tr], q); sent += q; }}
-        next_tr++;
+    while (next_tr < N_TR && TR_DAY[next_tr] == day) {{ owed[TR_DC[next_tr]] += TR_QTY[next_tr]; next_tr++; }}
+    for (d = 0; d < NDC; d++) {{
+        q = owed[d] < plant - sent ? owed[d] : plant - sent;
+        if (q > 0.0) {{ to_dc(d, q); owed[d] -= q; sent += q; }}
     }}
     plant -= sent;
 }}

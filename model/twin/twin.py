@@ -46,6 +46,9 @@ Modes
                              correlate 0.72 with the previous day's output, 0.12 with the same day's)
                 "fraction" : a fixed daily fraction of plant stock is shipped (fitted; superseded)
                 "replay"   : the recorded transfers per DC are replayed, clipped to the available plant stock
+                "replay_deferred" : as "replay", but the clipped part of a transfer stays owed to its DC and is
+                             shipped as soon as plant stock allows (validation Amendment 3: plain replay strands
+                             stock at the plant whenever the twin's output is later than the recorded one)
   dc_split      "cover" : each shipment is allocated to equalise the DCs' days of cover (stock / recent daily
                           sales); recorded: the largest share went to the lowest-cover DC on 65 % of transfer
                           days (random: 33 %)
@@ -64,7 +67,7 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample"):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample", lead_stream="global", observer=None):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
@@ -72,6 +75,12 @@ class Twin:
         self._changeover_days = changeover_days
         self.scenario = scenario or {}
         self.lead_mode = lead_mode   # "sample" or "median" (deterministic, for the UPPAAL cross-check)
+        # "global": one random stream for all lead times (validation runs). "keyed": each PO's lead time is drawn
+        # from a stream keyed by (seed, material, creation day, index of the PO for that material and day), so
+        # runs that differ only by extra POs keep identical lead times for every other PO (common random numbers
+        # for comparing decisions, AI layer L2)
+        self.lead_stream, self.seed = lead_stream, seed
+        self.observer = observer     # called as observer(twin, day) at the start of every day (AI layer L1 features)
         self.controller = controller
         if policy == "controller" and controller is None:
             raise ValueError("policy='controller' needs a controller object")
@@ -140,6 +149,8 @@ class Twin:
         self.last_product = None
         self.changeover_left = 0
         self.changeover_days = self._changeover_days
+        self._po_count = {}
+        self.owed = {d: 0.0 for d in DCS}                       # push_rule "replay_deferred"
 
     # ------------------------------------------------------------------ disruptions
     @staticmethod
@@ -156,7 +167,7 @@ class Twin:
         return e
 
     def _new_po(self, material, qty, day, lead=None, quality_exempt=False):
-        lead = self._lead(material) if lead is None else lead
+        lead = self._lead(material, day) if lead is None else lead
         e = self._applies("supplier_delay", day, material)
         if e:
             lead += math.ceil(e["relative"] * lead)
@@ -172,10 +183,15 @@ class Twin:
     def _qty(self):
         return float(self.rng.choice(self.qty_samples))
 
-    def _lead(self, material):
+    def _lead(self, material, day=None):
         vals, p = self.lead["food" if material.startswith("AA-R") else "packaging"]
         if self.lead_mode == "median":
             return int(vals[np.searchsorted(np.cumsum(p), 0.5)])
+        if self.lead_stream == "keyed" and day is not None:
+            key = (material, day)
+            k = self._po_count[key] = self._po_count.get(key, -1) + 1
+            g = np.random.default_rng([self.seed, self.components.index(material), day, k])
+            return int(g.choice(vals, p=p))
         return int(self.rng.choice(vals, p=p))
 
     def _lots(self, q, product):
@@ -311,13 +327,16 @@ class Twin:
     def _push(self, carried):
         if self.policy == "controller":
             plan = self.controller.transfers(self, self.today, carried) or {}
-            sent = 0.0
+            sent, done = 0.0, {}
             for d in DCS:
                 q = max(0.0, min(plan.get(d, 0.0), self.plant - sent))
                 if q > 0:
                     self._to_dc(d, q)
                     sent += q
+                    done[d] = q
             self.plant -= sent
+            if hasattr(self.controller, "shipped"):
+                self.controller.shipped(done)
             return sent
         if self.push_rule == "replay":
             sent = 0.0
@@ -325,6 +344,18 @@ class Twin:
                 q = min(t["qty"], self.plant - sent)
                 if q > 0:
                     self._to_dc(t["dc"], q)
+                    sent += q
+            self.plant -= sent
+            return sent
+        if self.push_rule == "replay_deferred":
+            sent = 0.0
+            for t in self.rec_transfers.get(self.today, []):
+                self.owed[t["dc"]] += t["qty"]
+            for d in DCS:
+                q = min(self.owed[d], self.plant - sent)
+                if q > 0:
+                    self._to_dc(d, q)
+                    self.owed[d] -= q
                     sent += q
             self.plant -= sent
             return sent
@@ -385,14 +416,17 @@ class Twin:
         return sold, lost
 
     def _other_sales(self, day):
-        """Other products at planning level: replayed sales, clipped to their total stock."""
+        """Other products at planning level: replayed sales, clipped to their total stock. Returns the lost units."""
+        lost = 0.0
         for p in self.planning_products:
             if p == self.product:
                 continue
             q = self.other_sales.get(p, {}).get(day, 0.0)
             s = min(q, self.other_stock[p])
             self.other_stock[p] -= s
+            lost += q - s
             self.open_forecast[p] = max(0.0, self.open_forecast[p] - s)
+        return lost
 
     def _decide_replay(self, day):
         # physics uses what was actually issued (differs from the reservation for partly issued orders)
@@ -462,6 +496,8 @@ class Twin:
         first, last = self.inp["days"]["first"], self.inp["days"]["last"]
         for day in range(first - 1, last + 1):
             self.today = day
+            if self.observer:
+                self.observer(self, day)
             self._arrivals()
             received = self._receipts(day)
             carried = self.plant
@@ -473,13 +509,14 @@ class Twin:
             for d in DCS:
                 self.recent_sales[d].append(sold[d] + lost[d])
             self.open_forecast[self.product] = max(0.0, self.open_forecast[self.product] - sum(sold.values()))  # R1
-            self._other_sales(day)
+            lost_other = self._other_sales(day)
             mrp, n_created = self._decide(day)
             row = {"day": day, "received": received, "production_f12": out_f12, "production_other": out_other,
                    "transferred": sent, "sales": sum(sold.values()), "lost": sum(lost.values()),
                    "plant_stock": self.plant, "queue_orders": len(self.queue),
                    "queue_f12_units": sum(o["remaining"] for o in self.queue if o["product"] == self.product),
-                   "open_po_qty": sum(p["qty"] for p in self.open_pos), "mrp_run": mrp, "orders_created": n_created}
+                   "open_po_qty": sum(p["qty"] for p in self.open_pos), "mrp_run": mrp, "orders_created": n_created,
+                   "lost_other": lost_other}
             for d in DCS:
                 row[f"dc_{d}"] = self.dc[d]
                 row[f"sales_{d}"] = sold[d]

@@ -1,0 +1,212 @@
+{
+ "normal_2": {
+  "run": "normal_2",
+  "PR1_sales_price": {
+   "mean": 4.3368,
+   "min": 3.9599999999999995,
+   "max": 5.260000000000001,
+   "lines": 2914
+  },
+  "PR2_purchase_price": {
+   "AA-P01": {
+    "mean": 0.3109,
+    "min": 0.28,
+    "max": 0.34,
+    "lines": 38
+   },
+   "AA-P02": {
+    "mean": 0.1419,
+    "min": 0.12,
+    "max": 0.16,
+    "lines": 38
+   },
+   "AA-R01": {
+    "mean": 2.0705,
+    "min": 1.59,
+    "max": 2.48,
+    "lines": 24
+   },
+   "AA-R02": {
+    "mean": 4.7128,
+    "min": 3.93,
+    "max": 5.76,
+    "lines": 34
+   },
+   "AA-R03": {
+    "mean": 4.924,
+    "min": 4.02,
+    "max": 5.97,
+    "lines": 23
+   },
+   "AA-R04": {
+    "mean": 1.0697,
+    "min": 0.58,
+    "max": 1.54,
+    "lines": 23
+   },
+   "AA-R05": {
+    "mean": 1.0232,
+    "min": 0.69,
+    "max": 1.33,
+    "lines": 37
+   },
+   "AA-R06": {
+    "mean": 0.8587,
+    "min": 0.59,
+    "max": 1.42,
+    "lines": 37
+   }
+  },
+  "PR3_material_cost": {
+   "bom": {
+    "AA-P01": 1.0,
+    "AA-P02": 1.0,
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35
+   },
+   "cost_per_unit": 2.5253
+  },
+  "margin_per_unit": 1.8115
+ },
+ "fraud_2": {
+  "run": "fraud_2",
+  "PR1_sales_price": {
+   "mean": 4.628,
+   "min": 4.004987951807228,
+   "max": 5.260000000000001,
+   "lines": 2431
+  },
+  "PR2_purchase_price": {
+   "AA-P01": {
+    "mean": 0.3131,
+    "min": 0.28,
+    "max": 0.34,
+    "lines": 37
+   },
+   "AA-P02": {
+    "mean": 0.1435,
+    "min": 0.12,
+    "max": 0.16,
+    "lines": 37
+   },
+   "AA-R01": {
+    "mean": 1.9618,
+    "min": 1.66,
+    "max": 2.43,
+    "lines": 24
+   },
+   "AA-R02": {
+    "mean": 4.8439,
+    "min": 3.93,
+    "max": 6.5,
+    "lines": 31
+   },
+   "AA-R03": {
+    "mean": 4.6443,
+    "min": 4.02,
+    "max": 6.8,
+    "lines": 27
+   },
+   "AA-R04": {
+    "mean": 1.277,
+    "min": 0.65,
+    "max": 1.6,
+    "lines": 24
+   },
+   "AA-R05": {
+    "mean": 0.9891,
+    "min": 0.71,
+    "max": 1.33,
+    "lines": 37
+   },
+   "AA-R06": {
+    "mean": 0.8599,
+    "min": 0.57,
+    "max": 1.42,
+    "lines": 36
+   }
+  },
+  "PR3_material_cost": {
+   "bom": {
+    "AA-P01": 1.0,
+    "AA-P02": 1.0,
+    "AA-R02": 0.3,
+    "AA-R05": 0.2,
+    "AA-R06": 0.5
+   },
+   "cost_per_unit": 2.5375
+  },
+  "margin_per_unit": 2.0905
+ },
+ "fraud_3": {
+  "run": "fraud_3",
+  "PR1_sales_price": {
+   "mean": 4.8828,
+   "min": 0.99,
+   "max": 5.1000000000000005,
+   "lines": 2490
+  },
+  "PR2_purchase_price": {
+   "AA-P01": {
+    "mean": 0.3203,
+    "min": 0.28,
+    "max": 0.35,
+    "lines": 36
+   },
+   "AA-P02": {
+    "mean": 0.1475,
+    "min": 0.12,
+    "max": 0.17,
+    "lines": 36
+   },
+   "AA-R01": {
+    "mean": 2.0086,
+    "min": 1.63,
+    "max": 2.89,
+    "lines": 22
+   },
+   "AA-R02": {
+    "mean": 4.5949,
+    "min": 3.93,
+    "max": 6.65,
+    "lines": 35
+   },
+   "AA-R03": {
+    "mean": 5.0369,
+    "min": 4.08,
+    "max": 6.9,
+    "lines": 21
+   },
+   "AA-R04": {
+    "mean": 4.7247,
+    "min": 0.65,
+    "max": 77.0,
+    "lines": 19
+   },
+   "AA-R05": {
+    "mean": 0.9853,
+    "min": 0.71,
+    "max": 1.46,
+    "lines": 35
+   },
+   "AA-R06": {
+    "mean": 0.9086,
+    "min": 0.57,
+    "max": 1.42,
+    "lines": 35
+   }
+  },
+  "PR3_material_cost": {
+   "bom": {
+    "AA-P01": 1.0,
+    "AA-P02": 1.0,
+    "AA-R02": 0.3,
+    "AA-R05": 0.35,
+    "AA-R06": 0.35
+   },
+   "cost_per_unit": 2.5091
+  },
+  "margin_per_unit": 2.3737
+ }
+}

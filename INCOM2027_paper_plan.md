@@ -117,6 +117,23 @@ Only after this do the AI layers (Section 3) run: predict the effect of injected
 
 ## 3. Method
 
+> **Implemented design (October 2026; details and results in `docs/ai_layers.md`).** The data-backed twin changed what "calibration uncertainty" means, and the method below has been adapted accordingly:
+> - **The shift is real, not synthetic.** The three game years are three player teams on the same company. The AI is built on normal 2 and tested on fraud 2 and fraud 3: another team's policy and lead times. That replaces the Latin-hypercube θ ensemble. STRESS episodes (beyond the evidence) add a severity shift.
+> - **L1:** gradient boosting on the notice plus the plant state, in dimensionless units, with conformal upper bounds. Results:
+>   - Coverage decays under the team shift (88 % → 85 % / 79 %).
+>   - Weighted conformal fails (the bounds become infinite).
+>   - Recalibration on 100 target outcomes restores about 90 %.
+> - **L2:** a risk-constrained choice among the players' three levers: the cheapest action whose conformal bound meets the service limit L*. Results:
+>   - It cuts loss by 12 % in its build year.
+>   - It does not transfer to another team.
+>   - Adapting it with 400 target-twin episodes restores a 15 % gain.
+> - **L3:** the policy is distilled into a depth-3 tree. SHAP importance is stable across years even where prediction fails, so **stability is not evidence of transfer**.
+> - **L4:** Clopper–Pearson certificates of the tree on independent episodes, for service and for **do-no-harm**.
+> - **Stratego and the UPPAAL encoding of the tree** come next. The UPPAAL model (`docs/uppaal.md`) first needs the levers.
+>
+> The text below is the original plan, kept for reference.
+
+
 ### Step 0: V12 model (prerequisite)
 Built from the evidence ledger (Section 2):
 1. Build the undisrupted model from the proven flows (Phase B) and ledger values (Phase C).

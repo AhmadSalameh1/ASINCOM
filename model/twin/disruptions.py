@@ -1,6 +1,6 @@
 """Phase E: inject evidence-based disruptions into the validated twin and measure their physical impact.
 
-Decisions are replayed (policy/push/demand replay), except the one reaction of the accepted MRP replica that
+Decisions are replayed (policy/push/demand replay; transfers deferred, validation Amendment 3), except the one reaction of the accepted MRP replica that
 a quantity loss triggers (rule R5: blocked material is re-ordered the same day). This measures how each disruption propagates through
 the validated physics when the players' historical decisions do NOT react (open loop). The AI layers
 (prediction, decision) come later.
@@ -55,7 +55,7 @@ def start_days(inp, seeds):
 def run(inp, make_scen, starts):
     rows = []
     for s, st in enumerate(starts):
-        df = Twin(inp, seed=s, demand_mode="replay", policy="replay", push_rule="replay",
+        df = Twin(inp, seed=s, demand_mode="replay", policy="replay", push_rule="replay_deferred",
                   scenario=make_scen(st)).run()
         rows.append(df.set_index("day"))
     return rows
