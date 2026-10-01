@@ -14,20 +14,20 @@
 \begin{document}
 \begin{frontmatter}
 
-\title{Predict, decide, explain, certify: trustworthy disruption response on an evidence-based supply-chain twin}
+\title{Predict, Decide, Explain, Certify: Trustworthy Disruption Response on an Evidence-Based Supply-Chain Twin}
 
 % TODO(authors): confirm the author list, order and e-mail addresses.
 \author[First]{Ahmad Salameh}
 \author[First]{Sara Himmiche}
 
-\address[First]{SYMME, Universit\'e Savoie Mont Blanc, Annecy, France}
+\address[First]{SYMME, Universit\'e Savoie Mont Blanc, Annecy, France}% TODO(e-mail): add (e-mail: ...) as in the IFAC sample
 
 \begin{abstract}
 AI layers on supply-chain digital twins are usually trained and assessed on one calibrated simulator. We ask
 what such layers can be trusted to do when every part of the twin, and every disruption injected into it, is
 backed by data, and when they are tested on a team they were not built on. From the SAP data of three ERPsim game
 years played on the same company we derive and validate a day-level twin, generated identically in Python and as
-an UPPAAL model. Disruptions are sampled within open-data and in-game evidence, and responses use only the levers
+a UPPAAL model. Disruptions are sampled within open-data and in-game evidence, and responses use only the levers
 the human players had. Four layers predict the impact of a notified disruption with conformal bounds, choose a
 response under a service constraint, distil the choice into a readable tree, and certify it with
 Clopper--Pearson and statistical model checking. In the build year the certified tree raises the service level
@@ -63,7 +63,7 @@ certify --- and report where they hold and where they do not (Fig.~\ref{fig:fram
 The contributions are:
 (i) an \emph{evidence-first} twin: every parameter, structural rule and player decision is derived from the
 recorded data, validated against two unseen years under a pre-registered protocol, and generated as both a Python
-simulator and an UPPAAL model that agree in 591 of 591 deterministic configurations;
+simulator and a UPPAAL model that agree in 591 of 591 deterministic configurations;
 (ii) disruptions sampled \emph{within evidence bounds} (open shipment data and the game's own scrap and stoppage
 records) and responses restricted to the levers the players had;
 (iii) a predict--decide--explain--certify pipeline whose decision rule is constrained by conformal bounds and
@@ -135,7 +135,7 @@ also contains fraud orders that physically removed \num{67431} units. The pre-re
 met for fraud~3, which we use only as a shift test.
 
 \subsection{One twin, two implementations}
-An UPPAAL model is generated from the same inputs: one day-tick timed automaton whose step function executes the
+A UPPAAL model is generated from the same inputs: one day-tick timed automaton whose step function executes the
 same day, with all quantities as doubles so that the arithmetic matches. With every lead time at its median the
 model is deterministic, and a line-by-line Python transcription of the generated file reproduces the twin day by
 day in 591 of 591 configurations (all disruption types, all response actions and the decision tree of
@@ -333,7 +333,7 @@ The tree is a learned policy certified by SMC, not a strategy synthesised by Str
 \section{Conclusion}
 
 From the SAP records of three game years we built a supply-chain twin whose every part is backed by data and
-validated on years it was not built on, generated it identically as a simulator and an UPPAAL model, and stacked
+validated on years it was not built on, generated it identically as a simulator and a UPPAAL model, and stacked
 on it a predict--decide--explain--certify pipeline restricted to evidence-bounded disruptions and real levers.
 The certified, readable policy improves service in its build year; transferred to another team it does not, and
 the certificates say so. Recalibration and adaptation on the target twin restore coverage and value. Trustworthy
