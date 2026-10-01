@@ -4,7 +4,7 @@
 set -e
 cd "$(dirname "$0")/.."
 mkdir -p build
-sed -e 's/\\documentclass{ifacconf}/\\documentclass{ifacconf-standin}/' -e 's/\\bibliographystyle{ifacconf}/\\bibliographystyle{plainnat}/' main.tex > build/main_standin.tex
+sed -e 's/\\documentclass{ifacconf}/\\documentclass{ifacconf-standin}/' main.tex > build/main_standin.tex
 cp tools/ifacconf-standin.cls references.bib build/
 rm -rf build/figures && cp -r figures build/figures
 cd build

@@ -1,7 +1,7 @@
 INCOM 2027 paper -- files for Overleaf
 
 Contents
-  main.tex          the manuscript (uses \documentclass{ifacconf} and \bibliographystyle{ifacconf})
+  main.tex          the manuscript (uses \documentclass{ifacconf}; the class sets the ifacconf bibliography style)
   references.bib    the bibliography (all entries verified)
   figures/          the four figures used in the paper (vector PDF)
 
