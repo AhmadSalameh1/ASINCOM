@@ -16,7 +16,7 @@ Second property, do no harm: "the policy's loss exceeds the loss of the players'
 helps on average but often makes things worse would not be trustworthy.
 For comparison, the same certificates for the players' own response (none) and for L2 (black box). The
 certified level is reported (lower bound), not a pass/fail at an arbitrary p*: the attainable level is set
-by line stoppages, which no lever can repair (even the oracle meets L* in only about 81 % of normal 2 episodes).
+by line stoppages, which no lever can repair (even the best action in hindsight meets L* in only about 84 % of normal 2 episodes).
 Because L2 built on normal 2 does not transfer to the other teams (l2_results.md), the fraud years are also
 certified with the adapted tree (normal 2 + 400 target episodes), on the other 1,600 target episodes.
 The STRESS set (beyond the evidence) is reported but is outside the certified population.
