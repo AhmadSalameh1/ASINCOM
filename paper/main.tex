@@ -13,7 +13,6 @@
 
 % Pending results (filled in when model/ai/rollout_baseline.py and revision_stats.py finish):
 \providecommand{\ROLLOUT}{}
-\providecommand{\GRPNOTICE}{pending}
 \begin{document}
 \begin{frontmatter}
 
@@ -253,7 +252,7 @@ marks the end of the 60-day window and $\mathit{ok}$ that the loss of all produc
 
 \textbf{L1.} On the Y1 held-out episodes the predictor's mean absolute error is 0.22 days of demand, against
 1.20 for the per-type mean and 0.94 for a model that sees only the notice; with splits grouped by notice day it is
-0.38 (notice-only \GRPNOTICE{}), so part of the random-split advantage came from shared notice days, but the plant
+0.38 (notice-only 0.90, per-type mean 1.18), so part of the random-split advantage came from shared notice days, but the plant
 state still matters. In Y2 the advantage disappears (0.78 vs 0.77 for the notice-only model); in Y3 it shrinks
 (0.51 vs 0.71). Coverage of the 90\,\% bound is 88.0\,\% on the 400 held-out episodes (standard error about 1.5
 points) and 89.6\,\% on the certification sample, but falls to 84.9 and 79.0\,\% in Y2 and Y3, with the worst

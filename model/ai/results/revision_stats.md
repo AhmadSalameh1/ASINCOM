@@ -61,3 +61,25 @@ Per-action conformal corrections: none 0.00, po5 0.00, po10 0.00, fg 0.01, ship 
 | Y1 certification sample | cheapest feasible action | 6.6% | 91.6% | 97.7% |
 | Y1 certification sample | lowest bound (none feasible) | 25.3% | 79.8% | 32.8% |
 | Y1 certification sample | all | 100 % | 87.9% | 82.7% |
+
+## 5. L1 point models, grouped split (held-out start days of normal 2), MAE in days
+
+| model | MAE | Spearman |
+|---|---|---|
+| per-type mean | 1.184 | |
+| ridge (notice+state) | 1.203 | 0.66 |
+| gbm-notice | 0.902 | 0.81 |
+| gbm-state | 1.791 | 0.19 |
+| gbm (notice+state) | 0.377 | 0.85 |
+
+## 6. L2 cost model C_a: held-out error (Y1, added inventory capital in days of demand)
+
+| action | MAE | mean realised |
+|---|---|---|
+| po5 | 0.137 | 2.839 |
+| po10 | 0.310 | 9.626 |
+| fg | 0.127 | 3.317 |
+| ship | 0.050 | -0.011 |
+| prio | 0.074 | 0.019 |
+| fg+prio | 0.162 | 3.393 |
+| po10+fg+prio | 0.351 | 12.709 |

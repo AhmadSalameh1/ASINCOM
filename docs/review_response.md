@@ -91,14 +91,14 @@ The dataset article confirms that normal 2, fraud 2 and fraud 3 were all played 
 
 ## Remaining points
 - **R2.3, leakage:** splits grouped by notice day were added (`revision_stats.md` §1, §5).
-  - L1 MAE rises from 0.22 to 0.38 (notice-only model: see `revision_stats.md` §5). Held-out coverage is 87.3 %, and 93.2 % on the certification sample.
+  - L1 MAE rises from 0.22 to 0.38, against 0.90 for the notice-only model and 1.18 for the per-type mean (`revision_stats.md` §5), so the plant state still matters. Held-out coverage is 87.3 %, and 93.2 % on the certification sample.
   - L2 still beats the players on held-out days (1.65 vs 1.98).
   - The certification sample is a separate random stream.
   - The paper reports both splits.
 - **R2.2, R4.Q5, L1/L2 specification:**
   - L1 is one model for the players' plan; its target is the *extra* F12 loss.
   - L2 has one quantile model and one conformal correction per action; its target is the *total* loss of all products (the service quantity).
-  - Ĉ_a is a per-action gradient-boosted point model. Its held-out MAE is in `revision_stats.md`.
+  - Ĉ_a is a per-action gradient-boosted point model. Its held-out MAE is 0.05–0.35 days of demand, against mean added capital of 2.8–12.7 days for the stocking actions (`revision_stats.md` §6).
 - **R1.5, R4.5, oracle:** now defined as the cheapest action meeting L\* ex post, else the least loss. It minimises violations, not mean loss, which is why a fixed action can lose less on average.
 - **R2.7, baselines:**
   - point-L2 is now in the text: same loss at half the spend, so the conformal margin adds caution, not value.
