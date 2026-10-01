@@ -1,4 +1,4 @@
-# Twin-rollout baseline (K = 4 rollouts per action, lowest mean simulated loss)
+# Twin-rollout baseline (K = 4 rollouts per action, lowest mean simulated loss; demand after the notice: recorded (clairvoyant reference))
 
 Realised outcomes on the same episodes for every policy (paired). L* = 1 day of demand.
 

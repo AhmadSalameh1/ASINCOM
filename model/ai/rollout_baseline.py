@@ -8,6 +8,14 @@ itself (the same run as for every other policy), so all comparisons are paired.
 
 Compared on the same episodes: players (no response), L2, the tree, the oracle.
 
+Two information sets (--demand):
+  replay     the rollouts replay the recorded customer orders after the notice: they know the future demand, so
+             this is a clairvoyant upper reference, not a fair baseline (results/rollout_baseline.md)
+  resampled  after the notice each day's orders (F12 and other products) are those of a day drawn from the 20 days
+             before it (Twin(demand_from=...)): the planner knows only past demand; the fair baseline
+             (results/rollout_baseline_resampled.md)
+Both variants still replay the players' recorded future decisions (their plan in force), as every policy does.
+
 Usage:
     python rollout_baseline.py [--n 1000] [--k 4] [--out results]
 """
@@ -49,7 +57,7 @@ def disruption(row):
 
 
 def rollouts(job):
-    run, s, seed, d, k, dem = job
+    run, s, seed, d, k, dem, mode = job
     inp = _inp(run)
     sc = scenario(d, s)
     out = []
@@ -58,7 +66,8 @@ def rollouts(job):
         for j in range(k):
             ctl = ResponseController(inp, s, po, fg, ship, prio)
             df = Twin(inp, seed=seed, demand_mode="replay", policy="controller", controller=ctl, scenario=sc,
-                      lead_stream="keyed", reseed_from=(s, 10_000_000 + 1000 * seed + j)).run().set_index("day")
+                      lead_stream="keyed", reseed_from=(s, 10_000_000 + 1000 * seed + j),
+                      demand_from=(s, 20_000_000 + 1000 * seed + j) if mode == "resampled" else None).run().set_index("day")
             w = df.loc[s:s + HORIZON - 1]
             losses.append(float((w.lost + w.lost_other).sum()) / dem)
             invs.append(float(inventory_value(w, inp["components"], PRICES[run]).mean()))
@@ -72,11 +81,13 @@ def main():
     ap.add_argument("--n", type=int, default=1000)
     ap.add_argument("--k", type=int, default=4)
     ap.add_argument("--out", default=os.path.join(HERE, "results"))
+    ap.add_argument("--demand", choices=["replay", "resampled"], default="replay")
     a = ap.parse_args()
     tr, cal, te = split_within(load("normal_2"))
     model = L2().fit(tr, cal)
     tree = distil(model, pd.concat([tr, cal]), 3)
-    md = [f"# Twin-rollout baseline (K = {a.k} rollouts per action, lowest mean simulated loss)\n",
+    md = [f"# Twin-rollout baseline (K = {a.k} rollouts per action, lowest mean simulated loss; demand after the notice: "
+          f"{'recorded (clairvoyant reference)' if a.demand == 'replay' else 'resampled from the 20 days before (fair)'})\n",
           "Realised outcomes on the same episodes for every policy (paired). L* = 1 day of demand.\n",
           "| sample | policy | lost (days) | service (loss <= L*) | added inventory (EUR) | acted |", "|---|---|---|---|---|---|"]
     perm = np.random.default_rng(2027).permutation(2000)
@@ -95,7 +106,7 @@ def main():
             dd = disruption(row)
             if dd["type"] == "E2" and not dd["e2_allfood"]:
                 dd["e2_material"] = recover_material(run, int(row.episode))
-            jobs.append((run, int(row.start), int(row.seed), dd, a.k, float(row.dem)))
+            jobs.append((run, int(row.start), int(row.seed), dd, a.k, float(row.dem), a.demand))
         with Pool(os.cpu_count()) as pool:
             ch = pool.map(rollouts, jobs, chunksize=2)
         pol = {"players (no response)": pd.Series("none", index=d.index), "L2": m_.choose(d),
@@ -106,7 +117,7 @@ def main():
             md.append(f"| {sname} (n={len(d)}) | {p} | {o['lost_days']:.3f} | {1 - o['violation']:.1%} | "
                       f"{o['added_inv_eur']:,.0f} | {o['acted']:.0%} |")
         _ = r
-    with open(os.path.join(a.out, "rollout_baseline.md"), "w") as fh:
+    with open(os.path.join(a.out, "rollout_baseline.md" if a.demand == "replay" else "rollout_baseline_resampled.md"), "w") as fh:
         fh.write("\n".join(md) + "\n")
     print("\n".join(md))
 

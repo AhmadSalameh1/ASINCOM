@@ -68,7 +68,7 @@ DCS = ["North", "South", "West"]
 
 class Twin:
     def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample", lead_stream="global", observer=None,
-                 reseed_from=None):
+                 reseed_from=None, demand_from=None):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
@@ -85,6 +85,10 @@ class Twin:
         # (day, seed2): with keyed lead streams, POs created from `day` on draw from seed2 instead of seed, so the
         # history before `day` is identical to the run with `seed` (twin rollouts from an observed state)
         self.reseed_from = reseed_from
+        # demand_from=(day, seed): from `day` on, every day's recorded orders (F12 and other products) are replaced by
+        # those of a day drawn uniformly from the 20 days before `day`; used by planner rollouts, which must not see
+        # the recorded future demand
+        self.demand_from = demand_from
         self.controller = controller
         if policy == "controller" and controller is None:
             raise ValueError("policy='controller' needs a controller object")
@@ -393,6 +397,13 @@ class Twin:
         self.plant -= sent
         return sent
 
+    def _source_day(self, day):
+        if self.demand_from is None or day < self.demand_from[0]:
+            return day
+        s0 = self.demand_from[0]
+        g = np.random.default_rng([self.demand_from[1], day])
+        return int(g.integers(max(1, s0 - 20), s0))
+
     def _demand_factor(self, day):
         e = self._applies("demand", day)
         return e["factor"] if e else 1.0
@@ -400,7 +411,7 @@ class Twin:
     def _sales(self, day):
         sold, lost = defaultdict(float), defaultdict(float)
         if self.demand_mode in ("replay", "replay_all"):
-            for o in self.replay_orders.get(day, []):
+            for o in self.replay_orders.get(self._source_day(day), []):
                 dc = self.dc_of.get(o["customer"])
                 if dc is None:
                     continue
@@ -428,7 +439,7 @@ class Twin:
         for p in self.planning_products:
             if p == self.product:
                 continue
-            q = self.other_sales.get(p, {}).get(day, 0.0)
+            q = self.other_sales.get(p, {}).get(self._source_day(day), 0.0)
             s = min(q, self.other_stock[p])
             self.other_stock[p] -= s
             lost += q - s
