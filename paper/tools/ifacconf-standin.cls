@@ -7,6 +7,8 @@
 \RequirePackage[a4paper,textwidth=17.4cm,textheight=24.2cm,top=2.4cm,columnsep=0.6cm]{geometry}
 \RequirePackage{mathptmx}
 \RequirePackage{natbib}
+\RequirePackage{url}
+\newcommand{\doi}[1]{doi:\url{#1}}
 \bibliographystyle{plainnat}
 \setcitestyle{authoryear,round}
 \newcommand{\@ifacaddress}{}
