@@ -15,8 +15,9 @@
    - Check the official `ifacconf.bst` output once.
 3. **UPPAAL.**
    - Run `verifyta` on the `_crosscheck*.xml` files and confirm `RESULT: MATCH` (`docs/uppaal.md` §3).
-   - Run query 2 on the `_ai_` files. Then replace "expected values" in the Discussion, and the hollow markers in Fig. 3 (`model/uppaal/smc_mirror.csv`), with the verifyta results.
-4. **Compile with the official class** and check the page limit. With the stand-in class page 6 is completely full; if the official class runs over, drop the framework figure (Fig. 1) first. Not included for space: validation, resilience and L1 coverage (`figures/fig2–fig4`).
+   - Run query 2 on the `_ai_` files. Then replace the "Python execution of the generated model" values in §3.4, §6 (L4) and the hollow markers in Fig. 3 (`model/uppaal/smc_mirror.csv`) with the verifyta results (state version, queries, ε/α, runs), and remove "pending" from §3.4, the Fig. 3 caption and the Limitations.
+4. **Compile with the official class** and check the page limit (6 pages after the review revision, page 6 full). The framework figure (`figures/fig1_framework`) was dropped for space in the review revision. Not included either: validation, resilience and L1 coverage (`figures/fig2–fig4`).
+5. **Mock review:** the point-by-point response is `docs/review_response.md`.
 
 ## Where each number comes from
 | Paper section | Source |
@@ -26,7 +27,8 @@
 | Mirror 591/591 (§3.4) | `model/uppaal/crosscheck_suite_*.csv` |
 | Phase E impacts, Table 1 (§4) | `model/twin/disruptions/*_impact.md`, `docs/disruptions.md`, `data/open_data/open_data_evidence.json` |
 | L1 (§6) | `model/ai/results/l1_results.md`, `l1_primary.csv`, `l1_ablation.csv`, `l1_loyo.csv` |
-| L2, Fig. 1 (§6) | `model/ai/results/l2_results.md`, `l2_comparison.csv`, `l2_transfer.csv` |
+| L2, Fig. 1 (§6) | `model/ai/results/l2_results.md`, `l2_comparison.csv`, `l2_transfer.csv`, `rollout_baseline.md` |
+| Paired tests, grouped split, recalibration resamples, L2 branches (§5–6) | `model/ai/results/revision_stats.md` |
 | L3, Fig. 2 (§6) | `model/ai/results/l3_results.md`, `tree_normal_2.json` |
 | L4, Fig. 3 (§6) | `model/ai/results/l4_results.md`, `l4_certificates.csv`, `model/uppaal/smc_mirror.csv` |
 | Robustness (§6) | `model/ai/results/robustness.md` |

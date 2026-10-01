@@ -11,10 +11,14 @@
 \usepackage{siunitx}
 \sisetup{group-separator={,},group-minimum-digits=4}
 
+% Pending results (filled in when model/ai/rollout_baseline.py and revision_stats.py finish):
+\providecommand{\ROLLOUT}{}
+\providecommand{\GRPNOTICE}{pending}
 \begin{document}
 \begin{frontmatter}
 
-\title{Predict, Decide, Explain, Certify: Trustworthy Disruption Response on an Evidence-Based Supply-Chain Twin}
+\title{Towards Trustworthy Disruption Response: Predict, Decide, Explain and Bound on an Evidence-Based
+Supply-Chain Twin}
 
 % TODO(authors): confirm the author list, order and e-mail addresses.
 \author[First]{Ahmad Salameh}
@@ -25,19 +29,21 @@
 \begin{abstract}
 AI layers on supply-chain digital twins are usually trained and assessed on one calibrated simulator. We ask
 what such layers can be trusted to do when every part of the twin, and every disruption injected into it, is
-backed by data, and when they are tested on a team they were not built on. From the SAP data of three ERPsim game
-years played on the same company we derive and validate a day-level twin, generated identically in Python and as
-a UPPAAL model. Disruptions are sampled within open-data and in-game evidence, and responses use only the levers
-the human players had. Four layers predict the impact of a notified disruption with conformal bounds, choose a
-response under a service constraint, distil the choice into a readable tree, and certify it with
-Clopper--Pearson and statistical model checking. In the build year the certified tree raises the service level
-from 75.7\,\% to at least 78.2\,\% with at most 2.0\,\% harm. On other teams' years, coverage, decision value and
-certificates degrade unless the layers are recalibrated or adapted on the target twin.
+backed by data, and when the decisions that shaped the data change. From the SAP records of three runs of an
+ERPsim game, played on the same company by the same student group with different decisions, we derive a day-level
+twin, validate it on the two later runs, and generate it also as a UPPAAL model. Disruptions are sampled within
+open-data and in-game evidence, and responses use only the levers the players had. Four layers predict the impact
+of a notified disruption with conformal bounds, choose a response under a service limit, distil the choice into a
+depth-3 tree, and bound the tree's service and harm rates with exact binomial confidence bounds. On an independent
+sample of the build run, the tree raises the share of disruptions kept within one day of lost demand from 77.6 to
+80.0\,\% (paired difference +2.5 points, 95\,\% CI 1.8--3.1) and does harm in 1.4\,\% ($\le$2.0\,\%). On the later
+runs, coverage and decision value are lost unless the layers are recalibrated or adapted on the target twin, and
+explanation stability does not reveal the loss.
 \end{abstract}
 
 \begin{keyword}
-Digital twin; supply chain resilience; disruption management; conformal prediction; statistical model checking;
-explainable AI; ERP data.
+Digital twins; supply chain resilience; disruption management; conformal prediction; explainable AI; statistical
+model checking; ERP data.
 \end{keyword}
 
 \end{frontmatter}
@@ -45,168 +51,171 @@ explainable AI; ERP data.
 %% ------------------------------------------------------------------------------------------------------------
 \section{Introduction}
 
-Disruptions of supply, production and demand propagate through stock and capacity into lost sales, and
-decision support for them is increasingly built as AI layers on top of digital twins
-\citep{ivanov2021digitaltwin,baryannis2019scrm}. Whether such support can be trusted depends on two things that
-are rarely examined together. The first is the twin: an AI layer can only be as credible as the simulator it
-learns from and is checked against, yet twins are often calibrated quickly to whatever data exists and validated,
-if at all, on the data used to build them \citep{sargent2013vv}. The second is the AI layer itself: its
-predictions, its decisions and its explanations should come with statements of how often they hold, for the
-situations in which they will actually be used.
+Disruptions of supply, production and demand propagate through stock and capacity into lost sales
+\citep{dolgui2018ripple}, and decision support for them is increasingly built as AI layers on digital twins
+\citep{ivanov2021digitaltwin,ivanov2023idt,baryannis2019scrm}. Trust depends on two things rarely examined together: the twin,
+which is often calibrated to whatever data exists and validated, if at all, on the data used to build it
+\citep{sargent2013vv}; and the AI layer, whose predictions, decisions and explanations should come with statements
+of how often they hold, and for which population.
 
 This paper builds both from the same evidence. The twin is derived from the SAP tables of an ERPsim
-manufacturing game \citep{leger2006erpsim} released as open research data \citep{tritscher2022openerp}. Three game
-years of one company, played by teams with different policies, provide a natural test of transfer: everything is
-built on one year and checked on the other two. On this twin we stack four layers --- predict, decide, explain,
-certify --- and report where they hold and where they do not (Fig.~\ref{fig:framework}).
+manufacturing game \citep{leger2006erpsim} released as open research data \citep{tritscher2022openerp}. Three runs
+of the game on the same company, played by the same group with different decisions, give a controlled test of
+transfer: everything is built on the first run and checked on the other two. On this twin we stack four layers
+--- predict, decide, explain, bound --- and report where they hold and where they do not.
 
 The contributions are:
-(i) an \emph{evidence-first} twin: every parameter, structural rule and player decision is derived from the
-recorded data, validated against two unseen years under a pre-registered protocol, and generated as both a Python
-simulator and a UPPAAL model that agree in 591 of 591 deterministic configurations;
-(ii) disruptions sampled \emph{within evidence bounds} (open shipment data and the game's own scrap and stoppage
-records) and responses restricted to the levers the players had;
-(iii) a predict--decide--explain--certify pipeline whose decision rule is constrained by conformal bounds and
-whose certified object is the explanation itself; and
-(iv) a measured account of transfer: the layers work in their build year, degrade on another team's year, and
-recover with recalibration or adaptation on the target twin, while explanation stability does not reveal the
-degradation.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/fig1_framework.pdf}
-\caption{Evidence-first pipeline: every model element is derived from the SAP data of one game year and checked on
-two years played by another team; the Python twin and the generated UPPAAL model agree in 591 of 591 deterministic
-configurations; disruptions are sampled within evidence bounds and the AI layers may use only the players' levers.}
-\label{fig:framework}
-\end{figure*}
+(i) an \emph{evidence-first} twin, derived from the recorded data, checked on two runs it was not built on with
+metrics fixed beforehand, and also generated as a UPPAAL model;
+(ii) disruptions sampled \emph{within evidence bounds} and responses restricted to the players' levers;
+(iii) a predict--decide--explain--bound pipeline whose statistical guarantee is on the explanation itself; and
+(iv) a measured account of transfer across decision policies, including what restores it.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Related work}
 
-Supply-chain digital twins for resilience range from simulation models of disruption propagation to
-recovery planning by optimisation \citep{ivanov2021digitaltwin,hosseini2019resilience}, and AI is used for risk
-prediction and response \citep{baryannis2019scrm}. Most studies use one calibrated simulator and report average
-performance. Conformal prediction gives distribution-free coverage under exchangeability
-\citep{vovk2005alrw,romano2019cqr,angelopoulos2023gentle}; its behaviour under covariate shift has been studied
-through importance weighting \citep{tibshirani2019covariateshift} and online adaptation \citep{gibbs2021aci}.
-Interpretable policies can be obtained by distilling a black box into a tree \citep{bastani2017extraction} and
-are preferable in high-stakes settings \citep{rudin2019stop}; for controllers, decision-tree representations are
-established in formal methods \citep{ashok2020dtcontrol}. Statistical model checking estimates the probability of
-temporal properties with confidence bounds \citep{legay2010smc}; UPPAAL SMC and Stratego support stochastic hybrid
-models and strategy synthesis \citep{david2015uppaalsmc,david2015stratego}, and SMC has been used to evaluate the
-robustness of production schedules \citep{himmiche2018smc}. Our work combines these elements on a twin whose
-evidence base and validation are part of the contribution, and tests transfer across real policy shifts.
+Supply-chain twins for resilience range from simulation models of disruption propagation to recovery planning
+by optimisation \citep{ivanov2021digitaltwin,hosseini2019resilience}; ripple-effect and viability studies stress
+propagation and co-occurrence \citep{dolgui2018ripple,ivanov2023idt}, and time-to-recover and time-to-survive
+models target the weak links \citep{simchilevi2015risk}. AI is used for risk prediction and response
+\citep{baryannis2019scrm}. Conformal
+prediction gives distribution-free coverage under exchangeability \citep{vovk2005alrw,romano2019cqr,
+angelopoulos2023gentle}; under shift it has been extended by importance weighting
+\citep{tibshirani2019covariateshift}, online adaptation \citep{gibbs2021aci} and weighted non-exchangeable
+schemes \citep{barber2023beyond}, and to decisions by risk control and conformal decision theory
+\citep{angelopoulos2024crc,lekeufack2024cdt}. Black boxes can be distilled into trees
+\citep{bastani2017extraction}, which are preferable in high-stakes settings \citep{rudin2019stop} and established
+as controller representations \citep{ashok2020dtcontrol}. Statistical model checking (SMC) estimates the
+probability of temporal properties with confidence bounds \citep{legay2010smc}; UPPAAL SMC and Stratego support
+stochastic models and strategy synthesis \citep{david2015uppaalsmc,david2015stratego}, and SMC has evaluated the
+robustness of production schedules \citep{himmiche2018smc}. We combine these elements on a twin whose evidence
+base and validation are part of the contribution, and test transfer across changes of the decision policy.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{An evidence-first twin}
 
-\subsection{Data}
-ERPsim runs a simulated company in SAP; each round of the game spans 20 simulated days and a year has 12 rounds.
-The released data \citep{tritscher2022openerp} contain several game years, some with labelled fraud cases. We use
-the three years of one player group: \emph{normal~2} (build year) and \emph{fraud~2}, \emph{fraud~3} (validation
-years); the fraud-labelled documents are excluded from demand statistics. The company sells one detailed product
-(F12) to about 70 customers through three distribution centres (DCs), makes it with five of eight components
-(food and packaging) on a production line of \num{24000} units per day shared with two to three other products, and
-buys components with lead times of mostly one to six days.
+\subsection{Data and notation}
+ERPsim runs a simulated company in SAP; a game \emph{round} spans 20 simulated days and a run has 12 rounds. The
+released data \citep{tritscher2022openerp} contain several runs; we use the three runs of one group of five
+students on the same company: Y1 (dataset \emph{normal~2}, build run), Y2 and Y3 (\emph{fraud~2},
+\emph{fraud~3}), in which one participant also acted as a fraudster. The company sells one detailed product (F12)
+to about 70 customers through three distribution centres (DCs: North, South, West), makes it from five of eight
+components on a line of \num{24000} units per day shared with two to three other products, and buys components
+with lead times of mostly one to six days. \emph{Days of demand} divide a quantity by the mean daily F12 demand of
+the 20 days before the notice (about \num{7700} units in Y1); the \emph{cover} of a stock is its days of demand.
+\emph{Steady months} are the months after the start-up phase; a \emph{notice} tells the planner the type and
+severity of a disruption on its first day. Prices come from purchase-order (EKPO) and sales-order (VBAP) lines.
 
 \subsection{Evidence ledger, structure and policy}
-Every element is derived by scripts from the SAP tables and recorded with its source, method and value in each
-year. Seventeen structural claims are tested in all three years, among them: unmet demand is lost (no backorders),
-each customer is served by one DC, plant-to-DC transfers are instantaneous, all products share one line, an order
-starts only when components for its whole batch are in stock (78 of 78 recorded starts), the mass balance closes,
-and the game starts with empty stock. The players' only planning decision is the forecast; SAP MRP turns it into
-production and purchase orders, and an MRP replica reproduces 20 of 21 production decisions and 29 of 37 purchasing
-runs. Component purchase prices (EKPO) and sales prices (VBAP) give a margin of 1.81 to 2.37\,\euro{} per unit.
+Every element is derived by scripts from the SAP tables and recorded with its source, method and value per run.
+Seventeen structural claims are tested in all runs, e.g.\ unmet demand is lost, plant-to-DC transfers are
+instantaneous, all products share one line, and an order starts only when the components for its whole batch are
+in stock (78 of 78 starts). The players' only planning decision is the forecast; SAP MRP turns it into production
+and purchase orders, and an MRP replica reproduces 20 of 21 production decisions and 29 of 37 purchasing runs.
+The F12 margin is 1.81 to 2.37\,\euro{} per unit.
 
 \subsection{Twin and validation}
-The twin advances in daily steps (one time unit is one game day): supplier receipts, production on the shared
-line with a 0.6-day changeover, plant-to-DC transfers, sales clipped to DC stock, and decisions. For validation the
-players' recorded decisions are replayed, so that the test concerns the physics. A protocol fixed on the build
-year before the validation years were run defines a primary cumulative-deviation metric (A1) and secondary metrics
-on stock-out months, planning delay, component stock-outs and a recorded production pause. Two later amendments are
-disclosed. The latest (round~3) replays a transfer that cannot ship for lack of plant stock as soon as stock allows:
-plain replay had left the clipped part at the plant for ever, holding two to four times the recorded plant stock.
-With this rule, yearly sales are within 1\,\% of the record in all three years and transfers are exact (A1 for
-sales 0.5, 1.0 and 1.0\,\%; for transfers 2.2, 3.6 and 2.1\,\%). Normal~2 fails one secondary metric, fraud~2 two
-and fraud~3 four. A data-only check traces the fraud-year stock-out differences to a constant offset of about two
-days of demand per DC, created by first-month losses that the recorded (censored) demand cannot reproduce; fraud~3
-also contains fraud orders that physically removed \num{67431} units. The pre-registered verdict is therefore not
-met for fraud~3, which we use only as a shift test.
+The twin advances in game days: supplier receipts with sampled lead times, production on the shared line (one
+line-day is \num{24000} units; a product switch costs 0.6 line-day of capacity, deducted in units and carried
+over to the next day if needed), transfers, sales clipped to DC stock, and decisions. For validation the players' recorded decisions are
+replayed, so that the test concerns the physics. A protocol fixed on Y1 before any validation run, and documented
+in the repository, defines eight metrics. The primary one, A1, is the maximum over days of the absolute
+difference between the twin's and the recorded cumulative quantity (sales, production, transfers), divided by
+the recorded yearly total; it passes at 10\,\%. A run is \emph{validated} if yearly totals and A1-sales pass and
+at most two of the six secondary metrics fail. Three revisions are disclosed: the first replaced band metrics
+with A1 before any validation run; the second and third were made after validation results had been seen and are
+therefore post hoc. The third replays a transfer that cannot ship for lack of plant stock as soon as stock allows
+(the players' records show an empty plant at every year end, whereas plain replay stranded 30--72\,k units there).
+With it, A1 is 0.5, 1.0 and 1.0\,\% for sales and 2.2, 3.6 and 2.1\,\% for transfers. Y1 fails one secondary metric
+(one component's stock-out share, 5.8 vs 5\,\%), Y2 two (DC stock-out months and the propagation of a recorded
+production pause) and Y3 four, so Y3 is not validated. The DC differences of Y2 and Y3 are a constant offset of about two days
+of demand per DC, from first-month losses that the censored demand record cannot reproduce. In Y3, fraud orders also removed \num{67431} units that the demand replay, which
+excludes fraud documents, does not remove (\num{2731} in Y2). Y3 is therefore used only as a shift case with an
+invalid twin.
 
-\subsection{One twin, two implementations}
-A UPPAAL model is generated from the same inputs: one day-tick timed automaton whose step function executes the
-same day, with all quantities as doubles so that the arithmetic matches. With every lead time at its median the
-model is deterministic, and a line-by-line Python transcription of the generated file reproduces the twin day by
-day in 591 of 591 configurations (all disruption types, all response actions and the decision tree of
-Section~\ref{sec:explain}; maximum difference $10^{-10}$ units). Running the generated files in \texttt{verifyta}
-is the remaining check (Section~\ref{sec:discussion}).
+\subsection{The same twin as a UPPAAL model}
+A generator writes the twin as one day-tick timed automaton whose step function executes the same day on
+doubles. UPPAAL's dense time is not used: its role is an independent implementation from the same inputs and
+access to SMC and Stratego. A line-by-line Python transcription of the generated functions, reading the
+constants from the generated file, reproduces the twin day by day in 591 of 591 deterministic configurations
+(lead times at their medians; all disruption types, all actions and the tree of Section~\ref{sec:explain};
+maximum difference $10^{-10}$ units). This checks the generator, not UPPAAL itself: running the files in
+\texttt{verifyta} is pending.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Disruptions within evidence, and the levers}
 
-A disruption is admitted only if it acts through a mechanism of the validated physics and its severity comes from
-evidence (Table~\ref{tab:disruptions}); open-data evidence is transferred only as dimensionless ratios. Each
-disruption starts at a random day of the steady months, because its impact depends strongly on where it falls
-relative to the production queue.
+A disruption is admitted if it acts through a mechanism of the twin and its severity comes from evidence
+(Table~\ref{tab:disruptions}); external evidence is transferred only as dimensionless ratios. E1 uses the
+lateness of \num{10324} delivered shipments as a ratio to their planned lead time, on the assumption that late
+deliveries scale with lead time across sectors. E3 is capped at the shortest of the three recorded production
+pauses (25, 52 and 60 days), so that every sampled stoppage is shorter than one the game produced. E5 delays a
+step that the game makes instantaneous; it is an extension beyond the validated physics, kept because its effect
+is small. A type is drawn uniformly, then a severity uniformly within its range (E1 by inverse sampling of the
+empirical ratio quantiles up to the 95th percentile), and the notice day uniformly over the steady months. Disruptions are single and
+do not co-occur.
 
 \begin{table*}[t]
-\caption{Disruptions, their mechanism in the twin, and the evidence for their severity.}
+\caption{Disruptions, their mechanism in the twin, and the evidence for their severity ($\ell$: the purchase
+order's sampled lead time).}
 \label{tab:disruptions}
 \centering\small
-\begin{tabular}{@{}p{2.4cm}p{6.4cm}p{8.2cm}@{}}
+\begin{tabular}{@{}p{2.4cm}p{6.6cm}p{8.0cm}@{}}
 \toprule
-Disruption & Mechanism & Severity range (evidence)\\
+Disruption & Mechanism (20-day window from the notice) & Severity range (evidence)\\
 \midrule
-E1 supplier delay & POs created in a 20-day window arrive $\lceil r\,\ell\rceil$ days late &
-$r \le 0.96$: delay/lead time of late shipments, USAID SCMS \citep{usaid_scms} (\num{10324} shipments)\\
-E2 quality loss & share $b$ of receipts blocked and re-ordered; the rest 2 days late &
-$b \in [0.2, 4.1]\,\%$: the game's six scrap events\\
+E1 supplier delay & purchase orders arrive $\lceil r\,\ell\rceil$ days late &
+$r \le 0.96$: lateness/lead time of late shipments, USAID SCMS \citep{usaid_scms}\\
+E2 quality loss & share $b$ of food receipts blocked and re-ordered; the accepted part arrives 2 days late &
+$b \in [0.2, 4.1]\,\%$: the game's six scrap events (scrapped receipts arrived late)\\
 E3 line stoppage & the shared line stops for $n$ days & $n \le 25$: shortest recorded production pause\\
-E4 demand surge & demand $\times f$ for 20 days & $f \le 1.19$: build-year monthly range\\
-E5 transit delay & plant-to-DC shipments arrive $k$ days late & $k \le 4$: DataCo q95 \citep{dataco2019}, an upper bound\\
+E4 demand surge & demand $\times f$ & $f \in [1.05, 1.19]$: highest monthly demand ratio in Y1\\
+E5 transit delay & plant-to-DC shipments arrive $k$ days late (extension) & $k \le 4$: DataCo q95
+\citep{dataco2019}, an upper bound\\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-Under the players' own decisions the same disruption hits the three teams very differently: a one-month
-19\,\% surge costs normal~2 a median of \num{28296} extra lost units, fraud~2 \num{5915} and fraud~3 none, and a
-25-day stoppage costs \num{54531}, \num{13363} and \num{19324} units. Supplier and quality disruptions have a
-median impact of zero in every year: the players' buffers absorb them except at unlucky timings (13--27\,\% of runs
-in normal~2). Resilience is thus a property of the policy state, which motivates layers that observe it.
+Under the players' own decisions the same 19\,\% surge costs Y1 a median of \num{28296} extra lost units, Y2
+\num{5915} and Y3 none, and supplier and quality disruptions matter only at unlucky timings: resilience is a
+property of the policy state, which motivates layers that observe it.
 
 Responses may use only the players' levers: purchase orders (a component buffer of 5 or 10 days of recent
-consumption), production-order conversions (an extra F12 batch of one line-day, or F12 priority on the line by
-holding other products' conversions while F12 waits) and transfers (rebalancing DCs by days of cover). With
-combinations these form eight actions, including ``no response''. The cost of an action is the extra inventory
-capital it ties up, valued at material cost; no holding-cost rate is assumed. Because the line runs at 82--93\,\%
-load, giving F12 priority moves loss to the other products, so the objective counts the lost demand of all
+consumption), production orders (an extra F12 batch of one line-day, or F12 priority on the line by holding other
+products' orders while F12 waits) and transfers (rebalancing DCs by cover). The eight actions are no response,
+buffer 5, buffer 10, batch, rebalance, priority, batch + priority, and buffer 10 + batch + priority. An extra batch
+ordered during a stoppage waits in the queue and runs first when the line restarts. The cost of an action is the
+extra inventory capital it ties up, at material cost; no holding-cost rate is assumed. Because the line runs at
+82--93\,\% load, priority moves loss to the other products, so the objective counts the lost demand of all
 products.
 
 %% ------------------------------------------------------------------------------------------------------------
-\section{Predict, decide, explain, certify}
+\section{Predict, decide, explain, bound}
 
 \subsection{Episodes}
-An episode is a game year, a start day, a seed and a disruption drawn within Table~\ref{tab:disruptions}. The twin
-runs it once without the disruption and once under the disruption for each action, with common random numbers.
-The features are what a planner observes at the notice (component cover, the production queue, plant and DC
-cover, recent losses, the transfer backlog, and the notice's type and severity), recorded inside the run so that
-no future information leaks; all are dimensionless because the years run at different demand levels. We generate
-\num{2000} episodes per year, 600 per year with severities beyond the evidence (STRESS), and an independent
-certification sample of \num{2000} build-year episodes. All layers are built on normal~2 (60\,\% training,
-20\,\% calibration) and tested on its held-out 20\,\%, on fraud~2 and fraud~3, and on STRESS.
+An episode is a run, a notice day, a seed and a disruption drawn as above. The twin runs it once without the
+disruption and once under the disruption for each action, with common random numbers (CRN), so all eight
+outcomes are observed and every comparison is paired. The 34 features are what a planner observes at the notice
+(component cover, the production queue, plant and DC cover, recent losses, the transfer backlog, and the notice's
+type and severity), recorded inside the run so that no future information leaks. We generate \num{2000}
+episodes per run, 600 per run with severities beyond the evidence (STRESS), and an independent certification
+sample of \num{2000} Y1 episodes from a separate random stream. The layers are built on Y1 (60\,\% training,
+20\,\% calibration) and tested on its held-out 20\,\% and on Y2 and Y3. Because random splits share notice days,
+we repeated the Y1 analysis with splits grouped by notice day.
 
 \subsection{L1: predict}
-The target is the extra lost demand over the 60 days after the notice, in days of demand. A gradient-boosted \citep{ke2017lightgbm}
-quantile model $\hat q(x)$ at level $1-\alpha=0.9$ is corrected by split conformal prediction: with calibration
-scores $s_i = y_i - \hat q(x_i)$, $i=1,\dots,n$,
+The target is the \emph{extra} F12 loss caused by the disruption under the players' plan, over the 60 days after
+the notice, in days of demand. A gradient-boosted \citep{ke2017lightgbm} quantile model $\hat q(x)$ at level
+$1-\alpha=0.9$ is corrected by split conformal prediction with the $n=400$ calibration scores
+$s_i = y_i - \hat q(x_i)$:
 \begin{equation}
 U(x) = \hat q(x) + s_{(\lceil (n+1)(1-\alpha)\rceil)}, \qquad \Pr\{Y \le U(X)\} \ge 1-\alpha
 \end{equation}
 under exchangeability \citep{romano2019cqr,angelopoulos2023gentle}.
 
 \subsection{L2: decide}
-For each action $a$, $U_a(x)$ bounds the 60-day loss of all products and $\hat C_a(x)$ predicts the added
+For each action $a$, a separate quantile model with its own conformal correction gives $U_a(x)$, a bound on the
+\emph{total} 60-day loss of all products (the service quantity), and a point model gives $\hat C_a(x)$, the added
 inventory capital. With a service limit $L^*$ of one day of demand over 60 days,
 \begin{equation}
 a^*(x)=\begin{cases}
@@ -215,130 +224,147 @@ a^*(x)=\begin{cases}
 \arg\min_a U_a(x) & \text{otherwise.}
 \end{cases}
 \end{equation}
-$L^*$ is stated, not tuned. Baselines: the players' plan, each fixed action, a per-type lookup rule (the action
-with the lowest mean loss per disruption type in training) and an oracle that knows the outcomes.
+The coverage of Eq.~(1) holds for each fixed action but not for the action selected after seeing all eight
+bounds, so L2 is a heuristic; only L4 carries a guarantee. Baselines: the players' plan, each fixed action, a
+lookup rule (per disruption type, the action with the lowest mean training loss), L2 with point predictions, a
+twin rollout that simulates each action from the observed state four times with fresh lead times and takes the
+lowest mean loss, and an oracle that knows the outcomes and takes the cheapest action meeting $L^*$, else the
+action with the least loss.
 
 \subsection{L3: explain}\label{sec:explain}
 L2's choices on the build episodes are distilled into a depth-3 tree \citep{bastani2017extraction}; stability is
 measured over ten bootstrap refits of the whole pipeline, and SHAP \citep{lundberg2017shap} describes L1.
 
-\subsection{L4: certify}
-The certified object is the tree. On episodes never used to build anything, the share $k/N$ that meet the service
-limit is binomial, and the 95\,\% Clopper--Pearson lower bound \citep{clopper1934} certifies the service level for
-that population. A second certificate bounds harm: the share of episodes in which the tree loses more than
-0.05 days of demand above the players' own plan. The UPPAAL model embeds the tree and samples the disruption at
-time zero within the same bounds, so that $\Pr[\le T](\Diamond\, \mathit{done} \wedge \mathit{ok})$ is an
-independent SMC estimate of the same property.
+\subsection{L4: bound}
+The object that receives the guarantee is the tree. On $N$ episodes drawn i.i.d.\ from the episode distribution
+above and never used to build anything, the number $k$ that meet the service limit is binomial; the two-sided
+95\,\% Clopper--Pearson interval \citep{clopper1934} gives a lower bound on the service probability that holds
+with 97.5\,\% confidence. A harm bound is computed in the same way for the share of episodes in which the tree
+loses more than 0.05 days of demand above the players' plan; service and harm hold jointly at 95\,\%. These are
+statistical guarantees for the twin under the sampled disruption distribution, not for real disruptions, other
+severity mixes or the twin's own error. $L^*$, the tree depth, the 0.9 level and the harm threshold were fixed on
+Y1 before the certification sample was generated. The generated UPPAAL model embeds the tree and samples the
+notice day and disruption from the same distribution; the property is
+$\Pr[\le T](\Diamond\, \mathit{done} \wedge \mathit{ok})$, where $T$ is the notice day plus 60 days, $\mathit{done}$
+marks the end of the 60-day window and $\mathit{ok}$ that the loss of all products in it is at most $L^*$.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Results}
 
-\textbf{L1.} In the build year the predictor's mean absolute error is 0.22 days of demand, against 1.20 for the
-per-type mean and 0.94 for a model that sees only the notice: the plant state matters (AUC for ``any extra loss''
-0.99). On the other teams' years this advantage disappears (error 0.78 and 0.51 against 0.77 and 0.71 for the
-notice-only model), and the coverage of the 90\,\% bound falls from 88.0\,\% to 84.9 and 79.0\,\%, with the worst
-disruption type at 65.8 and 59.8\,\%; beyond the evidence it is 61.2\,\%. Importance-weighted conformal prediction
-does not help: the years' states are almost separable, and the weighted bound is infinite in at least 99.9\,\% of
-the shifted episodes. Recalibrating the margin on 100 outcomes from the target restores 88.7 and 89.9\,\%
-(87.2\,\% beyond the evidence) at similar width. Building on two years and testing on the third does not help.
+\textbf{L1.} On the Y1 held-out episodes the predictor's mean absolute error is 0.22 days of demand, against
+1.20 for the per-type mean and 0.94 for a model that sees only the notice; with splits grouped by notice day it is
+0.38 (notice-only \GRPNOTICE{}), so part of the random-split advantage came from shared notice days, but the plant
+state still matters. In Y2 the advantage disappears (0.78 vs 0.77 for the notice-only model); in Y3 it shrinks
+(0.51 vs 0.71). Coverage of the 90\,\% bound is 88.0\,\% on the 400 held-out episodes (standard error about 1.5
+points) and 89.6\,\% on the certification sample, but falls to 84.9 and 79.0\,\% in Y2 and Y3, with the worst
+disruption type at 65.8 and 59.8\,\%, and to 61.2\,\% beyond the evidence. Importance-weighted conformal prediction needs overlap,
+which is absent: its bound is infinite in $\ge$99.9\,\% of the shifted episodes. Recalibrating the margin on 100 target outcomes, repeated over 200 resamples and evaluated on the
+remaining episodes, gives a mean coverage of 90.4\,\% (SD 2.7, 5--95\,\% range 85.9--94.8) in Y2 and 89.8\,\% (SD
+3.1) in Y3, with mean bounds of 1.04 and 0.95 days against 1.02 and 0.93 for the build-run bound.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig5_l2_frontier.pdf}
 \caption{L2: lost demand (all products, 60 days, in days of demand) against the added inventory capital of the
-response. Left: build year, held-out episodes. Middle and right: other teams' years; the hollow circle is L2 built
-on normal~2, the filled one L2 adapted with 400 target episodes (both on the same \num{1600} episodes).}
+response. Left: Y1 held-out episodes ($N=400$). Middle and right: the same \num{1600} episodes of Y2 and Y3 for
+every policy; the hollow circle is L2 built on Y1, the filled one L2 adapted with 400 other target episodes. The
+vertical scales differ between panels.}
 \label{fig:l2}
 \end{figure*}
 
-\textbf{L2.} On the held-out build-year episodes (Fig.~\ref{fig:l2}, left), the players lose 2.26 days of demand
-and exceed the limit in 24.8\,\% of episodes; L2 loses 1.99 days (\num{-12}\,\%), exceeds the limit in 19.8\,\%,
-acts in 34\,\% of episodes and adds 25\,k\euro{} of inventory, close to the oracle (1.91 days, 19.2\,\%). The
-lookup rule spends 124\,k\euro{} and loses more (2.11 days). Little more is attainable: even the best action in
-hindsight meets the limit in only 84\,\% of build-year episodes, because no lever repairs a long line stoppage.
-On the other teams' years, L2 built on normal~2 is no better than the players (1.47 vs 1.43 days in fraud~2):
-there, component buffers protect the other products, which never happened in the build year. Adapting L2 with 400
-episodes of the target twin recovers a 15\,\% lower loss in fraud~2 (1.19 vs 1.40 days) at 60\,k\euro{}, against
-147\,k\euro{} for the best fixed action. In fraud~3 there is little to gain, and the adapted L2 mostly does
-nothing.
+\textbf{L2.} On the Y1 held-out episodes (Fig.~\ref{fig:l2}, left) the players lose 2.26 days of demand and exceed
+the limit in 24.8\,\% of episodes; L2 loses 1.99 days (paired difference $-0.28$, 95\,\% CI $-0.38$ to $-0.18$),
+exceeds the limit in 19.8\,\%, acts in 34\,\% of episodes and adds 25\,k\euro{} of inventory. The oracle loses
+1.91 days and exceeds the limit in 19.2\,\%: even the best action in hindsight meets the limit in only 80.8\,\% of
+these episodes, because no lever repairs a long line stoppage. The lookup rule spends 124\,k\euro{} and loses
+more (2.11 days). Point predictions give the same loss (1.97 days) at half the spend: on loss, the conformal
+margin adds caution rather than value. \ROLLOUT{} With grouped splits L2 still beats the players on held-out days
+(1.65 vs 1.98 days). Valued at the F12 margin, the avoided loss is worth about 3.8\,k\euro{} per disruption. In
+68\,\% of the certification episodes the first branch of Eq.~(2) applies and in 25\,\% the third; there the chosen
+action's bound covers its outcome in only 80\,\% of cases, against 88\,\% overall.
+
+On the same \num{1600} Y2 episodes, L2 built on Y1 is slightly worse than the players (1.44 vs 1.40 days; +0.04,
+CI +0.00 to +0.07): in Y2 component buffers protect the other products, which never happened in Y1. Adapting L2
+with 400 Y2 episodes (300 training, 100 calibration, disjoint from the test episodes) gives 1.19 days (paired
+$-0.21$, CI $-0.27$ to $-0.15$) at 60\,k\euro{}; the best fixed action loses less (1.02) but ties up
+147\,k\euro{}. In Y3 there is little to gain: the players lose 0.66 days, and neither L2 nor the tree improves on that.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig6_tree.pdf}
-\caption{The certified policy: L2 distilled into a depth-3 tree on features observed at the notice. Each leaf
-shows the share of the independent certification episodes that reach it.}
+\caption{The bounded policy: L2 distilled into a depth-3 tree on features observed at the notice. Each leaf
+shows the share of the independent Y1 certification episodes that reach it.}
 \label{fig:tree}
 \end{figure*}
 
 \textbf{L3.} The tree (Fig.~\ref{fig:tree}) has eight leaves and six features. It first asks whether the line
-has stopped; if so, it adds an extra F12 batch (with a component buffer and line priority when the F12 queue is
-empty) or a component buffer, depending on finished-goods and DC cover. Otherwise it rebalances the DCs under a
-surge above 1.09 with low finished-goods cover, gives F12 line priority when plant stock is high, and else does
-nothing, which is the outcome in 75\,\% of episodes. It agrees with L2 on 77\,\% of
-held-out build-year decisions, 69\,\% in fraud~2 and 56\,\% in fraud~3. The root split appears in all ten
-bootstrap refits and the surge factor in every tree, but the lower splits vary (median agreement between refits
-77\,\% in the build year, 54\,\% in fraud~3). The SHAP importance ranking of L1 (stoppage length, finished-goods
-cover, North DC cover, surge factor first) is almost identical in every year (Spearman 0.96--0.99) although L1's
-accuracy and coverage degrade: \emph{a stable explanation is not evidence that a model transfers}.
+has stopped; if so, it orders an extra batch or a component buffer, depending on cover. Otherwise it rebalances
+the DCs under a strong surge, gives F12 priority when plant stock is high, and else does nothing (75\,\% of
+episodes). It agrees with L2 on 77\,\% of Y1 held-out decisions (L2 does
+nothing in 66\,\%), 69\,\% in Y2 and 56\,\% in Y3. Over ten bootstrap refits the root split is stable but the lower
+splits vary (median agreement 77\,\% in Y1, 54\,\% in Y3). The
+SHAP ranking of L1 (stoppage length, finished-goods cover, North DC cover, surge factor first) is almost identical
+in every run (Spearman 0.96--0.99) although L1's accuracy and coverage degrade: \emph{a stable explanation of a
+fixed model is not evidence that the model transfers}.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig7_certificates.pdf}
-\caption{L4. (a) Probability that the 60-day loss stays within one day of demand, with 95\,\% Clopper--Pearson
-intervals: filled markers on independent Python episodes, hollow markers from the generated UPPAAL model's own
-random semantics. (b) Certified harm of the tree relative to the players' plan.}
+\caption{L4. (a) Probability that the 60-day loss of all products stays within one day of demand, with two-sided
+95\,\% Clopper--Pearson intervals: filled markers on independent Python episodes ($N=\num{2000}$ in Y1, \num{1600}
+in Y2 and Y3), hollow markers from a Python execution of the generated UPPAAL model's random semantics (2,000
+runs; not yet run in UPPAAL). (b) Upper bound on the harm of the tree relative to the players' plan.}
 \label{fig:cert}
 \end{figure*}
 
-\textbf{L4.} On the independent build-year sample (Fig.~\ref{fig:cert}), the players meet the limit in
-77.6\,\% of episodes (certified $\ge$75.7\,\%), the tree in 80.0\,\% ($\ge$78.2\,\%) and the black-box L2 in
-82.7\,\% ($\ge$80.9\,\%): the explanation costs about 2.7 points. The tree loses more than 0.05 days of demand above
-the players' plan in 1.4\,\% of episodes (certified $\le$2.0\,\%). The tree built on normal~2 gives fraud~2 nothing ($\ge$77.0\,\% vs
-$\ge$77.2\,\% for the players) and its certified harm rises to 7.1\,\%; the adapted tree certifies
-$\ge$84.1\,\% against $\ge$76.9\,\%, with harm $\le$7.0\,\%. Against line stoppages no policy certifies more
-than 21--49\,\%, a limit of the plant rather than of the AI. Executing the generated UPPAAL models with their own
-random semantics gives 78.3 and 80.0\,\% in the build year and 87.7\,\% for the adapted tree in fraud~2, within
-sampling error of the Python certificates.
+\textbf{L4.} On the independent Y1 sample (Fig.~\ref{fig:cert}), the players meet the limit in 77.6\,\% of
+episodes ($\ge$75.7\,\%) and the tree in 80.0\,\% ($\ge$78.2\,\%). On the same episodes the tree is better in 50
+and worse in 1 (exact McNemar $p<10^{-13}$; paired difference +2.5 points, CI 1.8--3.1), and it does harm in
+1.4\,\% ($\le$2.0\,\%). The black-box L2 reaches 82.7\,\%, so the explanation costs 2.6 points (CI 1.9--3.5). On
+the \num{1600} Y2 test episodes, the tree built on Y1 gives no gain (78.6 vs 78.9\,\%, $p=0.18$) and does harm in
+6.1\,\% ($\le$7.3\,\%); the adapted tree reaches 85.9\,\% ($\ge$84.1\,\%; +6.9 points, CI 5.5--8.3) with harm
+$\le$7.0\,\%, so adaptation restores value but not a low harm rate. In Y3, whose twin is not validated, neither
+tree changes service (91.3 and 91.4 vs 91.1\,\%) and both lose slightly more than the players (+0.02 days, CI
++0.00 to +0.05). Against line stoppages the certified service of every policy stays between 20 and 49\,\%: an extra batch
+shortens the recovery but cannot replace lost line-days. The Python execution of the generated model gives the same service
+rates within sampling error (players 78.3\,\%, tree 80.0\,\% in Y1; adapted tree 87.7\,\% in Y2, two-proportion
+tests, all six $p \ge 0.11$), which supports the implementation but is not independent evidence of validity.
 
-\textbf{Robustness to the shipping rule.} Rebuilt on episodes generated with plain transfer replay, the pipeline
-looks very different: the players lose about twice as much, shipping the stranded plant stock is the best action
-in every year, and because that repair works for every team, coverage (89.5, 94.8, 94.4\,\%) and decision gains
-(46, 58, 43\,\%) appear to transfer. The transfer failure reported above is therefore not created by the
-corrected rule; the artefact hid it.
+\textbf{Robustness to the shipping rule.} On episodes generated with plain transfer replay, shipping the stranded
+plant stock is the best action in every run, and coverage (89.5, 94.8, 94.4\,\%) and decision gains (46, 58,
+43\,\%) appear to transfer: the twin artefact concealed the transfer failure.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Discussion}\label{sec:discussion}
 
-\textbf{What can be trusted.} Within the population it was built for, the explainable policy improves the
-service level with a certified bound and a certified low harm rate, uses the players' own levers, and does
-nothing in three quarters of the cases. Outside that population, the conformal coverage, the decision value and
-the certificate all degrade, and the certificate is what shows it. Explanation stability and SHAP rankings did
-not. Two inexpensive repairs work: recalibrating the conformal margin on about 100 outcomes, and adapting the
-decision layer with a few hundred episodes of the target's own twin. A twin per team, rather than one twin for
-all, is the practical consequence.
+\textbf{What can be trusted.} Within its population, the readable policy improves service with a bounded low
+harm rate, using the players' own levers. When the decisions behind the twin change, the conformal coverage, the decision value and
+the harm rate all degrade. A bound on the build run cannot detect this; bounds on the target twin did, and
+explanation stability did not. Two repairs work: recalibrating the conformal margin on about 100 target outcomes,
+and adapting the decision layer with a few hundred episodes of the target twin. Both need a validated twin of the
+current policy, so the practical rule is to recalibrate or adapt when the policy state shifts, for instance when
+the coverage of L1 on newly observed outcomes drifts, as in adaptive conformal inference \citep{gibbs2021aci}.
+The replay-rule artefact adds that validation down to the replay rules is a precondition for trustworthy AI on
+a twin.
 
-\textbf{Twin validity matters more than model choice.} An unvalidated replay rule produced an AI that appeared
-to transfer, for a reason that does not exist in the real game. Validation down to the replay rules is a
-precondition for trustworthy AI on a twin.
-
-\textbf{Limitations.} The data come from a business game, of one company, played by students; the evidence for
-disruption severities is partly external and transferred as ratios; fraud~3 does not meet the pre-registered
-validation verdict and the fraud years' DC stock is about two days of demand too high after the first month;
-the other products are modelled at planning level; line stoppages cannot be mitigated with the available levers;
-and the UPPAAL models still have to be executed in \texttt{verifyta} (the expected values are given above).
-The tree is a learned policy certified by SMC, not a strategy synthesised by Stratego
-\citep{david2015stratego}; synthesis over the same levers is a natural extension.
+\textbf{Limitations.} The data come from a business game played by one student group, with censored demand and
+injected fraud; severity evidence is partly external, and disruptions are single; the guarantees hold under our
+sampling distribution only; Y3 is not validated; the other products are modelled at planning level; the cost
+ignores holding rates; and the UPPAAL files have not yet been executed in \texttt{verifyta}. The tree is a
+learned policy, not a strategy synthesised by Stratego \citep{david2015stratego}; synthesis over the same eight
+actions, exported as a tree \citep{ashok2020dtcontrol}, is the natural next baseline.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{Conclusion}
 
-From the SAP records of three game years we built a supply-chain twin whose every part is backed by data and
-validated on years it was not built on, generated it identically as a simulator and a UPPAAL model, and stacked
-on it a predict--decide--explain--certify pipeline restricted to evidence-bounded disruptions and real levers.
-The certified, readable policy improves service in its build year; transferred to another team it does not, and
-the certificates say so. Recalibration and adaptation on the target twin restore coverage and value. Trustworthy
-AI for disruption response therefore depends as much on the evidence behind the twin and on where guarantees are
-evaluated as on the learning method.
+On a twin whose every part is backed by data and checked on runs it was not built on, a readable policy with
+a statistical guarantee improves service on its build run; when the decisions change it does not, and bounds
+computed on the target twin show it. Recalibration and adaptation on the target twin restore coverage
+and value. Trustworthy AI for disruption response therefore depends as much on the evidence behind the twin and on
+where guarantees are evaluated as on the learning method.
+
+\textbf{Data and code availability.} The SAP data are open \citep{tritscher2022openerp}. Scripts, evidence ledger, validation
+reports, twin, UPPAAL models, episodes and AI layers (with settings and seeds) will be public on publication.
 
 % TODO(funding/acknowledgements)
 \begin{ack}

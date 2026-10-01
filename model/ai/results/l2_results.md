@@ -81,7 +81,7 @@ L2 action mix: {'none': 0.462, 'fg': 0.207, 'prio': 0.136, 'fg+prio': 0.072, 'sh
 
 L2 action mix: {'none': 0.423, 'ship': 0.218, 'fg': 0.132, 'prio': 0.102, 'fg+prio': 0.074, 'po10+fg+prio': 0.032, 'po5': 0.014, 'po10': 0.004}
 
-## Transfer to another player team: remedies
+## Transfer to the later runs (same group, different decisions): remedies
 
 | variant | test year | policy | lost (days) | violation | added inventory (EUR) | acted |
 |---|---|---|---|---|---|---|

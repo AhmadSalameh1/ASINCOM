@@ -90,7 +90,7 @@ Mean lost demand of all products over 60 days, in days of demand (from `episodes
 - **Target:** extra lost demand caused by the disruption over 60 days (vs the same-seed run without it), under the players' decisions, in days of demand.
 - **Protocol:**
   - Built on normal 2: 1,200 train and 400 calibration episodes.
-  - Tested on the 400 held-out normal 2 episodes, on fraud 2 and fraud 3 (another team's policy, a real shift), and on STRESS.
+  - Tested on the 400 held-out normal 2 episodes, on fraud 2 and fraud 3 (later runs of the same player group with different decisions, a real policy shift), and on STRESS.
   - Model: gradient boosting. The hyperparameters were fixed before testing.
 
 ### Results
@@ -112,7 +112,7 @@ Mean lost demand of all products over 60 days, in days of demand (from `episodes
 
 ### Findings
 1. **Inside the build year, the predictor must see the plant state.** Adding the state to the notice cuts the error by a factor of 4 (Phase E finding 1, confirmed).
-2. **That state knowledge is team-specific.** Under another team's policy, it adds nothing over the notice. Coverage of the conformal bound decays from 88 % to 85 % / 79 % (worst type 60 %).
+2. **That state knowledge is policy-specific.** Under the later runs' decisions, it adds nothing over the notice. Coverage of the conformal bound decays from 88 % to 85 % / 79 % (worst type 60 %).
 3. **Importance weighting does not repair a shift this large.** The years' states are nearly separable, so the weighted bound becomes infinite. **Recalibrating the margin on 100 outcomes from the new setting restores about 90 %** marginal coverage at the same width. Per-type coverage stays lower.
 4. **Leave-one-year-out (supplement) does not help.** Pooling two teams does not make the third predictable.
 
@@ -141,7 +141,7 @@ The best fixed action in hindsight for fraud 2 is po10: 1.02 lost, 147k added in
 
 ### Findings
 1. **In the year it was built on, L2 cuts lost demand by 12 %.** It nearly reaches the oracle's violation rate (19.8 % vs 19.2 %) with a fifth of the inventory of the Phase E lookup rule, and it acts in only a third of the episodes.
-2. **A decision policy learned on one team's twin does not transfer to another team's.** It is slightly worse than doing nothing, and pooling two teams (leave-one-year-out) does not fix it.
+2. **A decision policy learned on the build run's twin does not transfer to the later runs (same group, different decisions).** It is slightly worse than doing nothing, and pooling two runs (leave-one-year-out) does not fix it.
 3. **A few hundred episodes on the target's own twin restore the gain:** −15 % loss in fraud 2 at 40 % of the inventory of the best fixed rule. Where there is nothing to gain (fraud 3), the adapted L2 mostly does nothing.
 4. **The conformal margin costs inventory without changing the mean outcome in-distribution** (point-L2 is similar). Its purpose is the guarantee (L4), not the average.
 
@@ -222,7 +222,7 @@ This is direct evidence that **validating the twin against the recorded data, do
 - A predict → decide → explain → certify pipeline on a supply-chain twin whose every part is backed by data, with disruptions drawn within evidence bounds and only the players' real levers.
 - **Positive:** in-distribution, the explainable policy certifiably improves service over the human team's own response, at low certified harm and modest inventory.
 - **Negative, and arguably more important for "trustworthy AI":**
-  - Prediction coverage, decision value and certificates all degrade when the twin of one team is used for another team's operations.
+  - Prediction coverage, decision value and certificates all degrade when the twin of one run is used for a run with different decisions.
   - Explanation stability does not reveal this.
   - Recalibration (100 outcomes) restores coverage, and adaptation (a few hundred target episodes) restores decision value.
 - **Twin validity matters more than model choice:** an unvalidated replay rule would have produced a falsely transferable AI (section 7).

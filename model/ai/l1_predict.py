@@ -5,7 +5,7 @@ players' decisions (open loop), in days of demand. Secondary target: whether the
 
 Protocol (fixed before any test result was seen; models and hyperparameters are not tuned on test data):
   build      normal 2 episodes: 60 % train, 20 % calibration (the calibration year of the twin)
-  test       normal 2 held-out 20 % (interior); fraud 2 and fraud 3 (another player team's policy and lead times:
+  test       normal 2 held-out 20 % (interior); fraud 2 and fraud 3 (later runs of the same group: different decisions and lead times:
              a real distribution shift); STRESS episodes (severity beyond the evidence)
   supplement leave-one-year-out: build on two years, test on the third
 Models

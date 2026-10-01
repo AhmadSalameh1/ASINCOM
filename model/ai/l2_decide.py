@@ -18,7 +18,7 @@ Baselines (evaluated on the same episodes; every outcome is a twin run, common r
 
 Protocol: as L1 (built on normal 2, tested on normal 2 held-out, fraud 2, fraud 3, STRESS). L* is stated, not
 tuned: the headline is L* = 1 day of demand over 60 days (fill rate >= 98.3 %); a sweep is reported.
-Two remedies for transfer to another player team (added after the first run showed that a policy built on
+Two remedies for transfer to the later runs (same group, different decisions) (added after the first run showed that a policy built on
 normal 2 does not transfer; all variants are reported):
   LOYO     built on two years (80 % train, 20 % calibration), tested on the third
   adapted  built on normal 2 plus 400 episodes of the target year (300 train, 100 calibration), tested on
@@ -191,7 +191,7 @@ def main():
             md.append(f"| {r.policy} | {r.lost_days:.3f} | {r.lost_units:,.0f} | {r.violation:.1%} | "
                       f"{r.added_inv_days:.3f} | {r.added_inv_eur:,.0f} | {r.acted:.0%} |")
         md.append(f"\nL2 action mix: {mix[s]}")
-    md.append("\n## Transfer to another player team: remedies\n")
+    md.append("\n## Transfer to the later runs (same group, different decisions): remedies\n")
     md.append("| variant | test year | policy | lost (days) | violation | added inventory (EUR) | acted |")
     md.append("|---|---|---|---|---|---|---|")
     for _, r in extra.iterrows():

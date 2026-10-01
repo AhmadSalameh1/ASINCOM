@@ -67,7 +67,8 @@ DCS = ["North", "South", "West"]
 
 
 class Twin:
-    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample", lead_stream="global", observer=None):
+    def __init__(self, inp, seed=0, forecast_mode="replay", demand_mode="sample", line_rule="erpsim", others="mrp", push_rule="lag1", mrp_timing="recorded", dc_split="fixed", policy="mrp", changeover_days=0.6, scenario=None, controller=None, lead_mode="sample", lead_stream="global", observer=None,
+                 reseed_from=None):
         if forecast_mode != "replay":
             raise NotImplementedError("only the replay forecast mode is implemented and validated so far")
         self.demand_mode, self.line_rule, self.others, self.push_rule = demand_mode, line_rule, others, push_rule
@@ -81,6 +82,9 @@ class Twin:
         # for comparing decisions, AI layer L2)
         self.lead_stream, self.seed = lead_stream, seed
         self.observer = observer     # called as observer(twin, day) at the start of every day (AI layer L1 features)
+        # (day, seed2): with keyed lead streams, POs created from `day` on draw from seed2 instead of seed, so the
+        # history before `day` is identical to the run with `seed` (twin rollouts from an observed state)
+        self.reseed_from = reseed_from
         self.controller = controller
         if policy == "controller" and controller is None:
             raise ValueError("policy='controller' needs a controller object")
@@ -190,7 +194,10 @@ class Twin:
         if self.lead_stream == "keyed" and day is not None:
             key = (material, day)
             k = self._po_count[key] = self._po_count.get(key, -1) + 1
-            g = np.random.default_rng([self.seed, self.components.index(material), day, k])
+            sd = self.seed
+            if self.reseed_from is not None and day >= self.reseed_from[0]:
+                sd = self.reseed_from[1]
+            g = np.random.default_rng([sd, self.components.index(material), day, k])
             return int(g.choice(vals, p=p))
         return int(self.rng.choice(vals, p=p))
 

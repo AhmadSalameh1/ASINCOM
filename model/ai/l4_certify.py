@@ -8,7 +8,7 @@ Each test set is a sample of episodes never used to build or calibrate anything 
 and disruptions), and every outcome is a twin run. So the satisfaction rate is a binomial proportion and its
 95 % Clopper-Pearson interval is a valid certificate for that population:
   level 1  per year: normal 2 (the build year; an independent sample of 2,000 episodes generated from a
-           separate random stream), fraud 2 and fraud 3 (other player teams)
+           separate random stream), fraud 2 and fraud 3 (later runs of the same group)
   level 2  per disruption type (the worst type bounds every type)
   level 3  across years: the guarantee holds for a year if its lower bound >= p*; reported per year
 Second property, do no harm: "the policy's loss exceeds the loss of the players' own plan by more than DELTA"
@@ -17,7 +17,7 @@ helps on average but often makes things worse would not be trustworthy.
 For comparison, the same certificates for the players' own response (none) and for L2 (black box). The
 certified level is reported (lower bound), not a pass/fail at an arbitrary p*: the attainable level is set
 by line stoppages, which no lever can repair (even the best action in hindsight meets L* in only about 84 % of normal 2 episodes).
-Because L2 built on normal 2 does not transfer to the other teams (l2_results.md), the fraud years are also
+Because L2 built on normal 2 does not transfer to the later runs (l2_results.md), the fraud years are also
 certified with the adapted tree (normal 2 + 400 target episodes), on the other 1,600 target episodes.
 The STRESS set (beyond the evidence) is reported but is outside the certified population.
 

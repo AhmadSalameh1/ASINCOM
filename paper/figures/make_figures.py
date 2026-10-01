@@ -2,7 +2,7 @@
 
   fig1_framework      the evidence-first pipeline: data -> twin (Python = UPPAAL) -> disruptions -> L1-L4
   fig2_validation     cumulative F12 sales and transfers: twin (median, 5-95 % band, 50 seeds) vs the recorded game
-  fig3_resilience     Phase E: extra lost demand per disruption level, per player team (same physics)
+  fig3_resilience     Phase E: extra lost demand per disruption level, per run (same physics, same player group, different decisions)
   fig4_l1_coverage    L1: prediction error and conformal coverage, in the build year and under shift
   fig5_l2_frontier    L2: lost demand vs added inventory capital, per policy
   fig6_tree           L3: the certified decision tree (normal 2)
@@ -39,7 +39,7 @@ COL, PAGE = 3.31, 6.85                     # inches: 8.4 cm column, 17.4 cm page
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 GREY, LIGHT, INK, INK2, GRID = "#6b6a65", "#c9c8c2", "#0b0b0b", "#52514e", "#e6e5e0"
 RUNS = ["normal_2", "fraud_2", "fraud_3"]
-YEAR = {"normal_2": "normal 2 (build year)", "fraud_2": "fraud 2", "fraud_3": "fraud 3"}
+YEAR = {"normal_2": "Y1 (build run)", "fraud_2": "Y2", "fraud_3": "Y3"}
 
 plt.rcParams.update({
     "font.family": "serif", "font.serif": ["Liberation Serif", "Times New Roman", "DejaVu Serif"],
@@ -74,21 +74,21 @@ def fig_framework(out):
     def arrow(x0, x1, y=11):
         ax.annotate("", xy=(x1, y), xytext=(x0, y), arrowprops=dict(arrowstyle="-|>", lw=0.7, color=INK2))
 
-    box(0.5, 2, 14.5, 18, "ERPsim SAP data", "3 game years,\nsame company\n(1 build,\n2 validation)\n+ USAID, DataCo")
+    box(0.5, 2, 14.5, 18, "ERPsim SAP data", "3 runs of one game,\nsame company and\nplayer group\n(Y1 build; Y2, Y3)\n+ USAID, DataCo")
     arrow(15.3, 16.9)
     box(17.2, 2, 15, 18, "Evidence first", "cleaning rules,\nevidence ledger,\n17 structure checks,\nMRP replica,\nprices (VBAP, EKPO)")
     arrow(32.5, 34.1)
-    box(34.4, 2, 16.5, 18, "Validated twin", "Python twin ≡ UPPAAL\n(generated; mirror\n591/591 configs);\npre-registered\nvalidation, 3 rounds")
+    box(34.4, 2, 16.5, 18, "Validated twin", "Python twin and\ngenerated UPPAAL\nmodel (591/591\nmirror configs);\nvalidation on Y2, Y3")
     arrow(51.2, 52.8)
     box(53.1, 2, 13.5, 18, "Disruptions", "E1–E5 sampled\nwithin evidence\nbounds; only the\nplayers' 3 levers")
     arrow(66.9, 68.5)
     w = 7.25
     labels = [("L1", "predict", "conformal\nbounds"), ("L2", "decide", "risk-\nbounded"),
-              ("L3", "explain", "tree,\nSHAP"), ("L4", "certify", "Clopper–\nPearson,\nUPPAAL\nSMC")]
+              ("L3", "explain", "tree,\nSHAP"), ("L4", "guarantee", "Clopper–\nPearson\nbounds")]
     for i, (k, t, b) in enumerate(labels):
         x = 68.8 + i * (w + 0.55)
         box(x, 2, w, 18, k, f"{t}\n\n{b}", edge=BLUE)
-    ax.text(68.8 + 2 * (w + 0.55) - 0.3, 21.4, "AI layers (built on one team, tested on the others)",
+    ax.text(68.8 + 2 * (w + 0.55) - 0.3, 21.4, "AI layers (built on Y1, tested on later runs Y2, Y3)",
             ha="center", va="bottom", fontsize=6, color=BLUE)
     save(fig, out, "fig1_framework")
 
@@ -175,8 +175,8 @@ def fig_resilience(out):
 def fig_l1(out):
     p = pd.read_csv(os.path.join(ROOT, "model", "ai", "results", "l1_primary.csv"))
     a = pd.read_csv(os.path.join(ROOT, "model", "ai", "results", "l1_ablation.csv"))
-    names = {"normal 2 held-out (interior)": "normal 2 (build year)", "fraud 2 (policy shift)": "fraud 2 (other team)",
-             "fraud 3 (policy shift)": "fraud 3 (other team)", "STRESS, all years (severity shift)": "beyond evidence"}
+    names = {"normal 2 held-out (interior)": "Y1 (build run)", "fraud 2 (policy shift)": "Y2 (later run)",
+             "fraud 3 (policy shift)": "Y3 (later run)", "STRESS, all years (severity shift)": "beyond evidence"}
     p["name"] = p.set.map(names)
     a["name"] = a.set.map(names)
     y = np.arange(len(p))[::-1]
@@ -232,9 +232,9 @@ def fig_l2(out):
             fx, fy = fixed.added_inv_eur / 1e3, fixed.lost_days
             pts = {"players": g[g.policy.str.startswith("players")].iloc[0],
                    "lookup rule": g[g.policy.str.startswith("type-rule")].iloc[0],
-                   "L2": g[g.policy.str.contains("conformal")].iloc[0],
+                   "L2": g[g.policy == "**L2 (conformal, risk-constrained)**"].iloc[0],
                    "oracle": g[g.policy.str.startswith("oracle")].iloc[0]}
-            title = "normal 2, held-out (build year)"
+            title = "Y1 held-out (build run)"
         else:
             rem = load(run).iloc[perm[400:]]
             fx = pd.Series([rem[f"addinv_{a}"].mean() / 1e3 for a in ACTIONS[1:]])
@@ -243,27 +243,27 @@ def fig_l2(out):
             b_ = tr[(tr.set == run) & tr.variant.str.startswith("built on normal 2")]
             pts = {"players": a_[a_.policy.str.startswith("players")].iloc[0],
                    "lookup rule": a_[a_.policy == "type-rule"].iloc[0],
-                   "L2 built on normal 2": b_[b_.policy == "L2"].iloc[0],
+                   "L2 built on Y1": b_[b_.policy == "L2"].iloc[0],
                    "L2": a_[a_.policy == "L2"].iloc[0],
                    "oracle": a_[a_.policy == "oracle"].iloc[0]}
-            title = f"{run.replace('_', ' ')} (other team; L2 adapted)"
+            title = f"{YEAR[run]} (later run; L2 adapted)"
         ax.scatter(fx, fy, s=12, color=LIGHT, zorder=2, label="fixed actions")
         style = {"players": dict(color=GREY, marker="o", s=22), "lookup rule": dict(color=ORANGE, marker="s", s=20),
                  "L2": dict(color=BLUE, marker="o", s=30),
-                 "L2 built on normal 2": dict(color="white", edgecolor=BLUE, marker="o", s=26, linewidth=1.0),
+                 "L2 built on Y1": dict(color="white", edgecolor=BLUE, marker="o", s=26, linewidth=1.0),
                  "oracle": dict(color="white", edgecolor=INK, marker="*", s=42, linewidth=0.8)}
-        if "L2 built on normal 2" in pts:
-            p0, p1 = pts["L2 built on normal 2"], pts["L2"]
+        if "L2 built on Y1" in pts:
+            p0, p1 = pts["L2 built on Y1"], pts["L2"]
             ax.annotate("", xy=(p1.added_inv_eur / 1e3, p1.lost_days), xytext=(p0.added_inv_eur / 1e3, p0.lost_days),
                         arrowprops=dict(arrowstyle="-|>", lw=0.7, color=BLUE, shrinkA=4, shrinkB=4))
-        offs = {"players": (4, -9), "L2 built on normal 2": (5, 2), "L2": (5, 3), "lookup rule": (-4, 5),
+        offs = {"players": (4, -9), "L2 built on Y1": (5, 2), "L2": (5, 3), "lookup rule": (-4, 5),
                 "oracle": (5, 2)}
         has = {"lookup rule": "right"}
         for name, r in pts.items():
             ax.scatter(r.added_inv_eur / 1e3, r.lost_days, zorder=4, label=name, **style[name])
             dx, dy = offs[name]
             ax.annotate(name, (r.added_inv_eur / 1e3, r.lost_days), xytext=(dx, dy), textcoords="offset points",
-                        fontsize=5.8, color=INK, ha=has.get(name, "left"))
+                        fontsize=6.2, color=INK, ha=has.get(name, "left"))
         ax.set_title(title)
         ax.set_xlabel("added inventory capital (k€)")
         if j == 0:
@@ -271,7 +271,9 @@ def fig_l2(out):
         ax.set_xlim(left=-15)
         ax.margins(y=0.14)
     h, l = axes[1].get_legend_handles_labels()
-    axes[0].legend([h[0]], [l[0]], loc="lower right", handletextpad=0.2)
+    lab = {"L2": "L2 (Y1: built on Y1; Y2, Y3: adapted)", "L2 built on Y1": "L2 built on Y1, not adapted"}
+    fig.legend(h, [lab.get(x, x) for x in l], loc="upper center", ncol=6, bbox_to_anchor=(0.5, 1.06),
+               handletextpad=0.2, columnspacing=1.0)
     fig.tight_layout(w_pad=0.8)
     save(fig, out, "fig5_l2_frontier")
 
@@ -323,8 +325,8 @@ def fig_tree(out):
                                (t["right"][n], "yes" if FEATURES[t["feature"][n]] == "type_E3" else ">")):
                 cx, cd = pos[child]
                 cy = sy(cd) + stag.get(child, 0)
-                ax.plot([sx(x), sx(cx)], [sy(dpt) - 4, cy + 5], color=LIGHT, lw=0.8, zorder=1)
-                ax.text((sx(x) + sx(cx)) / 2, (sy(dpt) - 4 + sy(cd) + 5) / 2, lab, fontsize=5.8, color=INK2,
+                ax.plot([sx(x), sx(cx)], [sy(dpt) - 4, cy + 5], color=GREY, lw=0.8, zorder=1)
+                ax.text((sx(x) + sx(cx)) / 2, (sy(dpt) - 4 + sy(cd) + 5) / 2, lab, fontsize=6.5, color=INK, fontweight="bold",
                         ha="center", va="center", bbox=dict(boxstyle="round,pad=0.1", fc="white", ec="none"))
     for n, (x, dpt) in pos.items():
         f = t["feature"][n]
@@ -368,46 +370,48 @@ def cp(k, n):
 def fig_certificates(out):
     c = pd.read_csv(os.path.join(ROOT, "model", "ai", "results", "l4_certificates.csv"))
     m = smc_values()
-    sel = {"normal_2": ("normal 2, independent certification sample", "players (no response)",
-                        "**tree (explainable, certified)**"),
-           "fraud_2": ("fraud 2, other 1,600 episodes", "players (no response)", "**adapted tree**"),
-           "fraud_3": ("fraud 3, other 1,600 episodes", "players (no response)", "**adapted tree**")}
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(PAGE, 2.15), gridspec_kw={"width_ratios": [1.5, 1]})
-    y0 = np.arange(3)[::-1] * 1.0
-    for j, run in enumerate(RUNS):
-        s, pp, pt = sel[run]
-        for k, (pol, col, mk, lab) in enumerate([(pp, GREY, "o", "players"), (pt, BLUE, "o", "tree")]):
+    # rows: (label, l4 set, tree policy name, mirror run or None)
+    rows = [("Y1 (build run)", "normal 2, independent certification sample", "**tree (explainable, certified)**", "normal_2"),
+            ("Y2, tree built on Y1", "fraud 2, other 1,600 episodes", "tree built on normal 2", None),
+            ("Y2, adapted tree", "fraud 2, other 1,600 episodes", "**adapted tree**", "fraud_2"),
+            ("Y3, adapted tree", "fraud 3, other 1,600 episodes", "**adapted tree**", "fraud_3")]
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(PAGE, 2.45), gridspec_kw={"width_ratios": [1.5, 1]})
+    y0 = np.arange(len(rows))[::-1] * 1.0
+    seen = set()
+    for j, (lab_row, s, pt, mrun) in enumerate(rows):
+        for k, (pol, col, lab) in enumerate([("players (no response)", GREY, "players"), (pt, BLUE, "tree")]):
             r = c[(c.set == s) & (c.policy == pol)].iloc[0]
-            kk = round(r.service * r.n)
-            lo, hi = cp(kk, r.n)
-            yy = y0[j] + (0.33 if k == 0 else -0.03)
+            lo, hi = cp(round(r.service * r.n), r.n)
+            yy = y0[j] + (0.30 if k == 0 else -0.02)
             ax1.plot([lo * 100, hi * 100], [yy, yy], color=col, lw=1.4, solid_capstyle="round")
-            ax1.scatter([r.service * 100], [yy], s=18, color=col, zorder=3,
-                        label=f"{lab}, Python episodes" if j == 0 else None)
-            mm = m[(m.run == run) & (m.policy == ("players" if k == 0 else "tree"))].iloc[0]
-            ym = yy - 0.14
-            ax1.plot([mm.lo * 100, mm.hi * 100], [ym, ym], color=col, lw=0.8, alpha=0.7)
-            ax1.scatter([mm.p * 100], [ym], s=15, color="white", edgecolor=col, linewidth=0.9, zorder=3,
-                        label=f"{lab}, UPPAAL model (SMC)" if j == 0 else None)
+            key = f"{lab}, Python episodes"
+            ax1.scatter([r.service * 100], [yy], s=18, color=col, zorder=3, label=key if key not in seen else None)
+            seen.add(key)
+            if mrun is not None:
+                mm = m[(m.run == mrun) & (m.policy == ("players" if k == 0 else "tree"))].iloc[0]
+                ym = yy - 0.14
+                ax1.plot([mm.lo * 100, mm.hi * 100], [ym, ym], color=col, lw=0.8, alpha=0.7)
+                key = f"{lab}, generated UPPAAL model (Python mirror)"
+                ax1.scatter([mm.p * 100], [ym], s=15, color="white", edgecolor=col, linewidth=0.9, zorder=3,
+                            label=key if key not in seen else None)
+                seen.add(key)
             if k == 1:
                 h = c[(c.set == s) & (c.policy == pol)].iloc[0]
                 ax2.barh(y0[j], h.harm_hi * 100, height=0.32, color=BLUE, alpha=0.85)
-                ax2.barh(y0[j], h.harm * 100, height=0.32, color="white", alpha=0.0)
                 ax2.text(h.harm_hi * 100 + 0.2, y0[j], f"≤ {h.harm_hi:.1%}  (observed {h.harm:.1%})",
                          va="center", fontsize=5.9, color=INK)
-    labs = ["normal 2 (build year)", "fraud 2 (adapted tree)", "fraud 3 (adapted tree)"]
     ax1.set_yticks(y0)
-    ax1.set_yticklabels(labs)
-    ax1.set_xlabel("P(60-day loss ≤ 1 day of demand), % with 95 % CI")
-    ax1.legend(loc="lower center", ncol=2, handletextpad=0.2, columnspacing=0.8, bbox_to_anchor=(0.5, 1.12))
-    ax1.set_title("(a) certified service level", pad=34)
+    ax1.set_yticklabels([r[0] for r in rows])
+    ax1.set_xlabel("P(60-day loss ≤ 1 day of demand), %, two-sided 95 % Clopper–Pearson")
+    ax1.legend(loc="lower center", ncol=2, handletextpad=0.2, columnspacing=0.8, bbox_to_anchor=(0.5, 1.10))
+    ax1.set_title("(a) service level", pad=34)
     ax1.grid(axis="y", visible=False)
     ax2.set_yticks(y0)
     ax2.set_yticklabels([])
-    ax2.set_xlim(0, 13)
-    ax2.set_xlabel("P(tree worse than players by > 0.05 days), %")
+    ax2.set_xlim(0, 10)
+    ax2.set_xlabel("P(tree loses > 0.05 days more than players), %")
     ax2.set_ylim(ax1.get_ylim())
-    ax2.set_title("(b) certified harm (95 % upper bound)", pad=34)
+    ax2.set_title("(b) harm (upper bound of two-sided 95 % CI)", pad=34)
     ax2.grid(axis="y", visible=False)
     fig.tight_layout(w_pad=0.8)
     save(fig, out, "fig7_certificates")
