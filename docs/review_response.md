@@ -1,5 +1,7 @@
 # Response to the mock review panel (INCOM 2027 draft)
 
+**Figure numbers changed:** the framework figure was dropped, so the reviewers' Fig. 2 (L2), Fig. 3 (tree) and Fig. 4 (certificates) are now Figs. 1, 2 and 3.
+
 Each point of the meta-review is answered below in its priority order. Every point gives what was checked, what changed in `paper/main.tex` and where the numbers come from. New statistics are in `model/ai/results/revision_stats.md` (script `model/ai/revision_stats.py`) and `model/ai/results/rollout_baseline.md` (script `model/ai/rollout_baseline.py`).
 
 ## 1. UPPAAL execution contradiction (all reviewers): accepted
@@ -102,7 +104,10 @@ The dataset article confirms that normal 2, fraud 2 and fraud 3 were all played 
 - **R1.5, R4.5, oracle:** now defined as the cheapest action meeting L\* ex post, else the least loss. It minimises violations, not mean loss, which is why a fixed action can lose less on average.
 - **R2.7, baselines:**
   - point-L2 is now in the text: same loss at half the spend, so the conformal margin adds caution, not value.
-  - The twin-rollout baseline (sample-average approximation, K = 4 rollouts per action with fresh lead times after the notice) is in `rollout_baseline.md` and in §6.
+  - Twin-rollout baseline (sample-average approximation, K = 4 rollouts per action from the observed state, fresh lead times after the notice), on 1,000 certification episodes:
+    - **Fair version** (demand after the notice resampled from the 20 days before it; `rollout_baseline_resampled.md`): loses 1.78 days against 1.53 for L2, and meets the limit *less* often than the players (75.6 % vs 77.9 %). It is in §6.
+    - **With the recorded future demand** (`rollout_baseline.md`): matches the oracle (83.1 % vs 83.2 %). The rollout's value therefore lies in knowing demand, which a planner does not.
+    - On the Y2 twin, without adaptation, the fair rollout loses 1.24 days (adapted L2 1.22, adapted tree 1.14; 1,000 episodes). Not in the paper, for space.
   - Stratego synthesis with a dtControl export is named as the next baseline. It was not run, because UPPAAL is not available in the build environment.
 - **R2.6, recalibration on a single draw:** now repeated over 200 resamples, evaluated on the remaining episodes. Y2 gives 90.4 % (SD 2.7, 85.9–94.8) and Y3 89.8 % (SD 3.1). Widths are reported: 1.04 / 0.95 days, against 1.02 / 0.93 for the build-run bound.
 - **R1.7, managerial conclusion:** "a twin per team" is replaced by "recalibrate or adapt when the policy state shifts", with drift of L1's coverage as a detection signal (adaptive conformal inference).

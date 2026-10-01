@@ -11,8 +11,6 @@
 \usepackage{siunitx}
 \sisetup{group-separator={,},group-minimum-digits=4}
 
-% Pending results (filled in when model/ai/rollout_baseline.py and revision_stats.py finish):
-\providecommand{\ROLLOUT}{}
 \begin{document}
 \begin{frontmatter}
 
@@ -87,8 +85,7 @@ schemes \citep{barber2023beyond}, and to decisions by risk control and conformal
 as controller representations \citep{ashok2020dtcontrol}. Statistical model checking (SMC) estimates the
 probability of temporal properties with confidence bounds \citep{legay2010smc}; UPPAAL SMC and Stratego support
 stochastic models and strategy synthesis \citep{david2015uppaalsmc,david2015stratego}, and SMC has evaluated the
-robustness of production schedules \citep{himmiche2018smc}. We combine these elements on a twin whose evidence
-base and validation are part of the contribution, and test transfer across changes of the decision policy.
+robustness of production schedules \citep{himmiche2018smc}. We combine them on a twin whose evidence and validation are part of the contribution.
 
 %% ------------------------------------------------------------------------------------------------------------
 \section{An evidence-first twin}
@@ -145,9 +142,8 @@ maximum difference $10^{-10}$ units). This checks the generator, not UPPAAL itse
 \section{Disruptions within evidence, and the levers}
 
 A disruption is admitted if it acts through a mechanism of the twin and its severity comes from evidence
-(Table~\ref{tab:disruptions}); external evidence is transferred only as dimensionless ratios. E1 uses the
-lateness of \num{10324} delivered shipments as a ratio to their planned lead time, on the assumption that late
-deliveries scale with lead time across sectors. E3 is capped at the shortest of the three recorded production
+(Table~\ref{tab:disruptions}); external evidence is transferred only as dimensionless ratios. E1 assumes that lateness scales with lead time across
+sectors. E3 is capped at the shortest of the three recorded production
 pauses (25, 52 and 60 days), so that every sampled stoppage is shorter than one the game produced. E5 delays a
 step that the game makes instantaneous; it is an extension beyond the validated physics, kept because its effect
 is small. A type is drawn uniformly, then a severity uniformly within its range (E1 by inverse sampling of the
@@ -226,8 +222,8 @@ a^*(x)=\begin{cases}
 The coverage of Eq.~(1) holds for each fixed action but not for the action selected after seeing all eight
 bounds, so L2 is a heuristic; only L4 carries a guarantee. Baselines: the players' plan, each fixed action, a
 lookup rule (per disruption type, the action with the lowest mean training loss), L2 with point predictions, a
-twin rollout that simulates each action from the observed state four times with fresh lead times and takes the
-lowest mean loss, and an oracle that knows the outcomes and takes the cheapest action meeting $L^*$, else the
+twin rollout that simulates each action from the observed state four times, with fresh lead times and the demand
+of the 20 days before the notice, and takes the lowest mean loss, and an oracle that knows the outcomes and takes the cheapest action meeting $L^*$, else the
 action with the least loss.
 
 \subsection{L3: explain}\label{sec:explain}
@@ -277,7 +273,9 @@ exceeds the limit in 19.8\,\%, acts in 34\,\% of episodes and adds 25\,k\euro{} 
 1.91 days and exceeds the limit in 19.2\,\%: even the best action in hindsight meets the limit in only 80.8\,\% of
 these episodes, because no lever repairs a long line stoppage. The lookup rule spends 124\,k\euro{} and loses
 more (2.11 days). Point predictions give the same loss (1.97 days) at half the spend: on loss, the conformal
-margin adds caution rather than value. \ROLLOUT{} With grouped splits L2 still beats the players on held-out days
+margin adds caution rather than value. On \num{1000} certification episodes the twin rollout loses 1.78 days against 1.53 for L2 and meets the limit
+less often than the players (75.6 vs 77.9\,\%); given the recorded future demand instead, it matches the oracle
+(83.1\,\%): its value lies in knowing demand. With grouped splits L2 still beats the players on held-out days
 (1.65 vs 1.98 days). Valued at the F12 margin, the avoided loss is worth about 3.8\,k\euro{} per disruption. In
 68\,\% of the certification episodes the first branch of Eq.~(2) applies and in 25\,\% the third; there the chosen
 action's bound covers its outcome in only 80\,\% of cases, against 88\,\% overall.
@@ -329,10 +327,6 @@ shortens the recovery but cannot replace lost line-days. The Python execution of
 rates within sampling error (players 78.3\,\%, tree 80.0\,\% in Y1; adapted tree 87.7\,\% in Y2, two-proportion
 tests, all six $p \ge 0.11$), which supports the implementation but is not independent evidence of validity.
 
-\textbf{Robustness to the shipping rule.} On episodes generated with plain transfer replay, shipping the stranded
-plant stock is the best action in every run, and coverage (89.5, 94.8, 94.4\,\%) and decision gains (46, 58,
-43\,\%) appear to transfer: the twin artefact concealed the transfer failure.
-
 %% ------------------------------------------------------------------------------------------------------------
 \section{Discussion}\label{sec:discussion}
 
@@ -343,8 +337,8 @@ explanation stability did not. Two repairs work: recalibrating the conformal mar
 and adapting the decision layer with a few hundred episodes of the target twin. Both need a validated twin of the
 current policy, so the practical rule is to recalibrate or adapt when the policy state shifts, for instance when
 the coverage of L1 on newly observed outcomes drifts, as in adaptive conformal inference \citep{gibbs2021aci}.
-The replay-rule artefact adds that validation down to the replay rules is a precondition for trustworthy AI on
-a twin.
+Validation down to the replay rules is a precondition: on episodes from plain transfer replay, shipping the
+stranded plant stock is best in every run, and coverage (89.5--94.8\,\%) and gains (43--58\,\%) seem to transfer.
 
 \textbf{Limitations.} The data come from a business game played by one student group, with censored demand and
 injected fraud; severity evidence is partly external, and disruptions are single; the guarantees hold under our

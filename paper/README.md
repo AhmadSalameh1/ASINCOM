@@ -4,7 +4,7 @@
 - `references.bib`: the bibliography.
 - `figures/`: built by `figures/make_figures.py` from the result files (see `figures/README.md`).
 - **Verified with the official IFAC class** (`ifacconf.cls` v1.3, 2022, supplied by the author; not committed because its licence forbids redistribution): 6 pages, no errors or warnings.
-- `tools/check_build.sh`: a local check build with a stand-in class (`tools/ifacconf-standin.cls`, IFAC-like layout: A4, 10 pt Times, two columns, 17.4 cm). It catches LaTeX errors and undefined references and gives an approximate page count. The current draft compiles cleanly to **6 pages** with it.
+- `tools/check_build.sh`: a local check build with a stand-in class (`tools/ifacconf-standin.cls`, IFAC-like layout: A4, 10 pt Times, two columns, 17.4 cm). It catches LaTeX errors and undefined references and gives an approximate page count. It runs slightly longer than the official class: the current draft is 7 pages with the stand-in and **6 pages with the official class**, which is the one that counts.
 
   **Submit with the official IFAC template** (e.g. the IFAC conference template on Overleaf): copy `main.tex`, `references.bib` and `figures/` into it.
 
