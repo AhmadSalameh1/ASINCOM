@@ -188,6 +188,15 @@ def section5(data):
     md.append(f"| per-type mean | {np.mean(np.abs(tm.predict(te) - te[TARGET].values)):.3f} | |")
     for _, r in abl.iterrows():
         md.append(f"| {r.model} | {r.MAE_days:.3f} | {r.spearman:.2f} |")
+    # cost model of L2 (random split, as used in the paper)
+    tr, cal, te = split_within(data["normal_2"])
+    m = L2().fit(tr, cal)
+    C = m.costs(te)
+    md.append("\n## 6. L2 cost model C_a: held-out error (Y1, added inventory capital in days of demand)\n")
+    md.append("| action | MAE | mean realised |")
+    md.append("|---|---|---|")
+    for a_ in ACTIONS[1:]:
+        md.append(f"| {a_} | {np.mean(np.abs(C[a_] - te[f'y_inv_{a_}'])):.3f} | {te[f'y_inv_{a_}'].mean():.3f} |")
     return md
 
 
